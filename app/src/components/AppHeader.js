@@ -8,17 +8,17 @@ import {
   MDBNavbarNav,
   MDBNavbarItem,
   MDBNavbarLink,
-  MDBBtn,
   MDBDropdown,
   MDBDropdownToggle,
   MDBDropdownMenu,
   MDBDropdownItem,
   MDBCollapse,
-  MDBTabs,
-  MDBTabsItem,
-  MDBTabsLink,
-  MDBTabsContent,
-  MDBTabsPane
+  // MDBBtn,
+  // MDBTabs,
+  // MDBTabsItem,
+  // MDBTabsLink,
+  // MDBTabsContent,
+  // MDBTabsPane
 } from 'mdb-react-ui-kit';
 
 

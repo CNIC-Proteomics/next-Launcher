@@ -5,9 +5,6 @@ const NavigationTabs = () => {
   return (
     <ul className="nav nav-tabs custom-tabs">
       <li className="nav-item">
-        <Link to="/" className="nav-link" aria-current="page">Main Page</Link>
-      </li>
-      <li className="nav-item">
         <Link to="/pipelines" className="nav-link">Pipelines</Link>
       </li>
       <li className="nav-item">

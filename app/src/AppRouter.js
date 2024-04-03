@@ -1,9 +1,9 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
 import NavigationTabs from './components/NavigationTabs';
-import MainPage from './components/MainPage';
+// import MainPage from './components/MainPage';
 import Pipelines from './components/Pipelines';
-import Launcher from './components/Launcher';
+import Parameters from './components/Parameters';
 
 const AppRouter = () => {
   return (
@@ -13,9 +13,12 @@ const AppRouter = () => {
       </div>
       <div className='app-container'>
         <Switch>
-          <Route path="/" exact component={MainPage} />
+          {/* <Route path="/" exact component={MainPage} /> */}
+          <Route exact path="/">
+            <Redirect to="/pipelines" />
+          </Route>
           <Route path="/pipelines" component={Pipelines} />
-          <Route path="/launcher" component={Launcher} />
+          <Route path="/parameters" component={Parameters} />
         </Switch>
       </div>
     </Router>

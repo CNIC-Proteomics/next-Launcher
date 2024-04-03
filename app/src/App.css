@@ -2,6 +2,14 @@
   text-align: center;
 }
 
+/*
+ * APP HEADER
+ */
+
+.app-header {
+  font-size: 14px !important;
+}
+
 .App-logo {
   height: 40vmin;
   pointer-events: none;
@@ -36,3 +44,73 @@
     transform: rotate(360deg);
   }
 }
+
+/*
+ * APP CONTAINER
+ */
+
+.app-container {
+  font-size: 12px !important;
+  margin: 0;
+  border-top: gainsboro solid 2px;
+}
+
+.app-description {
+  height: 100px;
+}
+
+/*
+ * NAVIGATION TABS
+ */
+
+.nav-tabs .nav-link {
+  text-transform: none !important;
+  font-size: 14px !important;
+}
+.custom-tabs .nav-link {
+  position: relative;
+  padding-bottom: 8px; /* Adjust as needed */
+}
+
+.custom-tabs .nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px; /* Height of the line */
+  background-color: transparent; /* Initial background color */
+  transition: background-color 0.3s ease; /* Smooth transition */
+}
+
+.custom-tabs .nav-link:hover::after {
+  background-color: #000000; /* Highlight color on hover */
+}
+
+/*
+ * PIPELINES DATATABLE
+ */
+
+.table-pipelines {
+  margin: 20px 60px;
+}
+
+table td {
+  font-size: 12px;
+}
+
+.table-pipelines .dataTables_scrollHead {
+  pointer-events: none;
+}
+
+.table-pipelines .btn {
+  text-transform: none;
+}
+
+.table-pipelines .btn-outline-primary:not([disabled]):not(.disabled):hover {
+  background-color: transparent !important;
+  border-color: #4285f4 !important;
+  box-shadow: 0 5px 11px 0 rgba(0,0,0,0.18), 0 4px 15px 0 rgba(0,0,0,0.15);
+}
+
+

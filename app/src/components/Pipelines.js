@@ -1,11 +1,11 @@
 // src/components/PipelineList.js
-
-
 import React from 'react';
 import {
   MDBIcon,
   MDBDataTable,
 } from 'mdbreact';
+import { Link } from 'react-router-dom';
+import { Button } from 'react-bootstrap';
 
 // Function to import JSON files dynamically
 const importAll = (r) => {
@@ -19,62 +19,59 @@ const importAll = (r) => {
 // Import all JSON files from the "pipelines" folder
 const pipelineFiles = importAll(require.context('../../public/pipelines', false, /\.json$/));
 
-
-
+// Create dynamically the Pipeline list
 const Pipelines = () => {
-  const transform = data => {
+  const transform = schema => {
     let icon
-    switch (data.id) {
+    switch (schema.id) {
         case 0:
-            icon = <MDBIcon id={data.id}  icon="times-circle" size="2x" className="red-text pr-3" />
+            icon = <MDBIcon id={schema.id}  icon="times-circle" size="2x" className="red-text pr-3" />
             break;
         case 1:
-            icon = <MDBIcon id={data.id}  icon="check-circle" size="2x" className="green-text pr-3" />
+            icon = <MDBIcon id={schema.id}  icon="check-circle" size="2x" className="green-text pr-3" />
             break;    
         case 2:
-            icon = <MDBIcon id={data.id}  icon="fas fa-ban" size="2x" className="red-text pr-3" />
+            icon = <MDBIcon id={schema.id}  icon="fas fa-ban" size="2x" className="red-text pr-3" />
             break;    
         default:
-          icon = <MDBIcon id={data.id}  icon="check-circle" size="2x" className="green-text pr-3" />
+          icon = <MDBIcon id={schema.id}  icon="check-circle" size="2x" className="green-text pr-3" />
             break;
     }
     const action = [
-        <button type="button" className="btn btn-outline-primary btn-sm m-0 waves-effect mr-3 ">Launch</button>, 
+        // <Link to={{ pathname: '/parameters', state: { schema: schema } }} type="button" className="btn btn-outline-primary btn-sm m-0 waves-effect mr-3">Create workflow</Link>
+        <Link to={{ pathname: '/parameters', state: { schema: schema } }}>
+          <Button variant="outline-primary" className="highlight-on-hover">Create workflow</Button>
+        </Link>
       ]
     return {
         icon: icon,
-        title: data.title,
-        description: data.description,
-        url: data.url,
+        title: schema.title,
+        description: schema.description,
+        url: schema.url,
         action: action }
   }
 
-  const [datatable, setDatatable] = React.useState({
+  const [datatable] = React.useState({
     columns: [
       {
         label: '',
         field: 'icon',
-        // width: 10,
       },
       {
         label: '',
         field: 'title',
-        // width: 150,
       },
       {
         label: '',
         field: 'description',
-        // width: 270,
       },
       {
         label: '',
         field: 'url',
-        // width: 200,
       },
       {
         label: '',
         field: 'action',
-        // width: 10,
       },
     ],
     rows: pipelineFiles.map(transform),
@@ -88,8 +85,8 @@ const Pipelines = () => {
       small
       paging={false}
       sortable={false}
-      searchBottom={false}
-      noHeader={true}
+      // searchBottom={false}
+      // noHeader={true}
       data={datatable}
     />
   </div>
