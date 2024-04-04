@@ -8,6 +8,8 @@ backend/build/nextflow/creds_smb_library
 backend/build/nextflow/template_sge_cell.conf
 
 # Source code
+backend/build/search_engine/MSFragger-3.8.zip
+backend/build/search_engine/ThermoRawFileParser1.4.2.zip
 backend/build/refrag/ReFrag/
 backend/build/shifts/SHIFTS-4/
 backend/build/solver/Solvers-PTMap/
