@@ -1,0 +1,14 @@
+_models
+_trace
+_workflows
+
+helm/.helmignore
+helm/.nextflow.log
+helm/.sops.yaml
+helm/templates/secret.yaml
+
+.ipynb_checkpoints
+*.json
+.nextflow*
+*.pkl
+*.pyc

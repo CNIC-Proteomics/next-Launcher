@@ -1,0 +1,42 @@
+<div class="row">
+	<div class="col">
+		<div class="card mb-4">
+			<h6 class="card-header">Workflows</h6>
+
+			<div class="card-body">
+				<a href="#!/workflows/0">Create workflow</a>
+			</div>
+
+			<div class="card-body">
+				<div class="button-group">
+					<button class="btn btn-light" ng-disabled="page == 0" ng-click="page > 0 && query(page - 1)">newer</button>
+					<button class="btn btn-light" ng-click="query(page + 1)">older</button>
+				</div>
+			</div>
+
+			<table class="table mb-0">
+				<th scope="col">ID</th>
+				<th scope="col">Date Created</th>
+				<th scope="col">Name</th>
+				<th scope="col">Pipeline</th>
+				<th scope="col">Status</th>
+				<th scope="col"></th>
+
+				<tr ng-repeat="w in workflows">
+					<td>
+						<a ng-href="#!/workflows/{{w._id}}">{{w._id.slice(0, 8)}}</a>
+					</td>
+					<td>{{w.date_created | date:'short'}}</td>
+					<td>{{w.name}}</td>
+					<td>{{w.pipeline}}</td>
+					<td>
+						<strong class="text-{{STATUS_COLORS[w.status]}}">{{w.status}}</strong>
+					</td>
+					<td class="text-center">
+						<span class="button-icon" ng-click="delete(w)">&times;</span>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+</div>

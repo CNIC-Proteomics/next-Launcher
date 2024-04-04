@@ -1,0 +1,76 @@
+version: 0.0.1
+
+services:
+
+  # mongodb:
+  #   image: mongo
+  #   container_name: mongodb
+  #   environment:
+  #     MONGO_INITDB_ROOT_USERNAME: myuser
+  #     MONGO_INITDB_ROOT_PASSWORD: mypassword
+  #   volumes:
+  #     - ./mongodb_data:/data/db
+  #   ports:
+  #     - "27017:27017"
+
+  nextflow:
+    image: 'nextflow'
+    container_name: 'nextflow'
+    build:
+      context: './backend/build/nextflow'
+      dockerfile: 'test.Dockerfile'
+    # depends_on:
+    #   - mongodb
+    # environment:
+    #   MONGODB_URI: mongodb://myuser:mypassword@mongodb:27017/mydb
+    ports:
+      - "8080:8080"
+    volumes:
+      - tierra:/mnt/tierra
+      - workspace:/workspace
+      - opt:/opt
+
+  # # BEGIN: DEPRECATED
+  search_engine:
+    image: 'search_engine'
+    container_name: 'search_engine'
+    build:
+      context: './backend/build/search_engine'
+      dockerfile: 'test.Dockerfile'
+    volumes:
+      - workspace:/workspace
+      - opt:/opt
+  # # END: DEPRECATED
+
+  # BEGIN: UNDER CONSTRUCTION
+  # web-app:
+  #   image: 'web-app'
+  #   container_name: 'web-app'
+  #   build:
+  #     context: './frontend/build'
+  #     dockerfile: 'web-app.Dockerfile'
+  #   ports:
+  #     - "3000:3000"
+  #   volumes:
+  #     - tierra:/mnt/tierra
+  #     - workspace:/workspace
+  # END: UNDER CONSTRUCTION
+
+volumes:
+
+  tierra:
+    name: 'tierra'
+    driver: 'local'
+    driver_opts:
+      type: 'cifs'
+      o: 'addr=tierra.cnic.es,domain=CNIC,username=jmrodriguezc,password=JaDe20-33!;'
+      device: '\\tierra.cnic.es\sc\U_Proteomica\UNIDAD\DatosCrudos\jmrodriguezc\projects\'
+
+  workspace:
+    name: 'workspace'
+    # driver: 'local'
+
+  opt:
+    name: 'opt'
+    # driver: 'local'
+

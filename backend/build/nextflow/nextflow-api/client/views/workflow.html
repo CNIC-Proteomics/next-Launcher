@@ -1,0 +1,235 @@
+<div class="row justify-content-center">
+	<div class="col-sm-6">
+		<div class="card mb-4">
+			<h6 class="card-header">Workflow</h6>
+
+			<form class="card-body" name="form">
+				<div class="form-group row" ng-show="workflow._id != '0'">
+					<label class="col-sm-3 col-form-label">ID</label>
+					<div class="col-sm-9">
+						<p class="form-control-plaintext">{{workflow._id}}</p>
+					</div>
+				</div>
+
+				<div class="form-group row" ng-show="workflow._id != '0'">
+					<label class="col-sm-3 col-form-label">Date Created</label>
+					<div class="col-sm-9">
+						<p class="form-control-plaintext">{{workflow.date_created | date:'short'}}</p>
+					</div>
+				</div>
+
+				<div class="form-group row" ng-show="workflow._id != '0'">
+					<label class="col-sm-3 col-form-label">Date Submitted</label>
+					<div class="col-sm-9">
+						<p class="form-control-plaintext">{{workflow.date_submitted | date:'short'}}</p>
+					</div>
+				</div>
+
+				<div class="form-group row">
+					<label class="col-sm-3 col-form-label">Name</label>
+					<div class="col-sm-9">
+						<input
+							class="form-control"
+							name="name"
+							ng-model="workflow.name"
+						/>
+					</div>
+				</div>
+
+				<div class="form-group row">
+					<label class="col-sm-3 col-form-label">Pipeline</label>
+					<div class="col-sm-9">
+						<input
+							class="form-control"
+							ng-class="{'is-invalid': form.pipeline.$touched && form.pipeline.$invalid}"
+							name="pipeline"
+							ng-model="workflow.pipeline"
+							required
+						/>
+					</div>
+				</div>
+
+				<div class="form-group row">
+					<label class="col-sm-3 col-form-label">Profiles</label>
+					<div class="col-sm-9">
+						<input
+							class="form-control"
+							ng-class="{'is-invalid': form.profiles.$touched && form.profiles.$invalid}"
+							name="profiles"
+							ng-model="workflow.profiles"
+							required
+						/>
+					</div>
+				</div>
+
+				<div class="form-group row">
+					<label class="col-sm-3 col-form-label">Revision</label>
+					<div class="col-sm-9">
+						<input
+							class="form-control"
+							ng-class="{'is-invalid': form.revision.$touched && form.revision.$invalid}"
+							name="revision"
+							ng-model="workflow.revision"
+							required
+						/>
+					</div>
+				</div>
+
+				<div class="form-group row">
+					<label class="col-sm-3 col-form-label">Params Format</label>
+					<div class="col-sm-9">
+						<select
+							class="form-control"
+							name="params_format"
+							ng-model="workflow.params_format">
+							<option value="json">JSON</option>
+							<option value="yaml">YAML</option>
+						</select>
+					</div>
+				</div>
+
+				<div class="form-group row">
+					<label class="col-sm-3 col-form-label">Params</label>
+					<div class="col-sm-9">
+						<textarea
+							class="form-control"
+							rows="8"
+							name="params_data"
+							ng-model="workflow.params_data">
+						</textarea>
+					</div>
+				</div>
+
+				<div class="form-group row">
+					<label class="col-sm-3 col-form-label">Input Directory</label>
+					<div class="col-sm-9">
+						<input
+							class="form-control"
+							ng-class="{'is-invalid': form.input_dir.$touched && form.input_dir.$invalid}"
+							name="input_dir"
+							ng-model="workflow.input_dir"
+							required
+						/>
+					</div>
+				</div>
+
+				<div class="form-group row">
+					<label class="col-sm-3 col-form-label">Output Directory</label>
+					<div class="col-sm-9">
+						<input
+							class="form-control"
+							ng-class="{'is-invalid': form.output_dir.$touched && form.output_dir.$invalid}"
+							name="output_dir"
+							ng-model="workflow.output_dir"
+							required
+						/>
+					</div>
+				</div>
+
+				<div class="form-group row" ng-show="workflow._id != '0'">
+					<label class="col-sm-3 col-form-label">Input Files</label>
+					<div class="col-sm-9">
+						<p class="form-control-plaintext" ng-show="workflow.input_files.length == 0">none</p>
+						<p class="form-control-plaintext" ng-repeat="f in workflow.input_files">
+							<a ng-href="api/workflows/{{workflow._id}}/download?path={{f}}" download>{{f}}</a>
+						</p>
+					</div>
+				</div>
+
+				<div class="form-group row" ng-show="workflow._id != '0'">
+					<label class="col-sm-3 col-form-label">Output Files</label>
+					<div class="col-sm-9">
+						<p class="form-control-plaintext" ng-show="workflow.output_files.length == 0">none</p>
+						<p class="form-control-plaintext" ng-repeat="f in workflow.output_files">
+							<a ng-href="api/workflows/{{workflow._id}}/download?path={{f}}" download>{{f}}</a>
+						</p>
+					</div>
+				</div>
+
+				<div class="form-group row" ng-show="workflow.output_data">
+					<label class="col-sm-3 col-form-label">Output Data</label>
+					<div class="col-sm-9">
+						<p class="form-control-plaintext">
+							<a ng-href="api/workflows/{{workflow._id}}/download" download>Download</a>
+						</p>
+					</div>
+				</div>
+
+				<hr>
+
+				<div class="text-center">
+					<button type="button" class="btn btn-outline-dark" ng-disabled="form.$invalid" ng-click="save(workflow)">Save</button>
+					<a href="/" class="btn btn-link">Cancel</a>
+				</div>
+			</form>
+		</div>
+
+		<div class="card mb-4" ng-show="workflow._id != '0'">
+			<h6 class="card-header">Input Data</h6>
+
+			<form class="card-body form-horizontal" name="input_files">
+				<div class="form-group row">
+					<label class="col-sm-3 col-form-label">Files</label>
+					<div class="col-sm-9">
+						<p class="form-control-plaintext" ng-show="uploader.queue.length == 0">none</p>
+						<p class="form-control-plaintext" ng-repeat="item in uploader.queue">{{item.file.name}}</p>
+
+						<input type="file" nv-file-select="" uploader="uploader" multiple/>
+					</div>
+				</div>
+
+				<div class="text-center">
+					<button type="button" class="btn btn-outline-dark" ng-click="upload()">
+						<span ng-show="uploading" class="spinner-border spinner-border-sm"></span>
+						<span ng-show="!uploading">Upload</span>
+					</button>
+				</div>
+			</form>
+		</div>
+
+		<div class="card mb-4" ng-show="workflow._id != '0'">
+			<h6 class="card-header">Execution</h6>
+
+			<form class="card-body form-horizontal" name="execution">
+				<div class="form-group row" ng-show="workflow.status">
+					<label class="col-sm-3 col-form-label">Status</label>
+					<div class="col-sm-9">
+						<p class="form-control-plaintext text-{{STATUS_COLORS[workflow.status]}}">
+							<strong>{{workflow.status}}</strong>
+						</p>
+					</div>
+				</div>
+
+				<div class="form-group row" ng-show="workflow.status">
+					<label class="col-sm-3 col-form-label">Attempts</label>
+					<div class="col-sm-9">
+						<p class="form-control-plaintext">
+							<strong>{{workflow.attempts}}</strong>
+						</p>
+					</div>
+				</div>
+
+				<div class="text-center">
+					<button type="button" class="btn btn-outline-dark" ng-disabled="workflow.status == 'running'" ng-click="workflow.status != 'running' && launch(workflow._id)">
+						<span ng-show="launching" class="spinner-border spinner-border-sm"></span>
+						<span ng-show="!launching">Launch</span>
+					</button>
+
+					<button type="button" class="btn btn-outline-dark" ng-disabled="workflow.status == 'running'" ng-click="workflow.status != 'running' && resume(workflow._id)">
+						<span ng-show="resuming" class="spinner-border spinner-border-sm"></span>
+						<span ng-show="!resuming">Resume</span>
+					</button>
+
+					<button type="button" class="btn btn-outline-dark" ng-disabled="workflow.status != 'running'" ng-click="workflow.status == 'running' && cancel(workflow._id)">
+						<span ng-show="cancelling" class="spinner-border spinner-border-sm"></span>
+						<span ng-show="!cancelling">Cancel</span>
+					</button>
+				</div>
+
+				<hr>
+
+				<pre class="border rounded p-2">{{workflow.log}}</pre>
+			</form>
+		</div>
+	</div>
+</div>

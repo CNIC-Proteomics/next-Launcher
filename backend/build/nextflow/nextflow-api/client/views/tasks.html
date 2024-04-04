@@ -1,0 +1,45 @@
+<div class="row">
+	<div class="col">
+		<div class="card mb-4">
+			<h6 class="card-header">Tasks</h6>
+
+			<form class="card-body" name="form">
+				<div class="form-group row">
+					<div class="col-sm-2">
+						<button type="button" class="btn btn-light" ng-disabled="page == 0" ng-click="page > 0 && query_tasks(page - 1)">newer</button>
+						<button type="button" class="btn btn-light" ng-click="query_tasks(page + 1)">older</button>
+					</div>
+					<div class="col-sm-5" ng-show="pipelines">
+						<select class="form-control" ng-model="pipeline" ng-options="p for p in pipelines" required></select>
+					</div>
+					<div class="col-sm-3" ng-show="pipelines">
+						<button type="button" class="btn btn-block btn-outline-dark" ng-disabled="archiving" ng-click="!archiving && archive(pipeline)">
+							<span ng-show="archiving" class="spinner-border spinner-border-sm"></span>
+							<span ng-show="!archiving">Create Archive</span>
+						</button>
+					</div>
+					<div class="col-sm-2" ng-show="archive_success">
+						<a class="btn btn-block btn-outline-dark" ng-href="api/tasks/archive/{{pipeline}}/download" download>Download</a>
+					</div>
+				</div>
+			</form>
+
+			<table class="table mb-0">
+				<th scope="col">ID</th>
+				<th scope="col">Run Name</th>
+				<th scope="col">Time</th>
+				<th scope="col">Event</th>
+				<th scope="col"></th>
+
+				<tr ng-repeat="t in tasks">
+					<td>
+						<a ng-href="#!/tasks/{{t._id}}">{{t._id.slice(0, 8)}}</a>
+					</td>
+					<td>{{t.runName}}</td>
+					<td>{{t.utcTime | date:'short'}}</td>
+					<td>{{t.event}}</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+</div>

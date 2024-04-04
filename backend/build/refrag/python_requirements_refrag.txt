@@ -1,0 +1,7 @@
+# Install Python packages for ReFrag
+pandas==2.0.3
+numpy==1.25.2
+pyopenms==3.1.0
+scipy==1.11.1
+shutup==0.2.0
+tqdm==4.66.1

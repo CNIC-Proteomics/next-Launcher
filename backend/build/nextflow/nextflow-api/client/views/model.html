@@ -1,0 +1,187 @@
+<div class="row justify-content-center">
+	<div class="col-sm-6">
+		<div class="card mb-4">
+			<h6 class="card-header">Query Dataset</h6>
+
+			<div class="card-body" ng-hide="pipelines">
+				<div class="text-center">
+					<span class="spinner-border spinner-border-sm"></span>
+					<span>Querying pipelines...</span>
+				</div>
+			</div>
+
+			<form class="card-body" name="form-query" ng-show="pipelines">
+				<div class="form-group row">
+					<label class="col-sm-3 col-form-label">Pipeline</label>
+					<div class="col-sm-9">
+						<select class="form-control" ng-model="pipeline" ng-options="p for p in pipelines"></select>
+					</div>
+				</div>
+
+				<div class="text-center">
+					<button type="button" class="btn btn-outline-dark" ng-disabled="querying" ng-click="!querying && query_dataset(pipeline)">
+						<span ng-show="querying" class="spinner-border spinner-border-sm"></span>
+						<span ng-show="!querying">Query</span>
+					</button>
+				</div>
+			</form>
+		</div>
+
+		<div class="card mb-4" ng-show="process_names">
+			<h6 class="card-header">Train Model</h6>
+
+			<form class="card-body" name="form-train">
+				<div class="form-group row">
+					<label class="col-sm-3 col-form-label">Process</label>
+					<div class="col-sm-9">
+						<select class="form-control" ng-model="train.process" ng-options="p for p in process_names" ng-change="update_columns(process_columns, train.process, args.merge_process)"></select>
+					</div>
+				</div>
+
+				<div class="form-group row">
+					<label class="col-sm-3 col-form-label">Join Process</label>
+					<div class="col-sm-9">
+						<select class="form-control" ng-model="args.merge_process" ng-options="p for p in process_names" ng-change="update_columns(process_columns, train.process, args.merge_process)">
+							<option></option>
+						</select>
+					</div>
+				</div>
+
+				<div class="form-group row" ng-show="args.merge_process">
+					<label class="col-sm-3 col-form-label">Join On</label>
+					<div class="col-sm-9">
+						<select class="form-control" ng-model="args.merge_key" ng-options="p for p in merge_columns"></select>
+					</div>
+				</div>
+
+				<div class="form-group row" ng-show="train.process">
+					<label class="col-sm-3 col-form-label">Inputs</label>
+					<div class="col-sm-9">
+						<select class="form-control" ng-model="args.inputs" ng-options="p for p in columns" multiple size="10"></select>
+					</div>
+				</div>
+
+				<div class="form-group row" ng-show="train.process">
+					<label class="col-sm-3 col-form-label">Target</label>
+					<div class="col-sm-9">
+						<select class="form-control" ng-model="args.target" ng-options="p for p in columns"></select>
+					</div>
+				</div>
+
+				<div class="form-group row" ng-show="train.process">
+					<label class="col-sm-3 col-form-label">Selectors</label>
+					<div class="col-sm-9">
+						<input class="form-control" ng-model="args.selectors"/>
+					</div>
+				</div>
+
+				<div class="form-group row" ng-show="train.process">
+					<label class="col-sm-3 col-form-label">Scaler</label>
+					<div class="col-sm-9">
+						<select class="form-control" ng-model="args.scaler" ng-options="v for v in ['maxabs', 'minmax', 'standard']">
+							<option></option>
+						</select>
+					</div>
+				</div>
+
+				<div class="form-group row" ng-show="train.process">
+					<label class="col-sm-3 col-form-label">Hidden Layers</label>
+					<div class="col-sm-9">
+						<input class="form-control" ng-model="args.hidden_layer_sizes" ng-pattern="/[\d\s]*/"/>
+					</div>
+				</div>
+
+				<div class="form-group row" ng-show="train.process">
+					<label class="col-sm-3 col-form-label">Epochs</label>
+					<div class="col-sm-9">
+						<input class="form-control" type="number" ng-model="args.epochs"/>
+					</div>
+				</div>
+
+				<div class="text-center">
+					<button type="button" class="btn btn-outline-dark" ng-disabled="training" ng-click="!training && train(pipeline, train.process, args)">
+						<span ng-show="training" class="spinner-border spinner-border-sm"></span>
+						<span ng-show="!training">Train</span>
+					</button>
+				</div>
+			</form>
+		</div>
+
+		<div class="card mb-4" ng-show="train.results">
+			<h6 class="card-header">Training Results</h6>
+
+			<div class="card-body">
+				<div class="form-group row">
+					<label class="col-sm-3 col-form-label">Prediction Error</label>
+					<div class="col-sm-9">
+						<p class="form-control-plaintext">{{train.results.mpe | number:3}} %</p>
+					</div>
+				</div>
+
+				<div class="form-group row">
+					<label class="col-sm-3 col-form-label">Coverage</label>
+					<div class="col-sm-9">
+						<p class="form-control-plaintext">{{train.results.cov | number:3}} %</p>
+					</div>
+				</div>
+			</div>
+
+			<div class="card-body text-center">
+				<img ng-src="data:image/png;base64,{{train.results.scatterplot}}"/>
+			</div>
+		</div>
+
+		<div class="card mb-4" ng-show="process_names">
+			<h6 class="card-header">Predict</h6>
+
+			<form class="card-body" name="form-get-config">
+				<div class="form-group row">
+					<label class="col-sm-3 col-form-label">Process</label>
+					<div class="col-sm-9">
+						<select class="form-control" ng-model="predict.process" ng-options="p for p in process_names"></select>
+					</div>
+				</div>
+
+				<div class="form-group row" ng-show="predict.process">
+					<label class="col-sm-3 col-form-label">Target</label>
+					<div class="col-sm-9">
+						<select class="form-control" ng-model="predict.target" ng-options="p for p in columns"></select>
+					</div>
+				</div>
+
+				<div class="text-center">
+					<button type="button" class="btn btn-outline-dark" ng-click="get_config(pipeline, predict.process, predict.target)">
+						<span>Get Config</span>
+					</button>
+				</div>
+			</form>
+
+			<form class="card-body" name="form-predict">
+				<div class="form-group row" ng-repeat="(key, options) in predict.options">
+					<label class="col-sm-3 col-form-label">{{key}}</label>
+					<div class="col-sm-9" ng-show="options">
+						<select class="form-control" ng-model="predict.inputs[key]" ng-options="v for v in options"></select>
+					</div>
+					<div class="col-sm-9" ng-hide="options">
+						<input class="form-control" ng-model="predict.inputs[key]"/>
+					</div>
+				</div>
+
+				<div class="text-center">
+					<button type="button" class="btn btn-outline-dark" ng-disabled="predicting" ng-click="!predicting && predict(pipeline, predict.process, predict.target, predict.inputs)">
+						<span ng-show="predicting" class="spinner-border spinner-border-sm"></span>
+						<span ng-show="!predicting">Predict</span>
+					</button>
+				</div>
+			</form>
+		</div>
+
+		<div class="card mb-4" ng-show="predict.results">
+			<h6 class="card-header">Prediction Results</h6>
+
+			<div class="card-body">
+				<pre class="pre-scrollable border rounded p-2">{{predict.results | json}}</pre>
+			</div>
+		</div>
+	</div>
+</div>

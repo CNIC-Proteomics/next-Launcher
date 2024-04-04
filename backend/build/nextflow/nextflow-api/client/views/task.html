@@ -1,0 +1,31 @@
+<div class="row justify-content-center">
+	<div class="col-sm-8">
+		<div class="card mb-4">
+			<h6 class="card-header">Task</h6>
+
+			<div class="card-body">
+				<pre class="border rounded p-2">{{task | json}}</pre>
+			</div>
+		</div>
+
+		<div class="card mb-4" ng-show="(task.event === 'process_started') || (task.event === 'process_completed')">
+			<h6 class="card-header">Logs</h6>
+
+			<div class="card-body">
+				<div class="text-center">
+					<button type="button" class="btn btn-outline-dark" ng-click="fetchLog()">Fetch Logs</button>
+				</div>
+
+				<hr>
+
+				<p>Output Log:</p>
+				<pre class="border rounded p-2">{{task_out}}</pre>
+
+				<hr>
+
+				<p>Error Log:</p>
+				<pre class="border rounded p-2">{{task_err}}</pre>
+			</div>
+		</div>
+	</div>
+</div>
