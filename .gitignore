@@ -15,6 +15,10 @@ backend/build/shifts/SHIFTS-4/
 backend/build/solver/Solvers-PTMap/
 backend/build/nextflow/sge/
 
+# Singularity
+backend/build/shifts/shifts.sif
+backend/build/solver/solver.sif
+
 
 #
 # Frontend ----
