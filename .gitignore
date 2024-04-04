@@ -1,2 +1,20 @@
+#
+# Backend ----
+#
+
+# Docker
+docker/build/nextflow/code_1.82.3-1696245001_amd64.deb
+
+
+# Singularity
+singularity/builds/search_engine/MSFragger-3.8
+singularity/builds/search_engine/search_engine.sif
+
+#
+# Frontend ----
+#
+
 # Node modules
-app/node_modules
+frontend/app/node_modules
+
+
