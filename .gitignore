@@ -3,12 +3,16 @@
 #
 
 # Docker
-docker/build/nextflow/code_1.82.3-1696245001_amd64.deb
+backend/build/nextflow/code_1.82.3-1696245001_amd64.deb
+backend/build/nextflow/creds_smb_library
+backend/build/nextflow/template_sge_cell.conf
 
+# Source code
+backend/build/refrag/ReFrag/
+backend/build/shifts/SHIFTS-4/
+backend/build/solver/Solvers-PTMap/
+backend/build/nextflow/sge/
 
-# Singularity
-singularity/builds/search_engine/MSFragger-3.8
-singularity/builds/search_engine/search_engine.sif
 
 #
 # Frontend ----
