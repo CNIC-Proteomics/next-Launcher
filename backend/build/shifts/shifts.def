@@ -8,17 +8,21 @@ From: ubuntu:22.04
 %help
     This is singularity container used for PTMs workflows based on SHIFTS.
 
+%arguments
+    # Declare variables
+    INSTALLATION_HOME=/opt/ptm-compass
+    SHIFTS_HOME=/opt/ptm-compass/shifts
+
 %setup
     # Create the home
-    INSTALLATION_HOME=/opt/ptm-compass
-    mkdir -p "${SINGULARITY_ROOTFS}${INSTALLATION_HOME}"
+    mkdir -p "${SINGULARITY_ROOTFS}{{INSTALLATION_HOME}}"
 
 %files
     # Obtain the SHIFTS folder
-    SHIFTS-4/ /opt/ptm-compass/shifts
+    SHIFTS-4/ {{SHIFTS_HOME}}
 
     # Obtain Python requirements
-    python_requirements_shifts.txt /opt/ptm-compass/shifts/
+    python_requirements_shifts.txt {{INSTALLATION_HOME}}
 
 %post
     # Install main packages
@@ -29,11 +33,10 @@ From: ubuntu:22.04
     python -m pip install --upgrade pip
     DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata python3-tk
 
-    # Create venv
-    cd /opt/ptm-compass/shifts && python -m venv env
-
-    # Requirements for Python
-    . /opt/ptm-compass/shifts/env/bin/activate && pip install -r /opt/ptm-compass/shifts/python_requirements_shifts.txt
+    # create venv
+    cd {{SHIFTS_HOME}} && python -m venv env
+    # requirements for Python
+    . {{SHIFTS_HOME}}/env/bin/activate && pip install -r {{INSTALLATION_HOME}}/python_requirements_shifts.txt
 
     # To end the build
     NOW=`date`
@@ -64,7 +67,7 @@ From: ubuntu:22.04
     fi
 
     # Check if SHIFTS has been installed
-    DIR=/opt/ptm-compass/shifts
+    DIR={{SHIFTS_HOME}}
     if [ -d "${DIR}" ]; then
         echo "The ${DIR} directory exists."
     else
@@ -73,11 +76,10 @@ From: ubuntu:22.04
     fi
 
     # Check if SHIFTS has been installed
-    SHIFTS_test=$(cd /opt/ptm-compass/shifts && . env/bin/activate && python SHIFTSadapter.py 2>&1 | grep "usage:")
+    SHIFTS_test=$(cd {{SHIFTS_HOME}} && . env/bin/activate && python SHIFTSadapter.py 2>&1 | grep "usage:")
     if [ "${SHIFTS_test}" != "" ]; then
         echo "SHIFTS ${SHIFTS_test} has been installed as expected."
     else
         echo "SHIFTS has not been installed."
-        # exit 1
+        exit 1
     fi
-

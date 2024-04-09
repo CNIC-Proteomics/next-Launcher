@@ -6,37 +6,42 @@ From: ubuntu:22.04
     Version v0.0.1
 
 %help
-    This is singularity container used for PTMs workflows based on Solvers-PTMmap.
+    ReCom rebuilt for MSFragger. Developed at the Cardiovascular Proteomics Lab / Proteomic Unit at CNIC (National Centre for Cardiovascular Research).
 
 %arguments
     # Declare variables
     INSTALLATION_HOME=/opt/ptm-compass
-    SOLVER_HOME=/opt/ptm-compass/solver
+    REFRAG_HOME=/opt/ptm-compass/refrag
 
 %setup
     # Create the home
     mkdir -p "${SINGULARITY_ROOTFS}{{INSTALLATION_HOME}}"
 
 %files
-    # Obtain the SOLVER folder
-    Solvers-PTMap/ {{SOLVER_HOME}}
+    # Obtain the REFRAG folder
+    ReFrag/ {{REFRAG_HOME}}
 
     # Obtain Python requirements
-    python_requirements_solver.txt {{INSTALLATION_HOME}}
+    python_requirements_refrag.txt {{INSTALLATION_HOME}}
 
 %post
     # Install main packages
     apt-get update -y
+
+    # Requirements for ReFrag (pyopenms)
+    apt-get install -y libglib2.0-0
+
 
     # Install Python packages
     apt-get -y install python-is-python3 python3-pip python3-venv
     python -m pip install --upgrade pip
     DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata python3-tk
 
+
     # create venv
-    cd {{SOLVER_HOME}} && python -m venv env
+    cd {{REFRAG_HOME}} && python -m venv env
     # requirements for Python
-    . {{SOLVER_HOME}}/env/bin/activate && pip install -r {{INSTALLATION_HOME}}/python_requirements_solver.txt
+    . {{REFRAG_HOME}}/env/bin/activate && pip install -r {{INSTALLATION_HOME}}/python_requirements_refrag.txt
 
     # To end the build
     NOW=`date`
@@ -66,8 +71,8 @@ From: ubuntu:22.04
         exit 1
     fi
 
-    # Check if SOLVER has been installed
-    DIR={{SOLVER_HOME}}
+    # Check if REFRAG has been installed
+    DIR={{REFRAG_HOME}}
     if [ -d "${DIR}" ]; then
         echo "The ${DIR} directory exists."
     else
@@ -75,11 +80,11 @@ From: ubuntu:22.04
         exit 1
     fi
 
-    # Check if SOLVER has been installed
-    SOLVER_test=$(cd {{SOLVER_HOME}} && . env/bin/activate && python DM0SOlver_V2.py 2>&1 | grep "usage:")
-    if [ "${SOLVER_test}" != "" ]; then
-        echo "SOLVER ${SOLVER_test} has been installed as expected."
+    # Check if REFRAG has been installed
+    REFRAG_test=$(cd {{REFRAG_HOME}} && . env/bin/activate && python ReFrag.py 2>&1 | grep "usage:")
+    if [ "${REFRAG_test}" != "" ]; then
+        echo "REFRAG ${REFRAG_test} has been installed as expected."
     else
-        echo "SOLVER has not been installed."
+        echo "REFRAG has not been installed."
         exit 1
     fi

@@ -7,7 +7,7 @@
 # Build in Singularity
 
 ```
-cd singularity\build\
+cd build\
 ```
 
 Building containers from SingularityCE definition files
@@ -15,8 +15,14 @@ Building containers from SingularityCE definition files
 cd search_engine
 sudo singularity  build  search_engine.sif  search_engine.def
 
-cd ptm-compass
-sudo singularity  build  ptm-compass.sif    ptm-compass.def
+cd shifts
+sudo singularity  build  shifts.sif    shifts.def
+
+cd solver
+sudo singularity  build  solver.sif  solver.def
+
+cd refrag
+sudo singularity  build  refrag.sif  refrag.def
 ```
 
 
@@ -25,8 +31,14 @@ Building container in sandbox from SingularityCE definition files
 cd search_engine
 sudo  singularity  build  --sandbox  /tmp/search_engine    search_engine.def
 
-cd ptm-compass
-sudo  singularity  build  --sandbox  /tmp/ptm-compass  ptm-compass.def
+cd shifts
+sudo  singularity  build  --sandbox  /tmp/shifts  shifts.def
+
+cd solver
+sudo  singularity  build  --sandbox  /tmp/solver  solver.def
+
+cd refrag
+sudo  singularity  build  --sandbox  /tmp/refrag  refrag.def
 ```
 
 
@@ -36,8 +48,11 @@ You can build into the same sandbox container multiple times (though the results
 cd search_engine
 sudo singularity  build  --update  --sandbox  /tmp/search_engine  search_engine.def
 
-cd ptm-compass
-sudo singularity  build  --update  --sandbox  /tmp/ptm-compass  ptm-compass/ptm-compass.def
+cd shifts
+sudo singularity  build  --update  --sandbox  /tmp/shifts  shifts.def
+
+cd solver
+sudo singularity  build  --update  --sandbox  /tmp/solver  solver.def
 ```
 
 
@@ -57,28 +72,28 @@ The shell command allows you to spawn a new shell within your container and inte
 ```
 singularity shell search_engine.sif
 
-singularity shell ptm-compass.sif
+singularity shell shifts.sif
 ```
 
 Enable to write in folder container (sandbox)
 ```
 sudo singularity shell --writable /tmp/search_engine
 
-sudo singularity shell --writable /tmp/ptm-compass
+sudo singularity shell --writable /tmp/shifts
 ```
 
 Enable to write in file container
 ```
 sudo singularity shell --writable-tmpfs search_engine.sif
 
-sudo singularity shell --writable-tmpfs ptm-compass.sif
+sudo singularity shell --writable-tmpfs shifts.sif
 ```
 
 Bind disk
 ```
 singularity shell --bind /mnt/tierra:/mnt/tierra search_engine.sif
 
-singularity shell --bind /mnt/tierra:/mnt/tierra ptm-compass.sif
+singularity shell --bind /mnt/tierra:/mnt/tierra shifts.sif
 ```
 
 
