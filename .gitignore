@@ -20,7 +20,8 @@ backend/build/shifts/shifts.sif
 backend/build/solver/solver.sif
 backend/build/refrag/refrag.sif
 backend/build/search_engine/search_engine.sif
-
+backend/build/backend.sif
+backend/build/ptm-compass.sif
 
 
 #

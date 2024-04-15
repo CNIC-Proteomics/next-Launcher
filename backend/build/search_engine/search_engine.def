@@ -19,7 +19,7 @@ From: ubuntu:22.04
 
 %arguments
     # Declare variables
-    INSTALLATION_HOME=/opt/search_engine
+    SEARCH_HOME=/opt/search_engine
     MSF_NAME=MSFragger-3.8
     MSF_HOME=/opt/search_engine/msfragger
     TPARSER_HOME=/opt/search_engine/thermorawfileparser
@@ -39,14 +39,14 @@ From: ubuntu:22.04
 
 %files
     # Obtain the MSFragger file
-    MSFragger-3.8.zip {{INSTALLATION_HOME}}/MSFragger.zip
+    MSFragger-3.8.zip {{SEARCH_HOME}}/MSFragger.zip
 
     # Obtain ThermoRawFileParser
-    ThermoRawFileParser1.4.2.zip {{INSTALLATION_HOME}}/ThermoRawFileParser.zip
+    ThermoRawFileParser1.4.2.zip {{SEARCH_HOME}}/ThermoRawFileParser.zip
 
     # Copy Python requirements
-    python_requirements_decoypyrat.txt  {{INSTALLATION_HOME}}
-    python_requirements_mzextractor.txt {{INSTALLATION_HOME}}
+    python_requirements_decoypyrat.txt  {{SEARCH_HOME}}
+    python_requirements_mzextractor.txt {{SEARCH_HOME}}
 
 %post
     # Install main packages
@@ -72,13 +72,13 @@ From: ubuntu:22.04
 
 
     # Uncompress MSFragger and rename jar file
-    unzip {{INSTALLATION_HOME}}/MSFragger.zip -d {{INSTALLATION_HOME}}
-    mv {{INSTALLATION_HOME}}/{{MSF_NAME}} {{MSF_HOME}}
+    unzip {{SEARCH_HOME}}/MSFragger.zip -d {{SEARCH_HOME}}
+    mv {{SEARCH_HOME}}/{{MSF_NAME}} {{MSF_HOME}}
     mv {{MSF_HOME}}/{{MSF_NAME}}.jar {{MSF_HOME}}/MSFragger.jar
 
 
     # Uncompress thermorawfileparser
-    unzip {{INSTALLATION_HOME}}/ThermoRawFileParser.zip -d {{TPARSER_HOME}}
+    unzip {{SEARCH_HOME}}/ThermoRawFileParser.zip -d {{TPARSER_HOME}}
 
 
     # Clone the CNIC dbscripts repository that contains the DecoyPYrat
@@ -86,7 +86,7 @@ From: ubuntu:22.04
     # create venv
     cd {{BIODATAHUB_HOME}} && python -m venv env
     # requirements for Python
-    . {{BIODATAHUB_HOME}}/env/bin/activate && pip install -r {{INSTALLATION_HOME}}/python_requirements_decoypyrat.txt
+    . {{BIODATAHUB_HOME}}/env/bin/activate && pip install -r {{SEARCH_HOME}}/python_requirements_decoypyrat.txt
 
 
     # Clone the programa that extract the qauntifications
@@ -94,7 +94,7 @@ From: ubuntu:22.04
     # create venv
     cd {{MZEXTRACTOR_HOME}} && python -m venv env
     # requirements for Python
-    . {{MZEXTRACTOR_HOME}}/env/bin/activate && pip install -r {{INSTALLATION_HOME}}/python_requirements_mzextractor.txt
+    . {{MZEXTRACTOR_HOME}}/env/bin/activate && pip install -r {{SEARCH_HOME}}/python_requirements_mzextractor.txt
 
 
     # To end the build

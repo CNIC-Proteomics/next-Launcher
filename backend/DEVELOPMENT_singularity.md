@@ -12,6 +12,9 @@ cd build\
 
 Building containers from SingularityCE definition files
 ```
+sudo singularity  build  backend.sif  backend.def
+sudo singularity  build  ptm-compass.sif  ptm-compass.def
+
 cd search_engine
 sudo singularity  build  search_engine.sif  search_engine.def
 
@@ -28,6 +31,8 @@ sudo singularity  build  refrag.sif  refrag.def
 
 Building container in sandbox from SingularityCE definition files
 ```
+sudo  singularity  build  --sandbox  /tmp/backend    backend.def
+
 cd search_engine
 sudo  singularity  build  --sandbox  /tmp/search_engine    search_engine.def
 

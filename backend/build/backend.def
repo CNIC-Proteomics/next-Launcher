@@ -1,0 +1,297 @@
+Bootstrap: library
+From: ubuntu:22.04
+
+%labels
+    Author jmrodriguezc@cnic.es
+    Version v0.0.1
+
+%help
+    This Singularity container is used for the PTM pipelines:
+    1. SearchEngine
+    2. ReFrag
+    3. SHIFTS
+    4. PTM-Solver
+
+%arguments
+    # Declare local folder
+    SEARCH_LOCAL=search_engine
+    REFRAG_LOCAL=refrag
+    SHIFTS_LOCAL=shifts
+    SOLVER_LOCAL=solver
+
+    # Declare variables
+    # SEARCH_ENGINE ---------------------------------------------------------------------------------------------
+    SEARCH_HOME=/opt/search_engine
+    MSF_NAME=MSFragger-3.8
+    MSF_HOME=/opt/search_engine/msfragger
+    TPARSER_HOME=/opt/search_engine/thermorawfileparser
+    BIODATAHUB_HOME=/opt/search_engine/biodatahub
+    MZEXTRACTOR_HOME=/opt/search_engine/mzextractor
+    
+    # REFRAG ---------------------------------------------------------------------------------------------
+    PTM_COMPASS_HOME=/opt/ptm-compass
+    REFRAG_HOME=/opt/ptm-compass/refrag
+
+    # SHIFTS ---------------------------------------------------------------------------------------------
+    PTM_COMPASS_HOME=/opt/ptm-compass
+    SHIFTS_HOME=/opt/ptm-compass/shifts
+
+    # SOLVER ---------------------------------------------------------------------------------------------
+    PTM_COMPASS_HOME=/opt/ptm-compass
+    SOLVER_HOME=/opt/ptm-compass/solver
+
+
+%environment
+    # Export env
+    # export MSF_HOME TPARSER_HOME
+
+%setup
+    # Create the home
+    mkdir -p "${SINGULARITY_ROOTFS}{{SEARCH_HOME}}"
+
+    # Create the ThermoRawFileParser home
+    mkdir -p "${SINGULARITY_ROOTFS}{{TPARSER_HOME}}"
+
+    # Create the home
+    mkdir -p "${SINGULARITY_ROOTFS}{{PTM_COMPASS_HOME}}"
+
+%files
+    # SEARCH_ENGINE ---------------------------------------------------------------------------------------------
+    # Obtain the MSFragger file
+    {{SEARCH_LOCAL}}/MSFragger-3.8.zip {{SEARCH_HOME}}/MSFragger.zip
+
+    # Obtain ThermoRawFileParser
+    {{SEARCH_LOCAL}}/ThermoRawFileParser1.4.2.zip {{SEARCH_HOME}}/ThermoRawFileParser.zip
+
+    # Copy Python requirements
+    {{SEARCH_LOCAL}}/python_requirements_decoypyrat.txt  {{SEARCH_HOME}}
+    {{SEARCH_LOCAL}}/python_requirements_mzextractor.txt {{SEARCH_HOME}}
+
+    # REFRAG ---------------------------------------------------------------------------------------------
+    # Obtain the REFRAG folder
+    {{REFRAG_LOCAL}}/ReFrag/ {{REFRAG_HOME}}
+
+    # Obtain Python requirements
+    {{REFRAG_LOCAL}}/python_requirements_refrag.txt {{PTM_COMPASS_HOME}}
+
+    # SHIFTS ---------------------------------------------------------------------------------------------
+    # Obtain the SHIFTS folder
+    {{SHIFTS_LOCAL}}/SHIFTS-4/ {{SHIFTS_HOME}}
+
+    # Obtain Python requirements
+    {{SHIFTS_LOCAL}}/python_requirements_shifts.txt {{PTM_COMPASS_HOME}}
+
+    # SOLVER ---------------------------------------------------------------------------------------------
+    # Obtain the SOLVER folder
+    {{SOLVER_LOCAL}}/Solvers-PTMap/ {{SOLVER_HOME}}
+
+    # Obtain Python requirements
+    {{SOLVER_LOCAL}}/python_requirements_solver.txt {{PTM_COMPASS_HOME}}
+
+%post
+    # Install main packages
+    apt-get update -y
+    apt-get install -y git
+    apt-get install -y unzip
+
+    # Install Python packages
+    apt-get -y install python-is-python3 python3-pip python3-venv
+    python -m pip install --upgrade pip
+    DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata python3-tk
+
+
+    # SEARCH_ENGINE ---------------------------------------------------------------------------------------------
+
+    # Requirements for MSFragger
+    apt-get install -y openjdk-19-jre-headless
+
+    # Requeriments for ThermoRawFileParser
+    apt-get install -y ca-certificates gnupg
+    # install mono (ThermoRawFileParser)
+    gpg --homedir /tmp --no-default-keyring --keyring /usr/share/keyrings/mono-official-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
+    echo "deb [signed-by=/usr/share/keyrings/mono-official-archive-keyring.gpg] https://download.mono-project.com/repo/ubuntu stable-focal main" | tee /etc/apt/sources.list.d/mono-official-stable.list
+    apt-get update -y
+    apt-get install -y mono-devel
+
+
+    # Uncompress MSFragger and rename jar file
+    unzip {{SEARCH_HOME}}/MSFragger.zip -d {{SEARCH_HOME}}
+    mv {{SEARCH_HOME}}/{{MSF_NAME}} {{MSF_HOME}}
+    mv {{MSF_HOME}}/{{MSF_NAME}}.jar {{MSF_HOME}}/MSFragger.jar
+
+
+    # Uncompress thermorawfileparser
+    unzip {{SEARCH_HOME}}/ThermoRawFileParser.zip -d {{TPARSER_HOME}}
+
+
+    # Clone the CNIC dbscripts repository that contains the DecoyPYrat
+    git clone https://github.com/CNIC-Proteomics/bioDataHub.git {{BIODATAHUB_HOME}}
+    # create venv
+    cd {{BIODATAHUB_HOME}} && python -m venv env
+    # requirements for Python
+    . {{BIODATAHUB_HOME}}/env/bin/activate && pip install -r {{SEARCH_HOME}}/python_requirements_decoypyrat.txt
+
+
+    # Clone the programa that extract the qauntifications
+    git clone https://github.com/CNIC-Proteomics/mz_extractor.git {{MZEXTRACTOR_HOME}}
+    # create venv
+    cd {{MZEXTRACTOR_HOME}} && python -m venv env
+    # requirements for Python
+    . {{MZEXTRACTOR_HOME}}/env/bin/activate && pip install -r {{SEARCH_HOME}}/python_requirements_mzextractor.txt
+
+
+    # REFRAG ---------------------------------------------------------------------------------------------
+
+    # Requirements for ReFrag (pyopenms)
+    apt-get install -y libglib2.0-0
+
+
+    # create venv
+    cd {{REFRAG_HOME}} && python -m venv env
+    # requirements for Python
+    . {{REFRAG_HOME}}/env/bin/activate && pip install -r {{PTM_COMPASS_HOME}}/python_requirements_refrag.txt
+
+
+    # SHIFTS ---------------------------------------------------------------------------------------------
+
+    # create venv
+    cd {{SHIFTS_HOME}} && python -m venv env
+    # requirements for Python
+    . {{SHIFTS_HOME}}/env/bin/activate && pip install -r {{PTM_COMPASS_HOME}}/python_requirements_shifts.txt
+
+
+    # SOLVER ---------------------------------------------------------------------------------------------
+
+    # create venv
+    cd {{SOLVER_HOME}} && python -m venv env
+    # requirements for Python
+    . {{SOLVER_HOME}}/env/bin/activate && pip install -r {{PTM_COMPASS_HOME}}/python_requirements_solver.txt
+
+
+
+    # To end the build
+    NOW=`date`
+    echo "export NOW=\"${NOW}\"" >> $SINGULARITY_ENVIRONMENT
+
+%runscript
+    echo "Container was created $NOW"
+    echo "Arguments received: $*"
+    exec echo "$@"
+
+%test
+    # Check if Ubuntu has been installed
+    grep -q NAME=\"Ubuntu\" /etc/os-release
+    if [ $? -eq 0 ]; then
+        echo "Container base is Ubuntu as expected."
+    else
+        echo "Container base is not Ubuntu."
+        exit 1
+    fi
+
+    # Check if Python has been installed
+    PYTHON_VER=$(python --version | awk '{print $2}' | tr -d '"')
+    if [ "${PYTHON_VER}" != "" ]; then
+        echo "Python ${PYTHON_VER} has been installed as expected."
+    else
+        echo "Python has not been installed."
+        exit 1
+    fi
+
+    # SEARCH_ENGINE ---------------------------------------------------------------------------------------------
+
+    # Check if Java has been installed
+    JAVA_VER=$(java -version 2>&1 >/dev/null | egrep "\S+\s+version" | awk '{print $3}' | tr -d '"')
+    if [ "${JAVA_VER}" != "" ]; then
+        echo "Java ${JAVA_VER} has been installed as expected."
+    else
+        echo "Java has not been installed."
+        exit 1
+    fi
+
+    # Check if MSFragger has been installed
+    FILE="{{MSF_HOME}}/MSFragger.jar"
+    if [ -f "${FILE}" ]; then
+        echo "The ${FILE} file exists."
+    else
+        echo "The ${FILE} file does not exit."
+        exit 1
+    fi
+
+    # Check if DecoyPYrat has been installed
+    DecoyPYrat_test=$(cd {{BIODATAHUB_HOME}} && . env/bin/activate && python src/decoyPYrat.v2.py 2>&1 | grep "usage:")
+    if [ "${DecoyPYrat_test}" != "" ]; then
+        echo "DecoyPYrat ${DecoyPYrat_test} has been installed as expected."
+    else
+        echo "DecoyPYrat has not been installed."
+        exit 1
+    fi
+
+    # Check if mzExtractor has been installed
+    mzExtractor_test=$(cd {{MZEXTRACTOR_HOME}} && . env/bin/activate && python mz_extractor.py 2>&1 | grep "usage:")
+    if [ "${mzExtractor_test}" != "" ]; then
+        echo "mzExtractor ${mzExtractor_test} has been installed as expected."
+    else
+        echo "mzExtractor has not been installed."
+        exit 1
+    fi
+
+    # REFRAG ---------------------------------------------------------------------------------------------
+
+    # Check if REFRAG has been installed
+    DIR={{REFRAG_HOME}}
+    if [ -d "${DIR}" ]; then
+        echo "The ${DIR} directory exists."
+    else
+        echo "The ${DIR} directory does not exit."
+        exit 1
+    fi
+
+    # Check if REFRAG has been installed
+    REFRAG_test=$(cd {{REFRAG_HOME}} && . env/bin/activate && python ReFrag.py 2>&1 | grep "usage:")
+    if [ "${REFRAG_test}" != "" ]; then
+        echo "REFRAG ${REFRAG_test} has been installed as expected."
+    else
+        echo "REFRAG has not been installed."
+        exit 1
+    fi
+
+    # SHIFTS ---------------------------------------------------------------------------------------------
+
+    # Check if SHIFTS has been installed
+    DIR={{SHIFTS_HOME}}
+    if [ -d "${DIR}" ]; then
+        echo "The ${DIR} directory exists."
+    else
+        echo "The ${DIR} directory does not exit."
+        exit 1
+    fi
+
+    # Check if SHIFTS has been installed
+    SHIFTS_test=$(cd {{SHIFTS_HOME}} && . env/bin/activate && python SHIFTSadapter.py 2>&1 | grep "usage:")
+    if [ "${SHIFTS_test}" != "" ]; then
+        echo "SHIFTS ${SHIFTS_test} has been installed as expected."
+    else
+        echo "SHIFTS has not been installed."
+        exit 1
+    fi
+
+
+    # SOLVER ---------------------------------------------------------------------------------------------
+
+    # Check if SOLVER has been installed
+    DIR={{SOLVER_HOME}}
+    if [ -d "${DIR}" ]; then
+        echo "The ${DIR} directory exists."
+    else
+        echo "The ${DIR} directory does not exit."
+        exit 1
+    fi
+
+    # Check if SOLVER has been installed
+    SOLVER_test=$(cd {{SOLVER_HOME}} && . env/bin/activate && python DM0SOlver_V2.py 2>&1 | grep "usage:")
+    if [ "${SOLVER_test}" != "" ]; then
+        echo "SOLVER ${SOLVER_test} has been installed as expected."
+    else
+        echo "SOLVER has not been installed."
+        exit 1
+    fi

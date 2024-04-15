@@ -1,0 +1,192 @@
+Bootstrap: library
+From: ubuntu:22.04
+
+%labels
+    Author jmrodriguezc@cnic.es
+    Version v0.0.1
+
+%help
+    This Singularity container is used for the PTM pipelines:
+    1. ReFrag
+    2. SHIFTS
+    3. PTM-Solver
+
+%arguments
+    # Declare local folder
+    REFRAG_LOCAL=refrag
+    SHIFTS_LOCAL=shifts
+    SOLVER_LOCAL=solver
+
+    # Declare variables
+    # REFRAG ---------------------------------------------------------------------------------------------
+    PTM_COMPASS_HOME=/opt/ptm-compass
+    REFRAG_HOME=/opt/ptm-compass/refrag
+
+    # SHIFTS ---------------------------------------------------------------------------------------------
+    PTM_COMPASS_HOME=/opt/ptm-compass
+    SHIFTS_HOME=/opt/ptm-compass/shifts
+
+    # SOLVER ---------------------------------------------------------------------------------------------
+    PTM_COMPASS_HOME=/opt/ptm-compass
+    SOLVER_HOME=/opt/ptm-compass/solver
+
+
+%environment
+    # Export env
+    # export MSF_HOME TPARSER_HOME
+
+%setup
+    # Create the home
+    mkdir -p "${SINGULARITY_ROOTFS}{{PTM_COMPASS_HOME}}"
+
+%files
+    # REFRAG ---------------------------------------------------------------------------------------------
+    # Obtain the REFRAG folder
+    {{REFRAG_LOCAL}}/ReFrag/ {{REFRAG_HOME}}
+
+    # Obtain Python requirements
+    {{REFRAG_LOCAL}}/python_requirements_refrag.txt {{PTM_COMPASS_HOME}}
+
+    # SHIFTS ---------------------------------------------------------------------------------------------
+    # Obtain the SHIFTS folder
+    {{SHIFTS_LOCAL}}/SHIFTS-4/ {{SHIFTS_HOME}}
+
+    # Obtain Python requirements
+    {{SHIFTS_LOCAL}}/python_requirements_shifts.txt {{PTM_COMPASS_HOME}}
+
+    # SOLVER ---------------------------------------------------------------------------------------------
+    # Obtain the SOLVER folder
+    {{SOLVER_LOCAL}}/Solvers-PTMap/ {{SOLVER_HOME}}
+
+    # Obtain Python requirements
+    {{SOLVER_LOCAL}}/python_requirements_solver.txt {{PTM_COMPASS_HOME}}
+
+%post
+    # Install main packages
+    apt-get update -y
+    apt-get install -y git
+    apt-get install -y unzip
+
+    # Install Python packages
+    apt-get -y install python-is-python3 python3-pip python3-venv
+    python -m pip install --upgrade pip
+    DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata python3-tk
+
+
+    # REFRAG ---------------------------------------------------------------------------------------------
+
+    # Requirements for ReFrag (pyopenms)
+    apt-get install -y libglib2.0-0
+
+
+    # create venv
+    cd {{REFRAG_HOME}} && python -m venv env
+    # requirements for Python
+    . {{REFRAG_HOME}}/env/bin/activate && pip install -r {{PTM_COMPASS_HOME}}/python_requirements_refrag.txt
+
+
+    # SHIFTS ---------------------------------------------------------------------------------------------
+
+    # create venv
+    cd {{SHIFTS_HOME}} && python -m venv env
+    # requirements for Python
+    . {{SHIFTS_HOME}}/env/bin/activate && pip install -r {{PTM_COMPASS_HOME}}/python_requirements_shifts.txt
+
+
+    # SOLVER ---------------------------------------------------------------------------------------------
+
+    # create venv
+    cd {{SOLVER_HOME}} && python -m venv env
+    # requirements for Python
+    . {{SOLVER_HOME}}/env/bin/activate && pip install -r {{PTM_COMPASS_HOME}}/python_requirements_solver.txt
+
+
+
+    # To end the build
+    NOW=`date`
+    echo "export NOW=\"${NOW}\"" >> $SINGULARITY_ENVIRONMENT
+
+%runscript
+    echo "Container was created $NOW"
+    echo "Arguments received: $*"
+    exec echo "$@"
+
+%test
+    # Check if Ubuntu has been installed
+    grep -q NAME=\"Ubuntu\" /etc/os-release
+    if [ $? -eq 0 ]; then
+        echo "Container base is Ubuntu as expected."
+    else
+        echo "Container base is not Ubuntu."
+        exit 1
+    fi
+
+    # Check if Python has been installed
+    PYTHON_VER=$(python --version | awk '{print $2}' | tr -d '"')
+    if [ "${PYTHON_VER}" != "" ]; then
+        echo "Python ${PYTHON_VER} has been installed as expected."
+    else
+        echo "Python has not been installed."
+        exit 1
+    fi
+
+    # REFRAG ---------------------------------------------------------------------------------------------
+
+    # Check if REFRAG has been installed
+    DIR={{REFRAG_HOME}}
+    if [ -d "${DIR}" ]; then
+        echo "The ${DIR} directory exists."
+    else
+        echo "The ${DIR} directory does not exit."
+        exit 1
+    fi
+
+    # Check if REFRAG has been installed
+    REFRAG_test=$(cd {{REFRAG_HOME}} && . env/bin/activate && python ReFrag.py 2>&1 | grep "usage:")
+    if [ "${REFRAG_test}" != "" ]; then
+        echo "REFRAG ${REFRAG_test} has been installed as expected."
+    else
+        echo "REFRAG has not been installed."
+        exit 1
+    fi
+
+    # SHIFTS ---------------------------------------------------------------------------------------------
+
+    # Check if SHIFTS has been installed
+    DIR={{SHIFTS_HOME}}
+    if [ -d "${DIR}" ]; then
+        echo "The ${DIR} directory exists."
+    else
+        echo "The ${DIR} directory does not exit."
+        exit 1
+    fi
+
+    # Check if SHIFTS has been installed
+    SHIFTS_test=$(cd {{SHIFTS_HOME}} && . env/bin/activate && python SHIFTSadapter.py 2>&1 | grep "usage:")
+    if [ "${SHIFTS_test}" != "" ]; then
+        echo "SHIFTS ${SHIFTS_test} has been installed as expected."
+    else
+        echo "SHIFTS has not been installed."
+        exit 1
+    fi
+
+
+    # SOLVER ---------------------------------------------------------------------------------------------
+
+    # Check if SOLVER has been installed
+    DIR={{SOLVER_HOME}}
+    if [ -d "${DIR}" ]; then
+        echo "The ${DIR} directory exists."
+    else
+        echo "The ${DIR} directory does not exit."
+        exit 1
+    fi
+
+    # Check if SOLVER has been installed
+    SOLVER_test=$(cd {{SOLVER_HOME}} && . env/bin/activate && python DM0SOlver_V2.py 2>&1 | grep "usage:")
+    if [ "${SOLVER_test}" != "" ]; then
+        echo "SOLVER ${SOLVER_test} has been installed as expected."
+    else
+        echo "SOLVER has not been installed."
+        exit 1
+    fi
