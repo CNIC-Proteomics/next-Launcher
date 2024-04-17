@@ -1,3 +1,11 @@
+/*
+ * APP HEADER
+ */
+
+ .app-header {
+  font-size: 14px !important;
+}
+
 .App {
   text-align: center;
 }
@@ -8,7 +16,7 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .App-logo {
+ .App-logo {
     animation: App-logo-spin infinite 20s linear;
   }
 }
@@ -35,4 +43,103 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+/*
+ * APP CONTAINER
+ */
+
+.app-container {
+  font-size: 12px !important;
+  margin-top: 0;
+  border-top: gainsboro solid 2px;
+}
+
+.app-description {
+  height: 100px;
+}
+
+/*
+ * NAVIGATION TABS
+ */
+
+.nav-tabs .nav-link {
+  text-transform: none !important;
+  font-size: 14px !important;
+}
+.custom-tabs .nav-link {
+  position: relative;
+  padding-bottom: 8px; /* Adjust as needed */
+}
+
+.custom-tabs .nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px; /* Height of the line */
+  background-color: transparent; /* Initial background color */
+  transition: background-color 0.3s ease; /* Smooth transition */
+}
+
+.custom-tabs .nav-link:hover::after {
+  background-color: #000000; /* Highlight color on hover */
+}
+
+/*
+ * PIPELINES DATATABLE
+ */
+
+.table-pipelines {
+  margin: 20px 60px;
+}
+
+table td {
+  font-size: 12px !important;
+}
+
+.table-pipelines .btn-outline-primary:hover {
+  background-color: transparent !important;
+  border-color: #4285f4 !important;
+  box-shadow: 0 5px 11px 0 rgba(0,0,0,0.18), 0 4px 15px 0 rgba(0,0,0,0.15);
+}
+
+/*
+ * PARAMETERS SECTION
+ */
+
+/* Sidebar */
+.sidebar {
+  /* position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  padding: 58px 0 0; */
+  position: relative;
+  right: 0;
+  padding: 10px;
+  /* Height of navbar */
+  box-shadow: 0 2px 5px 0 rgb(0 0 0 / 5%), 0 2px 10px 0 rgb(0 0 0 / 5%);
+  width: 240px;
+  /* z-index: 600; */
+}
+
+.sidebar .active {
+  border-radius: 5px;
+  box-shadow: 0 2px 5px 0 rgb(0 0 0 / 16%), 0 2px 10px 0 rgb(0 0 0 / 12%);
+}
+
+.list-group-item {
+  padding: 0.5rem 0;
+}
+
+.parameters {
+  margin-top: 10px;
+}
+
+.card-header {
+  text-align: left;
+  color: azure;
+  background-color: #8d8c8c;
 }

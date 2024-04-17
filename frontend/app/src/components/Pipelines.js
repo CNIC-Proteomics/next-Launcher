@@ -1,11 +1,9 @@
-// src/components/PipelineList.js
-
-
-import React from 'react';
+import React, { useState } from 'react';
 import {
   MDBIcon,
   MDBDataTable,
 } from 'mdbreact';
+import { Link } from 'react-router-dom';
 
 // Function to import JSON files dynamically
 const importAll = (r) => {
@@ -39,7 +37,12 @@ const Pipelines = () => {
             break;
     }
     const action = [
-        <button type="button" className="btn btn-outline-primary btn-sm m-0 waves-effect mr-3 ">Launch</button>, 
+        <Link to={{
+          pathname: '/parameters',
+          schema: data,
+        }}>
+          <button type="button" className="btn btn-outline-primary btn-sm m-0 mr-3 ">Launch</button>
+        </Link>,
       ]
     return {
         icon: icon,
@@ -49,7 +52,7 @@ const Pipelines = () => {
         action: action }
   }
 
-  const [datatable, setDatatable] = React.useState({
+  const [datatable] = useState({
     columns: [
       {
         label: '',
@@ -83,17 +86,29 @@ const Pipelines = () => {
   return (
     <div className="table-pipelines">
     <MDBDataTable
+      key='0'
       scrollY
       maxHeight="200px"
       small
       paging={false}
       sortable={false}
-      searchBottom={false}
-      noHeader={true}
       data={datatable}
     />
   </div>
   );
+
+
+//   <MDBDataTable
+//   scrollY
+//   maxHeight="200px"
+//   small
+//   paging={false}
+//   sortable={false}
+//   searchBottom={false}
+//   noHeader={true}
+//   data={datatable}
+// />
+
 //   <MDBDataTableV5
 //   hover
 //   data={datatable}

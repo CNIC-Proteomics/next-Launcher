@@ -1,80 +1,102 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "https://raw.githubusercontent.com/CNIC-Proteomics/nf-PTM-compass/main/nextflow_schema.json",
-  "title": "PTM-compass",
-  "description": "Nextflow for PTM-compass pipeline",
-  "url": "https://github.com/CNIC-Proteomics/nf-PTM-compass",
-  "type": "object",
-  "definitions": {
-      "input_options": {
-          "title": "Input options",
-          "type": "object",
-          "fa_icon": "fas fa-terminal",
-          "description": "Inputs required for the pipeline",
-          "required": [
-              "re_files",
-              "exp_table",
-              "database",
-              "decoy_prefix"
-          ],
-          "properties": {
-              "re_files": {
-                  "type": "string",
-                  "default": "/mnt/tierra/nf-PTM-compass/tests/test1/inputs/re_files",
-                  "format": "path",
-                  "description": "ReFrag (ReCom) result files",
-                  "fa_icon": "fas fa-file-contract",
-                  "help_text": "Under construction: Help for ReFrag results"
-              },
-              "exp_table": {
-                  "type": "string",
-                  "default": "/mnt/tierra/nf-PTM-compass/tests/test2/params/experiment_table.txt",
-                  "description": "Experimental table file",
-                  "format": "file-path",
-                  "fa_icon": "fas fa-vials",
-                  "help_text": "Under construction"
-              },
-              "database": {
-                  "type": "string",
-                  "default": "/mnt/tierra/nf-PTM-compass/tests/test2/dbs/human_202104_uni-sw-tr.target-decoy.fasta",
-                  "description": "The fasta protein database used during database searc",
-                  "pattern": "^\\S+\\.(?:fasta|fa)$",
-                  "format": "file-path",
-                  "fa_icon": "fas fa-database",
-                  "help_text": "The fasta protein database used during database search."
-              },
-              "decoy_prefix": {
-                  "type": "string",
-                  "default": "DECOY_",
-                  "description": "Pre- or suffix of decoy proteins in their accession",
-                  "fa_icon": "fas fa-font"
-              }
-          }
-      },
-      "output_options": {
-          "title": "Output options",
-          "type": "object",
-          "fa_icon": "fas fa-terminal",
-          "description": "Outputs required for the pipeline",
-          "required": [
+"$schema": "http://json-schema.org/draft-07/schema",
+"$id": "https://raw.githubusercontent.com/CNIC-Proteomics/nf-PTM-compass/main/nextflow_schema.json",
+"title": "PTM-compass pipeline parameters",
+"description": "PTM-compass workflow",
+"url": "https://github.com/CNIC-Proteomics/nf-PTM-compass",
+"icon": "",
+"type": "object",
+"definitions": {
+    "input_output_options": {
+        "title": "Input/Output options",
+        "type": "object",
+        "fa_icon": "fas fa-terminal",
+        "description": "Inputs and outputs required for the pipeline",
+        "required": [
+            "re_files",
+            "exp_table",
+            "database",
+            "decoy_prefix",
             "outdir"
-          ],
-          "properties": {
-              "outdir": {
-                  "type": "string",
-                  "format": "directory-path",
-                  "description": "The output directory where the results will be saved. You have to use absolute paths to storage on Cloud infrastructure.",
-                  "fa_icon": "fas fa-folder-open"
-              }
-          }
-      }
-  },
-  "allOf": [
-      {
-          "$ref": "#/definitions/input_options"
-      },
-      {
-          "$ref": "#/definitions/output_options"
-      }
-  ]
+        ],
+        "properties": {
+            "re_files": {
+                "type": "string",
+                "default": "/mnt/tierra/nf-PTM-compass/tests/test1/inputs/re_files",
+                "format": "path",
+                "description": "ReFrag (ReCom) result files",
+                "fa_icon": "fas fa-file-import",
+                "help_text": "Under construction: Help for ReFrag results",
+                "mimetype": "text/plain"
+            },
+            "exp_table": {
+                "type": "string",
+                "default": "/mnt/tierra/nf-PTM-compass/tests/test2/params/experiment_table.txt",
+                "description": "Experimental table file",
+                "format": "file-path",
+                "fa_icon": "fas fa-vials",
+                "help_text": "Under construction"
+            },
+            "database": {
+                "type": "string",
+                "default": "/mnt/tierra/nf-PTM-compass/tests/test2/dbs/human_202104_uni-sw-tr.target-decoy.fasta",
+                "description": "The fasta protein database used during database searc",
+                "pattern": "^\\S+\\.(?:fasta|fa)$",
+                "format": "file-path",
+                "fa_icon": "fas fa-database",
+                "help_text": "The fasta protein database used during database search."
+            },
+            "decoy_prefix": {
+                "type": "string",
+                "default": "DECOY_",
+                "description": "Pre- or suffix of decoy proteins in their accession",
+                "fa_icon": "fas fa-font"
+            }
+        }
+    },
+    "parameter_options": {
+        "title": "Parameter options",
+        "type": "object",
+        "fa_icon": "fas fa-terminal",
+        "description": "Outputs required for the pipeline",
+        "required": [
+            "params_file"
+        ],
+        "properties": {
+            "params_file": {
+                "type": "string",
+                "format": "file-path",
+                "description": "File with the parameter for the programs in INI format",
+                "fa_icon": "fas fa-file-signature",
+                "help_text": "Under construction: Help for ReFrag results",
+                "mimetype": "text/plain"
+            }
+        }
+    },
+    "output_options": {
+        "title": "Output options",
+        "type": "object",
+        "fa_icon": "fas fa-terminal",
+        "description": "Outputs required for the pipeline",
+        "required": [
+          "outdir"
+        ],
+        "properties": {
+            "outdir": {
+                "type": "string",
+                "format": "directory-path",
+                "description": "The output directory where the results will be saved. You have to use absolute paths to storage on Cloud infrastructure.",
+                "fa_icon": "fas fa-folder-open"
+            }
+        }
+    }
+},
+"allOf": [
+    {
+        "$ref": "#/definitions/input_output_options"
+    },
+    {
+        "$ref": "#/definitions/parameter_options"
+    }
+]
 }
