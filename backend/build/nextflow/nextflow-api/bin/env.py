@@ -14,6 +14,7 @@ BASE_DIR = BASE_DIRS[NXF_EXECUTOR]
 
 MODELS_DIR = os.path.join(BASE_DIR, '_models')
 TRACE_DIR = os.path.join(BASE_DIR, '_trace')
+INPUTS_DIR = os.path.join(BASE_DIR, '_inputs')
 WORKFLOWS_DIR = os.path.join(BASE_DIR, '_workflows')
 
 # validate environment settings

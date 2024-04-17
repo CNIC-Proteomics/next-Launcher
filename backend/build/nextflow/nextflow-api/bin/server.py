@@ -41,6 +41,85 @@ def message(status, message):
 	}
 
 
+#-------------------------------------
+# INPUTS Classes
+#-------------------------------------
+
+class InputQueryHandler(tornado.web.RequestHandler):
+
+	async def get(self):
+		page = int(self.get_query_argument('page', 0))
+		page_size = int(self.get_query_argument('page_size', 100))
+
+		db = self.settings['db']
+		workflows = await db.workflow_query(page, page_size)
+
+		self.set_status(200)
+		self.set_header('content-type', 'application/json')
+		self.write(tornado.escape.json_encode(workflows))
+
+
+
+class InputCreateHandler(tornado.web.RequestHandler):
+
+	REQUIRED_KEYS = set([
+		'pipeline'
+	])
+
+	DEFAULTS = {
+		'name': '',
+		'attempts': 0
+	}
+
+	def get(self):
+		workflow = {**self.DEFAULTS, **{ '_id': '0' }}
+
+		self.set_status(200)
+		self.set_header('content-type', 'application/json')
+		self.write(tornado.escape.json_encode(workflow))
+
+	async def post(self):
+		db = self.settings['db']
+
+		# # make sure request body is valid
+		# try:
+		# 	data = tornado.escape.json_decode(self.request.body)
+		# 	missing_keys = self.REQUIRED_KEYS - data.keys()
+		# except json.JSONDecodeError:
+		# 	self.set_status(422)
+		# 	self.write(message(422, 'Ill-formatted JSON'))
+		# 	return
+
+		# if missing_keys:
+		# 	self.set_status(400)
+		# 	self.write(message(400, 'Missing required field(s): %s' % list(missing_keys)))
+		# 	return
+
+		# create input
+		input = {**self.DEFAULTS, **data, **{ 'status': 'nascent' }}
+		input['_id'] = str(bson.ObjectId())
+
+		# append creation timestamp to input
+		input['date_created'] = int(time.time() * 1000)
+
+		# # transform pipeline name to lowercase
+		# input['pipeline'] = input['pipeline'].lower() 
+
+		# save input
+		await db.input_create(input)
+
+		# create input directory
+		input_dir = os.path.join(env.INPUTS_DIR, input['_id'])
+		os.makedirs(input_dir)
+
+		self.set_status(200)
+		self.set_header('content-type', 'application/json')
+		self.write(tornado.escape.json_encode({ '_id': input['_id'] }))
+
+
+#-------------------------------------
+# WORKFLOW Classes
+#-------------------------------------
 
 class WorkflowQueryHandler(tornado.web.RequestHandler):
 
@@ -818,6 +897,11 @@ if __name__ == '__main__':
 
 	# initialize api endpoints
 	app = tornado.web.Application([
+		(r'/api/inputs', InputQueryHandler),
+		(r'/api/inputs/0', InputCreateHandler),
+		(r'/api/inputs/([a-zA-Z0-9-]+)', InputEditHandler),
+		# (r'/api/inputs/([a-zA-Z0-9-]+)/upload', InputUploadHandler),
+
 		(r'/api/workflows', WorkflowQueryHandler),
 		(r'/api/workflows/0', WorkflowCreateHandler),
 		(r'/api/workflows/([a-zA-Z0-9-]+)', WorkflowEditHandler),

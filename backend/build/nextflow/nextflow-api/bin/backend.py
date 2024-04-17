@@ -12,6 +12,12 @@ class Backend():
 	def initialize(self):
 		pass
 
+	async def input_query(self, page, page_size):
+		raise NotImplementedError()
+
+	async def input_create(self, data):
+		raise NotImplementedError()
+
 	async def workflow_query(self, page, page_size):
 		raise NotImplementedError()
 
@@ -53,6 +59,7 @@ class FileBackend(Backend):
 		# initialize empty database if pickle file doesn't exist
 		except FileNotFoundError:
 			self._db = {
+				'inputs': [],
 				'workflows': [],
 				'tasks': []
 			}
@@ -64,6 +71,36 @@ class FileBackend(Backend):
 	def save(self):
 		pickle.dump(self._db, open(self._url, 'wb'))
 
+	# ----------------
+	# Input functions
+	# ----------------
+	async def input_query(self, page, page_size):
+		self._lock.acquire()
+		self.load()
+
+		# sort inputs by date_created in descending order
+		self._db['inputs'].sort(key=lambda w: w['date_created'], reverse=True)
+
+		# return the specified page of inputs
+		inputs = self._db['inputs'][(page * page_size) : ((page + 1) * page_size)]
+
+		self._lock.release()
+
+		return inputs
+
+	async def input_create(self, input):
+		self._lock.acquire()
+		self.load()
+
+		# append input to list of input
+		self._db['inputs'].append(input)
+
+		self.save()
+		self._lock.release()
+
+	# ----------------
+	# Workflow functions
+	# ----------------
 	async def workflow_query(self, page, page_size):
 		self._lock.acquire()
 		self.load()
