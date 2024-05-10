@@ -22,7 +22,7 @@
         "properties": {
             "re_files": {
                 "type": "string",
-                "default": "/mnt/tierra/nf-PTM-compass/tests/test1/inputs/re_files",
+                "default": "/mnt/tierra/nf-PTM-compass/tests/test1/inputs/re_files/*",
                 "format": "path",
                 "description": "ReFrag (ReCom) result files",
                 "fa_icon": "fas fa-file-import",
