@@ -10,14 +10,14 @@ Now that you have your Dockerfile, you can build your image. The docker build co
 
 Open Windows Prompt:
 ```
-cd S:\U_Proteomica\UNIDAD\DatosCrudos\jmrodriguezc\projects\quantMS-PTM\backend\docker\build
+cd S:\U_Proteomica\UNIDAD\DatosCrudos\jmrodriguezc\projects\next-Launcher\backend\build
 
 docker build -t backend -f backend.Dockerfile .
 ```
 <!-- DEPRECATED
 ```
 cd build/nextflow
-docker build -t nextflow -f nextflow.Dockerfile .
+docker build -t backend -f backend.Dockerfile .
 
 cd build/search_engine
 docker build -t search_engine -f search_engine.Dockerfile .
@@ -63,8 +63,8 @@ docker run --name solver -it -v tierra:/mnt/tierra solver
 
 Run the nextflow contaniner with privileged but **Be Carefull!!**
 ```
-docker run --security-opt seccomp=unconfined --name nextflow -it -v tierra:/mnt/tierra nextflow
-docker run --privileged --name nextflow -it -v tierra:/mnt/tierra nextflow
+docker run --security-opt seccomp=unconfined --name backend -it -v tierra:/mnt/tierra backend
+docker run --privileged --name backend -it -v tierra:/mnt/tierra backend
 ```
 References:
     Why is python slower inside a docker container?
@@ -76,26 +76,26 @@ References:
 
 Exec a shell of container that already exists
 ```
-docker exec -it nextflow bash
+docker exec -it backend bash
 ```
 
 __
 
 Start the nextflow container
 ```
-docker start nextflow
+docker start backend
 ```
 
 
 
 Remove a container
 ```
-docker rm nextflow
+docker rm backend
 ```
 
 Remove an image
 ```
-docker rmi nextflow
+docker rmi backend
 ```
 
 
@@ -124,31 +124,31 @@ docker compose run ptm-compass
 
 Run the nextflow contaniner
 ```
-docker run --name nextflow -it nextflow
+docker run --name backend -it backend
 
-docker run --name nextflow -it --volume S:\U_Proteomica\UNIDAD:/mnt/tierra nextflow
+docker run --name backend -it --volume S:\U_Proteomica\UNIDAD:/mnt/tierra backend
 
-docker run --name nextflow -it --volume \\tierra.cnic.es\SC:/mnt/tierra nextflow
+docker run --name backend -it --volume \\tierra.cnic.es\SC:/mnt/tierra backend
 
 
-docker run --name nextflow -it -v //tierra.cnic.es/SC:/mnt/tierra nextflow
+docker run --name backend -it -v //tierra.cnic.es/SC:/mnt/tierra backend
 
-docker run --name nextflow -it -v C:\Users\jmrodriguezc:/mnt/tierra nextflow
+docker run --name backend -it -v C:\Users\jmrodriguezc:/mnt/tierra backend
 
 
 ""
 
 
-docker run --name nextflow --mount type=bind,source="S:\U_Proteomica\UNIDAD"/target,target=/mnt/tierra nextflow
+docker run --name backend --mount type=bind,source="S:\U_Proteomica\UNIDAD"/target,target=/mnt/tierra backend
 
-docker run --name nextflow --mount type=bind,source="S:\U_Proteomica\UNIDAD"/target,target=/mnt/tierra nextflow
+docker run --name backend --mount type=bind,source="S:\U_Proteomica\UNIDAD"/target,target=/mnt/tierra backend
 
-docker run --name nextflow --mount type=bind,source="\\tierra.cnic.es\SC"/target,target=/mnt/tierra -it nextflow 
+docker run --name backend --mount type=bind,source="\\tierra.cnic.es\SC"/target,target=/mnt/tierra -it backend 
 
 
-docker run --name nextflow --mount type=bind,source="\\tierra.cnic.es\SC"/target,target=/mnt/tierra -it nextflow 
+docker run --name backend --mount type=bind,source="\\tierra.cnic.es\SC"/target,target=/mnt/tierra -it backend 
 
-docker run --name nextflow -it nextflow --mount type=bind,source="\\tierra.cnic.es\SC"/target,target=/mnt/tierra
+docker run --name backend -it backend --mount type=bind,source="\\tierra.cnic.es\SC"/target,target=/mnt/tierra
 
 
 docker volume create \
@@ -182,9 +182,9 @@ docker volume create --driver local --name persistent --opt type=cifs --opt devi
 
 
 
-docker run -d --name nextflow --mount source=tierra,target=/mnt/tierra nextflow 
+docker run -d --name backend --mount source=tierra,target=/mnt/tierra backend 
 
-docker run -d --name nextflow --mount source=tierra2,target=/mnt/tierra nextflow
+docker run -d --name backend --mount source=tierra2,target=/mnt/tierra backend
 
 
 
@@ -196,7 +196,7 @@ $ docker service create \
 $ docker service create \
     --mount 'type=volume,src=cif-volume,dst=/mnt/tierra,volume-driver=local,volume-opt=type=cifs,volume-opt=device=<nfs-server>:<nfs-path>,"volume-opt=o=addr=<nfs-address>,vers=4,soft,timeo=180,bg,tcp,rw"'
     --name myservice \
-    nextflow
+    backend
 
 
 

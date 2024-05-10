@@ -2,6 +2,7 @@ import os
 
 # load settings from environment variables
 NXF_EXECUTOR = os.environ.get('NXF_EXECUTOR', default='local')
+NXF_CONF = os.environ.get('NXF_CONF')
 PVC_NAME = os.environ.get('PVC_NAME')
 
 # define working directories
@@ -12,10 +13,11 @@ BASE_DIRS = {
 }
 BASE_DIR = BASE_DIRS[NXF_EXECUTOR]
 
-MODELS_DIR = os.path.join(BASE_DIR, '_models')
-TRACE_DIR = os.path.join(BASE_DIR, '_trace')
-INPUTS_DIR = os.path.join(BASE_DIR, '_inputs')
+DATASETS_DIR = os.path.join(BASE_DIR, '_datasets')
 WORKFLOWS_DIR = os.path.join(BASE_DIR, '_workflows')
+OUTPUTS_DIR = os.path.join(BASE_DIR, '_outputs')
+TRACES_DIR = os.path.join(BASE_DIR, '_traces')
+MODELS_DIR = os.path.join(BASE_DIR, '_models')
 
 # validate environment settings
 if NXF_EXECUTOR == 'k8s' and PVC_NAME is None:

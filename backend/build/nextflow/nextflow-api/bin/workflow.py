@@ -38,19 +38,6 @@ def run_workflow(workflow, work_dir, resume):
 			'-volume-mount', env.PVC_NAME
 		]
 
-	elif env.NXF_EXECUTOR == 'local':
-		args = [
-			'nextflow',
-			'-log', os.path.join(workflow['output_dir'], 'nextflow.log'),
-			'run',
-			workflow['pipeline'],
-			'-ansi-log', 'false',
-			'-latest',
-			'-name', run_name,
-			'-profile', workflow['profiles'],
-			'-revision', workflow['revision']
-		]
-
 	elif env.NXF_EXECUTOR == 'pbspro':
 		args = [
 			'nextflow',
@@ -64,14 +51,30 @@ def run_workflow(workflow, work_dir, resume):
 			'-revision', workflow['revision']
 		]
 
-	# add params file if specified
-	if workflow['params_format'] and workflow['params_data']:
-		params_filename = 'params.%s' % (workflow['params_format'])
-		params_file = open(params_filename, 'w')
-		params_file.write(workflow['params_data'])
-		params_file.close()
+	elif env.NXF_EXECUTOR == 'local':
+		args = [
+			'nextflow',
+			'-log', os.path.join(workflow['output_dir'], 'nextflow.log'),
+			'run',
+			workflow['pipeline'],
+			'-revision', workflow['revision'],
+			'-latest',
+			'-name', run_name,
+			'-profile', workflow['profiles'],
+			'-ansi-log', 'false'
+		]
 
-		args += ['-params-file', params_filename]
+	# add params
+	for param in workflow['params']:
+		pname = param['name']
+		if param['type'] == 'directory-path' or param['type'] == 'file-path':
+			pval = os.path.join( env.DATASETS_DIR, param['value'])
+		else:
+			pval = param['value']
+		args += [pname, pval]
+
+	# add the output directory
+	args += ['--outdir', workflow['output_dir']]
 
 	# add resume option if specified
 	if resume:

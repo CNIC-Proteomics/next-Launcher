@@ -12,10 +12,19 @@ class Backend():
 	def initialize(self):
 		pass
 
-	async def input_query(self, page, page_size):
+	async def dataset_query(self, page, page_size):
 		raise NotImplementedError()
 
-	async def input_create(self, data):
+	async def dataset_create(self, data):
+		raise NotImplementedError()
+
+	async def dataset_get(self, id):
+		raise NotImplementedError()
+
+	async def dataset_update(self, id, dataset):
+		raise NotImplementedError()
+
+	async def dataset_delete(self, id):
 		raise NotImplementedError()
 
 	async def workflow_query(self, page, page_size):
@@ -59,7 +68,7 @@ class FileBackend(Backend):
 		# initialize empty database if pickle file doesn't exist
 		except FileNotFoundError:
 			self._db = {
-				'inputs': [],
+				'datasets': [],
 				'workflows': [],
 				'tasks': []
 			}
@@ -72,31 +81,93 @@ class FileBackend(Backend):
 		pickle.dump(self._db, open(self._url, 'wb'))
 
 	# ----------------
-	# Input functions
+	# Dataset functions
 	# ----------------
-	async def input_query(self, page, page_size):
+	async def dataset_query(self, page, page_size):
 		self._lock.acquire()
 		self.load()
 
-		# sort inputs by date_created in descending order
-		self._db['inputs'].sort(key=lambda w: w['date_created'], reverse=True)
+		# sort datasets by date_created in descending order
+		self._db['datasets'].sort(key=lambda w: w['date_created'], reverse=True)
 
-		# return the specified page of inputs
-		inputs = self._db['inputs'][(page * page_size) : ((page + 1) * page_size)]
+		# return the specified page of datasets
+		datasets = self._db['datasets'][(page * page_size) : ((page + 1) * page_size)]
 
 		self._lock.release()
 
-		return inputs
+		return datasets
 
-	async def input_create(self, input):
+	async def dataset_create(self, dataset):
 		self._lock.acquire()
 		self.load()
 
-		# append input to list of input
-		self._db['inputs'].append(input)
+		# append dataset to list of datasets
+		self._db['datasets'].append(dataset)
 
 		self.save()
 		self._lock.release()
+
+	async def dataset_get(self, id):
+		self._lock.acquire()
+		self.load()
+
+		# search for dataset by id
+		dataset = None
+
+		for d in self._db['datasets']:
+			if d['_id'] == id:
+				dataset = d
+				break
+
+		self._lock.release()
+
+		# return dataset or raise error if dataset wasn't found
+		if dataset != None:
+			return dataset
+		else:
+			raise IndexError('Dataset was not found')
+
+	async def dataset_update(self, id, dataset):
+		self._lock.acquire()
+		self.load()
+
+		# search for dataset by id and update it
+		found = False
+
+		for i, d in enumerate(self._db['datasets']):
+			if d['_id'] == id:
+				# update dataset
+				self._db['datasets'][i] = dataset
+				found = True
+				break
+
+		self.save()
+		self._lock.release()
+
+		# raise error if dataset wasn't found
+		if not found:
+			raise IndexError('Dataset was not found')
+
+	async def dataset_delete(self, id):
+		self._lock.acquire()
+		self.load()
+
+		# search for dataset by id and delete it
+		found = False
+
+		for i, d in enumerate(self._db['datasets']):
+			if d['_id'] == id:
+				# delete dataset
+				self._db['datasets'].pop(i)
+				found = True
+				break
+
+		self.save()
+		self._lock.release()
+
+		# raise error if dataset wasn't found
+		if not found:
+			raise IndexError('Dataset was not found')
 
 	# ----------------
 	# Workflow functions
@@ -187,6 +258,10 @@ class FileBackend(Backend):
 		if not found:
 			raise IndexError('Workflow was not found')
 
+
+	# ----------------
+	# Task functions
+	# ----------------
 	async def task_query(self, page, page_size):
 		self._lock.acquire()
 		self.load()

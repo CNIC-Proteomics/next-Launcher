@@ -64,10 +64,15 @@ RUN mkdir -p /usr/local/bin && cd /usr/local/bin && curl -s https://get.nextflow
 # Setting up the environment variables
 ENV NXF_HOME ${INSTALLATION_HOME}/nextflow
 RUN mkdir -p "${NXF_HOME}"
+ENV NXF_CONF ${INSTALLATION_HOME}/nextflow/conf
+RUN mkdir -p "${NXF_CONF}"
 ENV NXF_WORK ${INSTALLATION_HOME}/nextflow/work
 RUN mkdir -p "${NXF_WORK}"
 ENV NXF_LOG ${INSTALLATION_HOME}/nextflow/log
 RUN mkdir -p "${NXF_LOG}"
+
+# Copy Nextflow config files
+COPY ${LOCAL_DIR}conf ${NXF_CONF}/.
 
 ###########
 # NF-CORE #

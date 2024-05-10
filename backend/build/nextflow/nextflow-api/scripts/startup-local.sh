@@ -12,15 +12,6 @@ else
 	exit -1
 fi
 
-# initialize environment
-#source ${HOME}/anaconda3/etc/profile.d/conda.sh
-#conda activate nextflow-api
-
-# start mongodb server
-# if [[ ${BACKEND} == "mongo" ]]; then
-#     sudo service mongodb start
-#	  sudo systemctl start mongod
-# fi
 # start mongodb server
 if [[ ${BACKEND} == "mongo" ]]; then
     scripts/db-startup.sh

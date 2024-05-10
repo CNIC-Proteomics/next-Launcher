@@ -3,17 +3,17 @@
 
 # parse command-line arguments
 if [[ $# != 2 ]]; then
-	echo "usage: $0 <url> <pipeline>"
+	echo "usage: $0 <url> <data>"
 	exit -1
 fi
 
 URL="$1"
-PIPELINE="$2"
+DATA="$2"
 
 # create a workflow instance
 curl -s \
 	-X POST \
-	-d "{\"pipeline\":\"${PIPELINE}\"}" \
+	-d "${DATA}" \
 	${URL}/api/workflows/0
 
 echo

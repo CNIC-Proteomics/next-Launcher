@@ -42,79 +42,259 @@ def message(status, message):
 
 
 #-------------------------------------
-# INPUTS Classes
+# DATASETS Classes
 #-------------------------------------
 
-class InputQueryHandler(tornado.web.RequestHandler):
+class DatasetQueryHandler(tornado.web.RequestHandler):
 
 	async def get(self):
 		page = int(self.get_query_argument('page', 0))
 		page_size = int(self.get_query_argument('page_size', 100))
 
 		db = self.settings['db']
-		workflows = await db.workflow_query(page, page_size)
+		datasets = await db.dataset_query(page, page_size)
 
 		self.set_status(200)
 		self.set_header('content-type', 'application/json')
-		self.write(tornado.escape.json_encode(workflows))
+		self.write(tornado.escape.json_encode(datasets))
 
 
 
-class InputCreateHandler(tornado.web.RequestHandler):
+class DatasetCreateHandler(tornado.web.RequestHandler):
 
 	REQUIRED_KEYS = set([
-		'pipeline'
+		'experiment'
 	])
 
 	DEFAULTS = {
-		'name': '',
-		'attempts': 0
+		'author': '',
+		'description': '',
+		'nfiles': 0
 	}
 
 	def get(self):
-		workflow = {**self.DEFAULTS, **{ '_id': '0' }}
+		dataset = {**self.DEFAULTS, **{ '_id': '0' }}
 
 		self.set_status(200)
 		self.set_header('content-type', 'application/json')
-		self.write(tornado.escape.json_encode(workflow))
+		self.write(tornado.escape.json_encode(dataset))
 
 	async def post(self):
+
 		db = self.settings['db']
 
-		# # make sure request body is valid
-		# try:
-		# 	data = tornado.escape.json_decode(self.request.body)
-		# 	missing_keys = self.REQUIRED_KEYS - data.keys()
-		# except json.JSONDecodeError:
-		# 	self.set_status(422)
-		# 	self.write(message(422, 'Ill-formatted JSON'))
-		# 	return
+		# make sure request body is valid
+		try:
+			data = tornado.escape.json_decode(self.request.body)
+			missing_keys = self.REQUIRED_KEYS - data.keys()
+		except json.JSONDecodeError:
+			self.set_status(422)
+			self.write(message(422, 'Ill-formatted JSON'))
+			return
 
-		# if missing_keys:
-		# 	self.set_status(400)
-		# 	self.write(message(400, 'Missing required field(s): %s' % list(missing_keys)))
-		# 	return
+		if missing_keys:
+			self.set_status(400)
+			self.write(message(400, 'Missing required field(s): %s' % list(missing_keys)))
+			return
 
-		# create input
-		input = {**self.DEFAULTS, **data, **{ 'status': 'nascent' }}
-		input['_id'] = str(bson.ObjectId())
+		# create dataset
+		dataset = {**self.DEFAULTS, **data}
+		dataset['_id'] = str(bson.ObjectId())
 
-		# append creation timestamp to input
-		input['date_created'] = int(time.time() * 1000)
+		# append creation timestamp to dataset
+		dataset['date_created'] = int(time.time() * 1000)
 
-		# # transform pipeline name to lowercase
-		# input['pipeline'] = input['pipeline'].lower() 
+		# transform experiment name to lowercase
+		dataset['experiment'] = dataset['experiment'].lower() 
 
-		# save input
-		await db.input_create(input)
+		# save dataset
+		await db.dataset_create(dataset)
 
-		# create input directory
-		input_dir = os.path.join(env.INPUTS_DIR, input['_id'])
-		os.makedirs(input_dir)
+		# create dataset directory
+		dataset_dir = os.path.join(env.DATASETS_DIR, dataset['_id'])
+		os.makedirs(dataset_dir)
 
 		self.set_status(200)
 		self.set_header('content-type', 'application/json')
-		self.write(tornado.escape.json_encode({ '_id': input['_id'] }))
+		self.write(tornado.escape.json_encode({ '_id': dataset['_id'] }))
+
+
+
+class DatasetEditHandler(tornado.web.RequestHandler):
+
+	REQUIRED_KEYS = set([
+		'experiment',
+		'author',
+		'description'
+	])
+
+	DEFAULTS = {
+		'author': '',
+		'description': '',
+		'nfiles': 0
+	}
+
+	async def get(self, id):
+		db = self.settings['db']
+
+		try:
+			# get dataset
+			dataset = await db.dataset_get(id)
+
+			# append list of input files
+			dataset_dir = os.path.join(env.DATASETS_DIR, id)
+			if os.path.exists(dataset_dir):
+				dataset['files'] = list_dir_recursive(dataset_dir, relpath_start=dataset_dir)
+			else:
+				dataset['files'] = []
+
+			self.set_status(200)
+			self.set_header('content-type', 'application/json')
+			self.write(tornado.escape.json_encode(dataset))
+		except:
+			self.set_status(404)
+			self.write(message(404, 'Failed to get dataset \"%s\"' % id))
+
+	async def post(self, id):
+		db = self.settings['db']
+
+		# make sure request body is valid
+		try:
+			data = tornado.escape.json_decode(self.request.body)
+			added_keys = data.keys() - self.REQUIRED_KEYS
+		except json.JSONDecodeError:
+			self.set_status(422)
+			self.write(message(422, 'Ill-formatted JSON'))
+
+		if added_keys:
+			self.set_status(400)
+			self.write(message(400, 'There are more field(s) than allowed: %s' % list(self.REQUIRED_KEYS)))
+			return
+
+		try:
+			# update dataset from request body
+			dataset = await db.dataset_get(id)
+			dataset = {**self.DEFAULTS, **dataset, **data}
+
+			# transform experiment name to lowercase
+			dataset['experiment'] = dataset['experiment'].lower() 
+
+			# save dataset
+			await db.dataset_update(id, dataset)
+
+			self.set_status(200)
+			self.set_header('content-type', 'application/json')
+			self.write(tornado.escape.json_encode({ '_id': id }))
+		except:
+			self.set_status(404)
+			self.write(message(404, 'Failed to update dataset \"%s\"' % id))
+
+	async def delete(self, id):
+		db = self.settings['db']
+
+		try:
+			# delete dataset
+			await db.dataset_delete(id)
+
+			# delete dataset directory
+			shutil.rmtree(os.path.join(env.DATASETS_DIR, id), ignore_errors=True)
+
+			self.set_status(200)
+			self.write(message(200, 'Dataset \"%s\" was deleted' % id))
+		except:
+			self.set_status(404)
+			self.write(message(404, 'Failed to delete dataset \"%s\"' % id))
+
+
+
+
+class DatasetUploadHandler(tornado.web.RequestHandler):
+
+	async def post(self, id, format, parameter):
+		db = self.settings['db']
+
+		# make sure request body contains files
+		files = self.request.files
+
+		if not files:
+			self.set_status(400)
+			self.write(message(400, 'No files were uploaded'))
+			return
+
+		try:
+			# get dataset
+			dataset = await db.dataset_get(id)
+		except:
+			self.set_status(404)
+			self.write(message(404, 'Dataset \"%s\" was not found' % id))
+
+		# determine which type of upload to do
+		if format == "directory-path":
+			try:
+				# initialize input directory using the parameter 'directory-path'
+				input_dir = os.path.join(env.DATASETS_DIR, id, parameter)
+				os.makedirs(input_dir, exist_ok=True)
+
+				# save uploaded files to input directory
+				filenames = []
+
+				for f_list in files.values():
+					for f_arg in f_list:
+						filename, body = f_arg['filename'], f_arg['body']
+						with open(os.path.join(input_dir, filename), 'wb') as f:
+							f.write(body)
+						filenames.append(filename)
+
+				# increase nfiles
+				dataset['nfiles'] += len(filenames)
+
+				# save dataset
+				await db.dataset_update(id, dataset)
+
+				self.set_status(200)
+				self.write(message(200, 'File \"%s\" was uploaded for dataset \"%s\" successfully' % (filenames, id)))
+			except:
+				self.set_status(404)
+				self.write(message(404, 'Failed to upload the file for dataset \"%s\"' % id))
+
+		# determine which type of upload to do
+		elif format == "file-path":
+			try:
+				# initialize input directory
+				input_dir = os.path.join(env.DATASETS_DIR, id)
+				os.makedirs(input_dir, exist_ok=True)
+
+				# save uploaded files to input directory
+				filenames = []
+
+				for f_list in files.values():
+					for f_arg in f_list:
+						filename, body = f_arg['filename'], f_arg['body']
+						# rename the filename based on 'parameter' query 'file-path'
+						filename = parameter + os.path.splitext(os.path.basename(filename))[1]
+						with open(os.path.join(input_dir, filename), 'wb') as f:
+							f.write(body)
+						filenames.append(filename)
+
+				# increase nfiles
+				dataset['nfiles'] += len(filenames)
+
+				# save dataset
+				await db.dataset_update(id, dataset)
+
+				self.set_status(200)
+				self.write(message(200, 'File \"%s\" was uploaded for dataset \"%s\" successfully' % (filenames, id)))
+			except:
+				self.set_status(404)
+				self.write(message(404, 'Failed to upload the file for dataset \"%s\"' % id))
+
+		# determine which type of upload to do
+		else:
+			self.set_status(404)
+			self.write(message(404, 'The \"%s\" value for the query is not correct. Try with ["directory-path","file-path"]' % format))
+
+
+
 
 
 #-------------------------------------
@@ -139,18 +319,19 @@ class WorkflowQueryHandler(tornado.web.RequestHandler):
 class WorkflowCreateHandler(tornado.web.RequestHandler):
 
 	REQUIRED_KEYS = set([
-		'pipeline'
+		'pipeline',
+		'revision',
+		'profiles'
 	])
 
 	DEFAULTS = {
 		'name': '',
-		'params_format': '',
-		'params_data': '',
-		'profiles': 'standard',
+		'author': '',
+		'description': '',
 		'revision': 'main',
-		'input_dir': 'input',
-		'output_dir': 'output',
-		'attempts': 0
+		'profiles': 'guess',
+		'attempts': 0,
+		'params': []
 	}
 
 	def get(self):
@@ -203,19 +384,16 @@ class WorkflowCreateHandler(tornado.web.RequestHandler):
 
 class WorkflowEditHandler(tornado.web.RequestHandler):
 
-	REQUIRED_KEYS = set([
-		'pipeline'
-	])
+	REQUIRED_KEYS = set([])
 
 	DEFAULTS = {
 		'name': '',
-		'params_format': '',
-		'params_data': '',
-		'profiles': 'standard',
-		'revision': 'master',
-		'input_dir': 'input',
-		'output_dir': 'output',
-		'attempts': 0
+		'author': '',
+		'description': '',
+		'revision': 'main',
+		'profiles': 'guess',
+		'attempts': 0,
+		'params': []
 	}
 
 	async def get(self, id):
@@ -231,9 +409,9 @@ class WorkflowEditHandler(tornado.web.RequestHandler):
 			output_dir = os.path.join(workflow_dir, workflow['output_dir'])
 
 			if os.path.exists(input_dir):
-				workflow['input_files'] = list_dir_recursive(input_dir, relpath_start=workflow_dir)
+				workflow['files'] = list_dir_recursive(input_dir, relpath_start=workflow_dir)
 			else:
-				workflow['input_files'] = []
+				workflow['files'] = []
 
 			# append list of output files
 			if os.path.exists(output_dir):
@@ -304,44 +482,9 @@ class WorkflowEditHandler(tornado.web.RequestHandler):
 
 
 
-class WorkflowUploadHandler(tornado.web.RequestHandler):
-
-	async def post(self, id):
-		db = self.settings['db']
-
-		# make sure request body contains files
-		files = self.request.files
-
-		if not files:
-			self.set_status(400)
-			self.write(message(400, 'No files were uploaded'))
-			return
-
-		# get workflow
-		workflow = await db.workflow_get(id)
-
-		# initialize input directory
-		input_dir = os.path.join(env.WORKFLOWS_DIR, id, workflow['input_dir'])
-		os.makedirs(input_dir, exist_ok=True)
-
-		# save uploaded files to input directory
-		filenames = []
-
-		for f_list in files.values():
-			for f_arg in f_list:
-				filename, body = f_arg['filename'], f_arg['body']
-				with open(os.path.join(input_dir, filename), 'wb') as f:
-					f.write(body)
-				filenames.append(filename)
-
-		self.set_status(200)
-		self.write(message(200, 'File \"%s\" was uploaded for workflow \"%s\" successfully' % (filenames, id)))
-
-
-
 class WorkflowLaunchHandler(tornado.web.RequestHandler):
 
-	resume = False
+	resume = True
 
 	async def post(self, id):
 		db = self.settings['db']
@@ -350,20 +493,19 @@ class WorkflowLaunchHandler(tornado.web.RequestHandler):
 			# get workflow
 			workflow = await db.workflow_get(id)
 
-			# make sure workflow is not already running
-			if workflow['status'] == 'running':
-				self.set_status(400)
-				self.write(message(400, 'Workflow \"%s\" is already running' % id))
-				return
+			# # make sure workflow is not already running
+			# if workflow['status'] == 'running':
+			# 	self.set_status(400)
+			# 	self.write(message(400, 'Workflow \"%s\" is already running' % id))
+			# 	return
 
-			# copy nextflow.config from input directory if it exists
+			# copy nextflow.config from nextflow configration folder
 			workflow_dir = os.path.join(env.WORKFLOWS_DIR, id)
-			input_dir = os.path.join(workflow_dir, workflow['input_dir'])
-			src = os.path.join(input_dir, 'nextflow.config')
+			src = os.path.join(env.NXF_CONF, 'nextflow.config')
 			dst = os.path.join(workflow_dir, 'nextflow.config')
 
 			if os.path.exists(dst):
-				os.remove(dst)
+				os.remove(dst)   
 
 			if os.path.exists(src):
 				shutil.copyfile(src, dst)
@@ -379,6 +521,10 @@ class WorkflowLaunchHandler(tornado.web.RequestHandler):
 			workflow['date_submitted'] = int(time.time() * 1000)
 			workflow['attempts'] += 1
 
+			# set up the output directory
+			output_dir = os.path.join(env.OUTPUTS_DIR, id, str(workflow['attempts']))
+			workflow['output_dir'] = output_dir
+
 			await db.workflow_update(id, workflow)
 
 			# launch workflow as a child process
@@ -387,9 +533,11 @@ class WorkflowLaunchHandler(tornado.web.RequestHandler):
 
 			self.set_status(200)
 			self.write(message(200, 'Workflow \"%s\" was launched' % id))
-		except:
+		# except:
+		except Exception as e:
 			self.set_status(404)
-			self.write(message(404, 'Failed to launch workflow \"%s\"' % id))
+			# self.write(message(404, 'Failed to launch workflow \"%s\"' % id))
+			self.write(message(404, 'Failed \"%s\"' % e))
 
 
 
@@ -473,6 +621,77 @@ class WorkflowDownloadHandler(tornado.web.StaticFileHandler):
 		return os.path.join(id, filename)
 
 
+
+#-------------------------------------
+# OUTPUTS Classes
+#-------------------------------------
+
+class OutputQueryHandler(tornado.web.RequestHandler):
+
+	async def get(self):
+		page = int(self.get_query_argument('page', 0))
+		page_size = int(self.get_query_argument('page_size', 100))
+
+		db = self.settings['db']
+		datasets = await db.dataset_query(page, page_size)
+
+		self.set_status(200)
+		self.set_header('content-type', 'application/json')
+		self.write(tornado.escape.json_encode(datasets))
+
+
+
+class OutputLogHandler(tornado.web.RequestHandler):
+
+	async def get(self, id):
+		db = self.settings['db']
+
+		try:
+			# get workflow
+			workflow = await db.workflow_get(id)
+
+			# append log if it exists
+			log_file = os.path.join(env.WORKFLOWS_DIR, id, '.workflow.log')
+
+			if os.path.exists(log_file):
+				f = open(log_file)
+				log = ''.join(f.readlines())
+			else:
+				log = ''
+
+			# construct response data
+			data = {
+				'_id': id,
+				'status': workflow['status'],
+				'attempts': workflow['attempts'],
+				'log': log
+			}
+
+			self.set_status(200)
+			self.set_header('content-type', 'application/json')
+			self.set_header('cache-control', 'no-store, no-cache, must-revalidate, max-age=0')
+			self.write(tornado.escape.json_encode(data))
+		except:
+			self.set_status(404)
+			self.write(message(404, 'Failed to fetch log for workflow \"%s\"' % id))
+
+
+
+class OutputDownloadHandler(tornado.web.StaticFileHandler):
+
+	def parse_url_path(self, id):
+		# provide output file if path is specified, otherwise output data archive
+		filename_default = '%s-output.tar.gz' % id
+		filename = self.get_query_argument('path', filename_default)
+
+		self.set_header('content-disposition', 'attachment; filename=\"%s\"' % filename)
+		return os.path.join(id, filename)
+
+
+
+#-------------------------------------
+# TASKS Classes
+#-------------------------------------
 
 class TaskQueryHandler(tornado.web.RequestHandler):
 
@@ -650,7 +869,7 @@ class TaskArchiveHandler(tornado.web.RequestHandler):
 				dfs[process] = pd.DataFrame([task for task in tasks if task['process'] == process])
 
 			# change to trace directory
-			os.chdir(env.TRACE_DIR)
+			os.chdir(env.TRACES_DIR)
 
 			# save dataframes to csv files
 			for process in process_names:
@@ -891,34 +1110,41 @@ if __name__ == '__main__':
 	tornado.options.parse_command_line()
 
 	# initialize auxiliary directories
-	os.makedirs(env.MODELS_DIR, exist_ok=True)
-	os.makedirs(env.TRACE_DIR, exist_ok=True)
 	os.makedirs(env.WORKFLOWS_DIR, exist_ok=True)
+	os.makedirs(env.DATASETS_DIR, exist_ok=True)
+	os.makedirs(env.OUTPUTS_DIR, exist_ok=True)
+	os.makedirs(env.TRACES_DIR, exist_ok=True)
+	os.makedirs(env.MODELS_DIR, exist_ok=True)
 
 	# initialize api endpoints
 	app = tornado.web.Application([
-		(r'/api/inputs', InputQueryHandler),
-		(r'/api/inputs/0', InputCreateHandler),
-		(r'/api/inputs/([a-zA-Z0-9-]+)', InputEditHandler),
-		# (r'/api/inputs/([a-zA-Z0-9-]+)/upload', InputUploadHandler),
+		(r'/api/datasets', DatasetQueryHandler),
+		(r'/api/datasets/0', DatasetCreateHandler),
+		(r'/api/datasets/([a-zA-Z0-9-]+)', DatasetEditHandler),
+		(r'/api/datasets/([a-zA-Z0-9-]+)/([a-zA-Z-]+)/([a-zA-Z0-9-_]+)/upload', DatasetUploadHandler),
 
 		(r'/api/workflows', WorkflowQueryHandler),
 		(r'/api/workflows/0', WorkflowCreateHandler),
 		(r'/api/workflows/([a-zA-Z0-9-]+)', WorkflowEditHandler),
-		(r'/api/workflows/([a-zA-Z0-9-]+)/upload', WorkflowUploadHandler),
 		(r'/api/workflows/([a-zA-Z0-9-]+)/launch', WorkflowLaunchHandler),
 		(r'/api/workflows/([a-zA-Z0-9-]+)/resume', WorkflowResumeHandler),
 		(r'/api/workflows/([a-zA-Z0-9-]+)/cancel', WorkflowCancelHandler),
 		(r'/api/workflows/([a-zA-Z0-9-]+)/log', WorkflowLogHandler),
 		(r'/api/workflows/([a-zA-Z0-9-]+)/download', WorkflowDownloadHandler, dict(path=env.WORKFLOWS_DIR)),
+
+		(r'/api/outputs', OutputQueryHandler),
+		(r'/api/outputs/([a-zA-Z0-9-]+)/log', OutputLogHandler),
+		(r'/api/outputs/([a-zA-Z0-9-]+)/download', OutputDownloadHandler, dict(path=env.OUTPUTS_DIR)),
+
 		(r'/api/tasks', TaskQueryHandler),
 		(r'/api/tasks/([a-zA-Z0-9-]+)/log', TaskLogHandler),
 		(r'/api/tasks/pipelines', TaskQueryPipelinesHandler),
 		(r'/api/tasks/pipelines/(.+)', TaskQueryPipelineHandler),
-		(r'/api/tasks/archive/(.+)/download', TaskArchiveDownloadHandler, dict(path=env.TRACE_DIR)),
+		(r'/api/tasks/archive/(.+)/download', TaskArchiveDownloadHandler, dict(path=env.TRACES_DIR)),
 		(r'/api/tasks/archive/(.+)', TaskArchiveHandler),
 		(r'/api/tasks/visualize', TaskVisualizeHandler),
 		(r'/api/tasks/([a-zA-Z0-9-]+)', TaskEditHandler),
+
 		(r'/api/model/train', ModelTrainHandler),
 		(r'/api/model/config', ModelConfigHandler),
 		(r'/api/model/predict', ModelPredictHandler),
