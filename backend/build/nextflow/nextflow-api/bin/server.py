@@ -16,6 +16,8 @@ import tornado.httpserver
 import tornado.ioloop
 import tornado.options
 import tornado.web
+import zipfile
+import io
 
 import backend
 import env
@@ -31,7 +33,6 @@ def list_dir_recursive(path, relpath_start=''):
 	files.sort()
 
 	return files
-
 
 
 def message(status, message):
@@ -69,7 +70,7 @@ class DatasetCreateHandler(tornado.web.RequestHandler):
 	DEFAULTS = {
 		'author': '',
 		'description': '',
-		'nfiles': 0
+		'n_files': 0
 	}
 
 	def get(self):
@@ -131,7 +132,7 @@ class DatasetEditHandler(tornado.web.RequestHandler):
 	DEFAULTS = {
 		'author': '',
 		'description': '',
-		'nfiles': 0
+		'n_files': 0
 	}
 
 	async def get(self, id):
@@ -245,8 +246,8 @@ class DatasetUploadHandler(tornado.web.RequestHandler):
 							f.write(body)
 						filenames.append(filename)
 
-				# increase nfiles
-				dataset['nfiles'] += len(filenames)
+				# increase n_files
+				dataset['n_files'] += len(filenames)
 
 				# save dataset
 				await db.dataset_update(id, dataset)
@@ -276,8 +277,8 @@ class DatasetUploadHandler(tornado.web.RequestHandler):
 							f.write(body)
 						filenames.append(filename)
 
-				# increase nfiles
-				dataset['nfiles'] += len(filenames)
+				# increase n_files
+				dataset['n_files'] += len(filenames)
 
 				# save dataset
 				await db.dataset_update(id, dataset)
@@ -330,8 +331,8 @@ class WorkflowCreateHandler(tornado.web.RequestHandler):
 		'description': '',
 		'revision': 'main',
 		'profiles': 'guess',
-		'attempts': 0,
-		'params': []
+		'n_attempts': 0,
+		'attempts': []
 	}
 
 	def get(self):
@@ -392,8 +393,8 @@ class WorkflowEditHandler(tornado.web.RequestHandler):
 		'description': '',
 		'revision': 'main',
 		'profiles': 'guess',
-		'attempts': 0,
-		'params': []
+		'n_attempts': 0,
+		'attempts': []
 	}
 
 	async def get(self, id):
@@ -402,25 +403,6 @@ class WorkflowEditHandler(tornado.web.RequestHandler):
 		try:
 			# get workflow
 			workflow = await db.workflow_get(id)
-
-			# append list of input files
-			workflow_dir = os.path.join(env.WORKFLOWS_DIR, id)
-			input_dir = os.path.join(workflow_dir, workflow['input_dir'])
-			output_dir = os.path.join(workflow_dir, workflow['output_dir'])
-
-			if os.path.exists(input_dir):
-				workflow['files'] = list_dir_recursive(input_dir, relpath_start=workflow_dir)
-			else:
-				workflow['files'] = []
-
-			# append list of output files
-			if os.path.exists(output_dir):
-				workflow['output_files'] = list_dir_recursive(output_dir, relpath_start=workflow_dir)
-			else:
-				workflow['output_files'] = []
-
-			# append status of output data
-			workflow['output_data'] = os.path.exists('%s/%s-output.tar.gz' % (workflow_dir, id))
 
 			self.set_status(200)
 			self.set_header('content-type', 'application/json')
@@ -484,25 +466,75 @@ class WorkflowEditHandler(tornado.web.RequestHandler):
 
 class WorkflowLaunchHandler(tornado.web.RequestHandler):
 
+	REQUIRED_KEYS = set([
+		'inputs'
+	])
+
+	DEFAULTS = {
+		'inputs': []
+	}
+
 	resume = True
 
 	async def post(self, id):
 		db = self.settings['db']
 
+		# make sure request body is valid
+		try:
+			data = tornado.escape.json_decode(self.request.body)
+			missing_keys = self.REQUIRED_KEYS - data.keys()
+		except json.JSONDecodeError:
+			self.set_status(422)
+			self.write(message(422, 'Ill-formatted JSON'))
+			return
+
+		if missing_keys:
+			self.set_status(400)
+			self.write(message(400, 'Missing required field(s): %s' % list(missing_keys)))
+			return
+
 		try:
 			# get workflow
 			workflow = await db.workflow_get(id)
+		except:
+			self.set_status(404)
+			self.write(message(404, 'Failed to get workflow \"%s\"' % id))
+			return
 
-			# # make sure workflow is not already running
-			# if workflow['status'] == 'running':
-			# 	self.set_status(400)
-			# 	self.write(message(400, 'Workflow \"%s\" is already running' % id))
-			# 	return
+		# # make sure workflow is not already running
+		# if workflow['status'] == 'running':
+		# 	self.set_status(400)
+		# 	self.write(message(400, 'Workflow \"%s\" is already running' % id))
+		# 	return
+
+		try:
+
+			# update workflow from request body
+			workflow = await db.workflow_get(id)
+
+			# update workflow status
+			workflow['status'] = 'running'
+			workflow['date_submitted'] = int(time.time() * 1000)
+			workflow['n_attempts'] += 1
+
+			# set up the attempt directory
+			attempt_dir = os.path.join(env.OUTPUTS_DIR, str(workflow['n_attempts']))
+
+			# update attempt execution
+			attempt = {
+				'id': workflow['n_attempts'],
+				'inputs': data['inputs'],
+				'output_dir': attempt_dir
+			}
+			workflow['attempts'].append(attempt)
+
+			await db.workflow_update(id, workflow)
 
 			# copy nextflow.config from nextflow configration folder
-			workflow_dir = os.path.join(env.WORKFLOWS_DIR, id)
+			output_dir = os.path.join(env.WORKFLOWS_DIR, id, attempt_dir)
+			os.makedirs(output_dir, exist_ok=True)
 			src = os.path.join(env.NXF_CONF, 'nextflow.config')
-			dst = os.path.join(workflow_dir, 'nextflow.config')
+			dst = os.path.join(output_dir, 'nextflow.config')
 
 			if os.path.exists(dst):
 				os.remove(dst)   
@@ -514,21 +546,10 @@ class WorkflowLaunchHandler(tornado.web.RequestHandler):
 			with open(dst, 'a') as f:
 				weblog_url = 'http://%s:%d/api/tasks' % (socket.gethostbyname(socket.gethostname()), tornado.options.options.port)
 				f.write('weblog { enabled = true\n url = \"%s\" }\n' % (weblog_url))
-				f.write('k8s { launchDir = \"%s\" }\n' % (workflow_dir))
-
-			# update workflow status
-			workflow['status'] = 'running'
-			workflow['date_submitted'] = int(time.time() * 1000)
-			workflow['attempts'] += 1
-
-			# set up the output directory
-			output_dir = os.path.join(env.OUTPUTS_DIR, id, str(workflow['attempts']))
-			workflow['output_dir'] = output_dir
-
-			await db.workflow_update(id, workflow)
+				f.write('k8s { launchDir = \"%s\" }\n' % (output_dir))
 
 			# launch workflow as a child process
-			p = mp.Process(target=Workflow.launch, args=(db, workflow, self.resume))
+			p = mp.Process(target=Workflow.launch, args=(db, workflow, attempt, output_dir, self.resume))
 			p.start()
 
 			self.set_status(200)
@@ -584,7 +605,7 @@ class WorkflowLogHandler(tornado.web.RequestHandler):
 			workflow = await db.workflow_get(id)
 
 			# append log if it exists
-			log_file = os.path.join(env.WORKFLOWS_DIR, id, '.workflow.log')
+			log_file = os.path.join(env.WORKFLOWS_DIR, id, env.OUTPUTS_DIR, str(workflow['n_attempts']), '.workflow.log')
 
 			if os.path.exists(log_file):
 				f = open(log_file)
@@ -596,7 +617,7 @@ class WorkflowLogHandler(tornado.web.RequestHandler):
 			data = {
 				'_id': id,
 				'status': workflow['status'],
-				'attempts': workflow['attempts'],
+				'n_attempts': workflow['n_attempts'],
 				'log': log
 			}
 
@@ -610,15 +631,16 @@ class WorkflowLogHandler(tornado.web.RequestHandler):
 
 
 
-class WorkflowDownloadHandler(tornado.web.StaticFileHandler):
+# class WorkflowDownloadHandler(tornado.web.StaticFileHandler):
 
-	def parse_url_path(self, id):
-		# provide output file if path is specified, otherwise output data archive
-		filename_default = '%s-output.tar.gz' % id
-		filename = self.get_query_argument('path', filename_default)
+# 	def parse_url_path(self, id):
+# 		# provide output file if path is specified, otherwise output data archive
+# 		filename_default = 'outputs-%s-%s.tar.gz' % (id, attempt)
+# 		filename = self.get_query_argument('path', filename_default)
 
-		self.set_header('content-disposition', 'attachment; filename=\"%s\"' % filename)
-		return os.path.join(id, filename)
+# 		self.set_header('content-disposition', 'attachment; filename=\"%s\"' % filename)
+# 		return os.path.join(id, filename)
+
 
 
 
@@ -626,66 +648,146 @@ class WorkflowDownloadHandler(tornado.web.StaticFileHandler):
 # OUTPUTS Classes
 #-------------------------------------
 
-class OutputQueryHandler(tornado.web.RequestHandler):
+class OutputEditHandler(tornado.web.RequestHandler):
 
-	async def get(self):
-		page = int(self.get_query_argument('page', 0))
-		page_size = int(self.get_query_argument('page_size', 100))
-
-		db = self.settings['db']
-		datasets = await db.dataset_query(page, page_size)
-
-		self.set_status(200)
-		self.set_header('content-type', 'application/json')
-		self.write(tornado.escape.json_encode(datasets))
-
-
-
-class OutputLogHandler(tornado.web.RequestHandler):
-
-	async def get(self, id):
+	async def get(self, id, attempt):
 		db = self.settings['db']
 
 		try:
 			# get workflow
 			workflow = await db.workflow_get(id)
 
-			# append log if it exists
-			log_file = os.path.join(env.WORKFLOWS_DIR, id, '.workflow.log')
+			# get output directory from attempt
+			workflow_dir = os.path.join(env.WORKFLOWS_DIR, id)
+			output_dir = os.path.join(workflow_dir, env.OUTPUTS_DIR, attempt)
 
-			if os.path.exists(log_file):
-				f = open(log_file)
-				log = ''.join(f.readlines())
+			if os.path.exists(output_dir):
+				outputs = list_dir_recursive(output_dir, relpath_start=output_dir)
+				# remove hide files
+				outputs = [o for o in outputs if not o.startswith('.')]
 			else:
-				log = ''
-
-			# construct response data
-			data = {
-				'_id': id,
-				'status': workflow['status'],
-				'attempts': workflow['attempts'],
-				'log': log
-			}
+				outputs = []
 
 			self.set_status(200)
 			self.set_header('content-type', 'application/json')
-			self.set_header('cache-control', 'no-store, no-cache, must-revalidate, max-age=0')
-			self.write(tornado.escape.json_encode(data))
+			self.write(tornado.escape.json_encode(outputs))
 		except:
 			self.set_status(404)
-			self.write(message(404, 'Failed to fetch log for workflow \"%s\"' % id))
+			self.write(message(404, 'Failed to get output attempt from workflow \"%s/%s\"' % (id,attempt)))
+
+	async def delete(self, id, attempt):
+		db = self.settings['db']
+
+		try:
+			# delete output
+			await db.output_delete(id, attempt)
+
+			# get output directory from attempt
+			workflow_dir = os.path.join(env.WORKFLOWS_DIR, id)
+			output_dir = os.path.join(workflow_dir, env.OUTPUTS_DIR, attempt)
+
+			if os.path.exists(output_dir):  
+				shutil.rmtree(output_dir, ignore_errors=True)
+
+			self.set_status(200)
+			self.write(message(200, 'Output \"%s\" was deleted' % id))
+		# except:
+		# 	self.set_status(404)
+		# 	self.write(message(404, 'Failed to delete output \"%s/%s\"' % (id,attempt)))
+		except Exception as e:
+			self.set_status(404)
+			self.write(message(404, 'Failed to delete output \"%s\"' % (e)))
 
 
 
 class OutputDownloadHandler(tornado.web.StaticFileHandler):
 
-	def parse_url_path(self, id):
+	def parse_url_path(self, data):
+		# get the given parameters
+		id = data.split('/')[0]
+		filename_default = '/'.join(data.split('/')[1:])
+
 		# provide output file if path is specified, otherwise output data archive
-		filename_default = '%s-output.tar.gz' % id
 		filename = self.get_query_argument('path', filename_default)
 
+		# set up the output from the attempt directory and filename
 		self.set_header('content-disposition', 'attachment; filename=\"%s\"' % filename)
-		return os.path.join(id, filename)
+		output = os.path.join(id, env.OUTPUTS_DIR, filename_default)
+		return output
+
+
+
+class OutputMultipleDownloadHandler(tornado.web.RequestHandler):
+
+	async def post(self, id, attempt):
+		db = self.settings['db']
+
+		# make sure request body is valid
+		try:
+			data = tornado.escape.json_decode(self.request.body)
+		except json.JSONDecodeError:
+			self.set_status(422)
+			self.write(message(422, 'Ill-formatted JSON'))
+
+		try:
+			# update workflow from request body
+			workflow = await db.workflow_get(id)
+
+			# get output directory from attempt
+			workflow_dir = os.path.join(env.WORKFLOWS_DIR, id)
+			output_dir = os.path.join(workflow_dir, env.OUTPUTS_DIR, attempt)
+
+			# # create zip archive of outputt files
+			# zipfile = os.path.join(env.TRACES_DIR, 'traces-%s-%s-%s.zip' % (id, attempt, str(bson.ObjectId())) )
+			# # ofiles = [o for o in data]
+			# subprocess.run(['zip', zipfile] + data, check=True, cwd=output_dir)
+
+
+			# create an in-memory zip file
+			memory_zip = io.BytesIO()
+			with zipfile.ZipFile(memory_zip, 'w') as zf:
+				for f in data:
+					# get the absolute path
+					file_path = os.path.join(output_dir, f)
+					# add the file to the zip archive
+					zf.write(file_path, arcname=f)
+
+					# the following code is you want to compress the files without folders:
+					# # extract the file name from the path
+					# file_name = os.path.basename(file_path)
+					# # add the file to the zip archive
+					# zf.write(file_path, arcname=f)
+	 
+
+   
+			# set the appropriate headers
+			self.set_header("Content-Type", "application/zip")
+			self.set_header("Content-Disposition", "attachment; filename=%s.zip" % f"outputs-{id}-{attempt}")
+			
+			# write the zip file data to the response
+			self.write(memory_zip.getvalue())
+		
+		except:
+			self.set_status(404)
+			self.write(message(404, 'Failed to download the multiple output files for \"%s/%s\"' % (id,attempt)))
+
+
+
+class OutputArchiveDownloadHandler(tornado.web.StaticFileHandler):
+
+	def parse_url_path(self, data):
+		# get the given parameters
+		(id, attempt) = data.split('/')
+
+		# provide output file if path is specified, otherwise output data archive
+		filename_default = 'outputs-%s-%s.tar.gz' % (id, attempt)
+		filename = self.get_query_argument('path', filename_default)
+
+		# set up the output from the attempt directory and filename
+		self.set_header('content-disposition', 'attachment; filename=\"%s\"' % filename)
+		output = os.path.join(id, env.OUTPUTS_DIR, filename)
+		return output
+	
 
 
 
@@ -1112,7 +1214,6 @@ if __name__ == '__main__':
 	# initialize auxiliary directories
 	os.makedirs(env.WORKFLOWS_DIR, exist_ok=True)
 	os.makedirs(env.DATASETS_DIR, exist_ok=True)
-	os.makedirs(env.OUTPUTS_DIR, exist_ok=True)
 	os.makedirs(env.TRACES_DIR, exist_ok=True)
 	os.makedirs(env.MODELS_DIR, exist_ok=True)
 
@@ -1130,11 +1231,12 @@ if __name__ == '__main__':
 		(r'/api/workflows/([a-zA-Z0-9-]+)/resume', WorkflowResumeHandler),
 		(r'/api/workflows/([a-zA-Z0-9-]+)/cancel', WorkflowCancelHandler),
 		(r'/api/workflows/([a-zA-Z0-9-]+)/log', WorkflowLogHandler),
-		(r'/api/workflows/([a-zA-Z0-9-]+)/download', WorkflowDownloadHandler, dict(path=env.WORKFLOWS_DIR)),
+		# (r'/api/workflows/([a-zA-Z0-9-]+)/download', WorkflowDownloadHandler, dict(path=env.WORKFLOWS_DIR)),
 
-		(r'/api/outputs', OutputQueryHandler),
-		(r'/api/outputs/([a-zA-Z0-9-]+)/log', OutputLogHandler),
-		(r'/api/outputs/([a-zA-Z0-9-]+)/download', OutputDownloadHandler, dict(path=env.OUTPUTS_DIR)),
+		(r'/api/outputs/([a-zA-Z0-9-]+)/([a-zA-Z0-9-]+)', OutputEditHandler),
+		(r'/api/outputs/single/(.+)/download', OutputDownloadHandler, dict(path=env.WORKFLOWS_DIR)),
+		(r'/api/outputs/multiple/([a-zA-Z0-9-]+)/([a-zA-Z0-9-]+)/download', OutputMultipleDownloadHandler),
+  		(r'/api/outputs/archive/(.+)/download', OutputArchiveDownloadHandler, dict(path=env.WORKFLOWS_DIR)),
 
 		(r'/api/tasks', TaskQueryHandler),
 		(r'/api/tasks/([a-zA-Z0-9-]+)/log', TaskLogHandler),

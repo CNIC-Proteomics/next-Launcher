@@ -33,16 +33,17 @@ bash dataset/edit.sh http://localhost:8080 66212647c63490ba135050a0 '{"name":"ne
 bash dataset/delete.sh http://localhost:8080 66212647c63490ba135050a0
 ```
 
-Test example for nf-PTM-compass
+
+### Test example for nf-PTM-compass
 ```
 bash dataset/create.sh http://localhost:8080 'dataset_1'
-bash dataset/upload.sh http://localhost:8080 663ca7a4d61efcf1dbf1c727 "directory-path" "re_files" "/mnt/tierra/nf-PTM-compass/tests/test1/inputs/re_files/JAL_Noa3_iT_ALL.txt"
-bash dataset/upload.sh http://localhost:8080 663ca7a4d61efcf1dbf1c727 "directory-path" "re_files" "/mnt/tierra/nf-PTM-compass/tests/test1/inputs/re_files/JAL_NoCD_iTR_ALL.txt"
-bash dataset/upload.sh http://localhost:8080 663ca7a4d61efcf1dbf1c727 "file-path" "exp_table" "/mnt/tierra/nf-PTM-compass/tests/test1/inputs/exp_table.txt"
-bash dataset/upload.sh http://localhost:8080 663ca7a4d61efcf1dbf1c727 "file-path" "database" "/mnt/tierra/nf-PTM-compass/tests/test1/inputs/database.fasta"
-bash dataset/upload.sh http://localhost:8080 663ca7a4d61efcf1dbf1c727 "file-path" "params-file" "/mnt/tierra/nf-PTM-compass/tests/test1/inputs/params.ini"
-bash dataset/upload.sh http://localhost:8080 663ca7a4d61efcf1dbf1c727 "file-path" "sitelist_file" "/mnt/tierra/nf-PTM-compass/tests/test1/inputs/sitelist.txt"
-bash dataset/upload.sh http://localhost:8080 663ca7a4d61efcf1dbf1c727 "file-path" "groupmaker_file" "/mnt/tierra/nf-PTM-compass/tests/test1/inputs/groupmaker.txt"
+bash dataset/upload.sh http://localhost:8080 66447dbf309b2cffc914ac87 "directory-path" "re_files" "/mnt/tierra/nf-PTM-compass/tests/test1/inputs/re_files/JAL_Noa3_iT_ALL.txt"
+bash dataset/upload.sh http://localhost:8080 66447dbf309b2cffc914ac87 "directory-path" "re_files" "/mnt/tierra/nf-PTM-compass/tests/test1/inputs/re_files/JAL_NoCD_iTR_ALL.txt"
+bash dataset/upload.sh http://localhost:8080 66447dbf309b2cffc914ac87 "file-path" "exp_table" "/mnt/tierra/nf-PTM-compass/tests/test1/inputs/exp_table.txt"
+bash dataset/upload.sh http://localhost:8080 66447dbf309b2cffc914ac87 "file-path" "database" "/mnt/tierra/nf-PTM-compass/tests/test1/inputs/database.fasta"
+bash dataset/upload.sh http://localhost:8080 66447dbf309b2cffc914ac87 "file-path" "params-file" "/mnt/tierra/nf-PTM-compass/tests/test1/inputs/params.ini"
+bash dataset/upload.sh http://localhost:8080 66447dbf309b2cffc914ac87 "file-path" "sitelist_file" "/mnt/tierra/nf-PTM-compass/tests/test1/inputs/sitelist.txt"
+bash dataset/upload.sh http://localhost:8080 66447dbf309b2cffc914ac87 "file-path" "groupmaker_file" "/mnt/tierra/nf-PTM-compass/tests/test1/inputs/groupmaker.txt"
 ```
 
 
@@ -59,39 +60,89 @@ bash workflow/create.sh http://localhost:8080 \
 '{"pipeline": "https://github.com/CNIC-Proteomics/nf-PTM-compass",
 "revision": "main",
 "profiles": "guess",
-"description": "test workflow",
-"params": [
-    {"name": "re_files", "type": "directory-path", "value": "663ca7a4d61efcf1dbf1c727/re_files/*"},
-    {"name": "exp_table", "type": "file-path", "value": "663ca7a4d61efcf1dbf1c727/exp_table.txt"},
-    {"name": "database", "type": "file-path", "value": "663ca7a4d61efcf1dbf1c727/database.fasta"},
-    {"name": "decoy_prefix", "type": "string", "value": "DECOY_"},
-    {"name": "params-file", "type": "file-path", "value": "663ca7a4d61efcf1dbf1c727/database.fasta"}
-]
+"description": "test workflow"
 }'
 ```
 
-3. Launch a workflow instance on a nextflow server
+3. Edit a workflow instance
 ```
-bash workflow/launch.sh http://localhost:8080 663cb088c59bdf69dc2daedc
+bash workflow/edit.sh http://localhost:8080 66447ecf309b2cffc914ac88 \
+'{"pipeline": "https://github.com/CNIC-Proteomics/nf-PTM-compass",
+"revision": "main",
+"profiles": "guess",
+"description": "test 2 workflow"
+}'
 ```
 
-4. Get the log of a workflow instance on a nextflow server
+4. Launch a workflow instance on a nextflow server
 ```
-bash workflow/log.sh http://localhost:8080 663cb088c59bdf69dc2daedc
-```
-
-5. Create a workflow instance
-```
-bash workflow/edit.sh http://localhost:8080 663cb088c59bdf69dc2daedc \
-'{"params": [
-    {"name": "--re_files", "type": "directory-path", "value": "663ca7a4d61efcf1dbf1c727/re_files/*"},
-    {"name": "--exp_table", "type": "file-path", "value": "663ca7a4d61efcf1dbf1c727/exp_table.txt"},
-    {"name": "--database", "type": "file-path", "value": "663ca7a4d61efcf1dbf1c727/database.fasta"},
+bash workflow/launch.sh http://localhost:8080 66447ecf309b2cffc914ac88 \
+'{"inputs": [
+    {"name": "--re_files", "type": "directory-path", "value": "66447dbf309b2cffc914ac87/re_files/*"},
+    {"name": "--exp_table", "type": "file-path", "value": "66447dbf309b2cffc914ac87/exp_table.txt"},
+    {"name": "--database", "type": "file-path", "value": "66447dbf309b2cffc914ac87/database.fasta"},
     {"name": "--decoy_prefix", "type": "string", "value": "DECOY_"},
-    {"name": "--params_file", "type": "file-path", "value": "663ca7a4d61efcf1dbf1c727/params-file.ini"},
-    {"name": "--sitelist_file", "type": "file-path", "value": "663ca7a4d61efcf1dbf1c727/sitelist_file.txt"},
-    {"name": "--groupmaker_file", "type": "file-path", "value": "663ca7a4d61efcf1dbf1c727/groupmaker_file.txt"}
+    {"name": "--params_file", "type": "file-path", "value": "66447dbf309b2cffc914ac87/params-file.ini"},
+    {"name": "--sitelist_file", "type": "file-path", "value": "66447dbf309b2cffc914ac87/sitelist_file.txt"},
+    {"name": "--groupmaker_file", "type": "file-path", "value": "66447dbf309b2cffc914ac87/groupmaker_file.txt"}
 ]
 }'
 ```
+
+5. Get the log of a workflow instance on a nextflow server
+```
+bash workflow/log.sh http://localhost:8080 66447ecf309b2cffc914ac88
+```
+
+6. Get a workflow instance on a nextflow server
+```
+bash workflow/get.sh http://localhost:8080 66447ecf309b2cffc914ac88
+```
+
+7. Cancel a workflow instance on a nextflow server
+```
+bash workflow/cancel.sh http://localhost:8080 66447ecf309b2cffc914ac88
+```
+
+
+# Command lines for Workflow (root user???)
+
+1. Delete a workflow instance on a nextflow server
+```
+bash workflow/delete.sh http://localhost:8080 66447ecf309b2cffc914ac88
+```
+
+
+# Command lines for outputs
+
+1. Get a list of all outputs for a workflow instance and attempt on a nextflow server
+```
+bash output/get.sh http://localhost:8080 66447ecf309b2cffc914ac88 1
+```
+
+2. Retrieve all data (all files) for a workflow instance and attempt on a nextflow server
+```
+bash output/archive.sh http://localhost:8080 66447ecf309b2cffc914ac88 1
+```
+
+3. Download a single file for a workflow instance and attempt on a Nextflow server.
+```
+bash output/download_single.sh http://localhost:8080 66447ecf309b2cffc914ac88 1 modules/solver/10_group_maker/experiment_PDMTable_GM.txt
+```
+
+4. Download multiple files for a workflow instance and attempt on a Nextflow server.
+```
+bash output/download_multi.sh http://localhost:8080 66447ecf309b2cffc914ac88 1 \
+'[
+    "modules/solver/10_group_maker/experiment_PDMTable_GM.txt",
+    "modules/solver/11_joiner/experiment_PDMTable_GM_J.txt"
+]'
+```
+
+5. Delete the outputs for a workflow intance and attempt on a nextflow server
+```
+bash output/delete.sh http://localhost:8080 66447ecf309b2cffc914ac88 1
+```
+
+
 

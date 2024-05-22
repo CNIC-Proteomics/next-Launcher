@@ -15,7 +15,7 @@ BASE_DIR = BASE_DIRS[NXF_EXECUTOR]
 
 DATASETS_DIR = os.path.join(BASE_DIR, '_datasets')
 WORKFLOWS_DIR = os.path.join(BASE_DIR, '_workflows')
-OUTPUTS_DIR = os.path.join(BASE_DIR, '_outputs')
+OUTPUTS_DIR = ''
 TRACES_DIR = os.path.join(BASE_DIR, '_traces')
 MODELS_DIR = os.path.join(BASE_DIR, '_models')
 

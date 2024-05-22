@@ -19,6 +19,7 @@ RUN apt-get install -y vim
 RUN apt-get install -y curl
 RUN apt-get install -y wget
 RUN apt-get install -y git
+RUN apt-get install -y zip
 RUN apt-get install -y unzip
 
 
@@ -101,11 +102,10 @@ RUN cat "/tmp/setup.root.sh" >> /root/.bashrc
 EXPOSE 8080
 
 # Define the command to execute when the container starts.
-CMD cd ${NXF_API_HOME} && ./scripts/startup-local.sh mongo
+# CMD cd ${NXF_API_HOME} && ./scripts/startup-local.sh mongo
 # CMD cd ${NXF_API_HOME} && ./scripts/startup-local.sh file
 
 # Setting up the environment variables
-# WORKDIR /opt/PTM-compass
 WORKDIR /workspace
 
 
@@ -141,6 +141,7 @@ WORKDIR /workspace
 # RUN apt-get install -y curl
 # RUN apt-get install -y wget
 # RUN apt-get install -y git
+# RUN apt-get install -y zip
 # RUN apt-get install -y unzip
 
 # Declare local variables
@@ -272,6 +273,7 @@ RUN cd ${MZEXTRACTOR_HOME} && /bin/bash -c "source ${MZEXTRACTOR_HOME}/env/bin/a
 # RUN apt-get install -y curl
 # RUN apt-get install -y wget
 # RUN apt-get install -y git
+# RUN apt-get install -y zip
 # RUN apt-get install -y unzip
 
 # Declare local variables
@@ -350,6 +352,7 @@ RUN cd ${SRC_HOME} && /bin/bash -c "source ${SRC_HOME}/env/bin/activate && pip i
 # RUN apt-get install -y curl
 # RUN apt-get install -y wget
 # RUN apt-get install -y git
+# RUN apt-get install -y zip
 # RUN apt-get install -y unzip
 
 # Declare local variables
@@ -417,6 +420,7 @@ RUN cd ${SRC_HOME} && /bin/bash -c "source ${SRC_HOME}/env/bin/activate && pip i
 # RUN apt-get install -y curl
 # RUN apt-get install -y wget
 # RUN apt-get install -y git
+# RUN apt-get install -y zip
 # RUN apt-get install -y unzip
 
 # Declare local variables

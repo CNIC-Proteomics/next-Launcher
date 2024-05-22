@@ -12,6 +12,7 @@ class Backend():
 	def initialize(self):
 		pass
 
+	# dataset functions -----
 	async def dataset_query(self, page, page_size):
 		raise NotImplementedError()
 
@@ -27,6 +28,7 @@ class Backend():
 	async def dataset_delete(self, id):
 		raise NotImplementedError()
 
+	# workflow functions -----
 	async def workflow_query(self, page, page_size):
 		raise NotImplementedError()
 
@@ -41,7 +43,11 @@ class Backend():
 
 	async def workflow_delete(self, id):
 		raise NotImplementedError()
+	
+	async def output_delete(self, id, attempt):
+		raise NotImplementedError()
 
+	# task functions -----
 	async def task_query(self, page, page_size):
 		raise NotImplementedError()
 
@@ -70,6 +76,7 @@ class FileBackend(Backend):
 			self._db = {
 				'datasets': [],
 				'workflows': [],
+				'outputs': [],
 				'tasks': []
 			}
 			self.save()
@@ -169,6 +176,7 @@ class FileBackend(Backend):
 		if not found:
 			raise IndexError('Dataset was not found')
 
+
 	# ----------------
 	# Workflow functions
 	# ----------------
@@ -257,6 +265,30 @@ class FileBackend(Backend):
 		# raise error if workflow wasn't found
 		if not found:
 			raise IndexError('Workflow was not found')
+
+	async def output_delete(self, id, attempt):
+		self._lock.acquire()
+		self.load()
+
+		# search for workflow by id and delete it
+		found = False
+
+		for i, w in enumerate(self._db['workflows']):
+			if w['_id'] == id:
+				for j, a in enumerate(w['attempts']):
+					if str(a['id']) == attempt:
+						# delete outpus
+						self._db['workflows'][i]['attempts'].pop(j)
+						found = True
+						break
+
+		self.save()
+		self._lock.release()
+
+		# raise error if workflow wasn't found
+		if not found:
+			raise IndexError('Output was not found')
+
 
 
 	# ----------------

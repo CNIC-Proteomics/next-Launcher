@@ -10,16 +10,16 @@ import env
 
 
 def get_run_name(workflow):
-	return 'workflow-%s-%04d' % (workflow['_id'], workflow['attempts'])
+	return 'workflow-%s-%04d' % (workflow['_id'], workflow['n_attempts'])
 
 
 
-def run_workflow(workflow, work_dir, resume):
+def run_workflow(workflow, attempt, output_dir, resume):
 	# save current directory
 	prev_dir = os.getcwd()
 
 	# change to workflow directory
-	os.chdir(work_dir)
+	os.chdir(output_dir)
 
 	# prepare command line arguments
 	run_name = get_run_name(workflow)
@@ -27,7 +27,7 @@ def run_workflow(workflow, work_dir, resume):
 	if env.NXF_EXECUTOR == 'k8s':
 		args = [
 			'nextflow',
-			'-log', os.path.join(workflow['output_dir'], 'nextflow.log'),
+			'-log', os.path.join(output_dir, 'nextflow.log'),
 			'kuberun',
 			workflow['pipeline'],
 			'-ansi-log', 'false',
@@ -41,7 +41,7 @@ def run_workflow(workflow, work_dir, resume):
 	elif env.NXF_EXECUTOR == 'pbspro':
 		args = [
 			'nextflow',
-			'-log', os.path.join(workflow['output_dir'], 'nextflow.log'),
+			'-log', os.path.join(output_dir, 'nextflow.log'),
 			'run',
 			workflow['pipeline'],
 			'-ansi-log', 'false',
@@ -54,7 +54,7 @@ def run_workflow(workflow, work_dir, resume):
 	elif env.NXF_EXECUTOR == 'local':
 		args = [
 			'nextflow',
-			'-log', os.path.join(workflow['output_dir'], 'nextflow.log'),
+			'-log', os.path.join(output_dir, 'nextflow.log'),
 			'run',
 			workflow['pipeline'],
 			'-revision', workflow['revision'],
@@ -65,7 +65,7 @@ def run_workflow(workflow, work_dir, resume):
 		]
 
 	# add params
-	for param in workflow['params']:
+	for param in attempt['inputs']:
 		pname = param['name']
 		if param['type'] == 'directory-path' or param['type'] == 'file-path':
 			pval = os.path.join( env.DATASETS_DIR, param['value'])
@@ -74,7 +74,7 @@ def run_workflow(workflow, work_dir, resume):
 		args += [pname, pval]
 
 	# add the output directory
-	args += ['--outdir', workflow['output_dir']]
+	args += ['--outdir', output_dir]
 
 	# add resume option if specified
 	if resume:
@@ -94,9 +94,9 @@ def run_workflow(workflow, work_dir, resume):
 
 
 
-def save_output(workflow, output_dir):
+def save_output(workflow, attempt, output_dir):
 	return subprocess.Popen(
-		['scripts/kube-save.sh', workflow['_id'], output_dir],
+		['scripts/kube-save.sh', str(workflow['_id']), str(attempt['id']), output_dir],
 		stdout=subprocess.PIPE,
 		stderr=subprocess.STDOUT
 	)
@@ -109,15 +109,14 @@ async def set_property(db, workflow, key, value):
 
 
 
-async def launch_async(db, workflow, resume):
+async def launch_async(db, workflow, attempt, output_dir, resume):
 	# re-initialize database backend
 	db.initialize()
 
 	# start workflow
-	work_dir = os.path.join(env.WORKFLOWS_DIR, workflow['_id'])
-	proc = run_workflow(workflow, work_dir, resume)
+	proc = run_workflow(workflow, attempt, output_dir, resume)
 	proc_pid = proc.pid
-
+	
 	print('%d: saving workflow pid...' % (proc_pid))
 
 	# save workflow pid
@@ -137,8 +136,7 @@ async def launch_async(db, workflow, resume):
 	print('%d: saving output data...' % (proc_pid))
 
 	# save output data
-	output_dir = os.path.join(env.WORKFLOWS_DIR, workflow['_id'], workflow['output_dir'])
-	proc = save_output(workflow, output_dir)
+	proc = save_output(workflow, attempt, output_dir)
 
 	proc_out, _ = proc.communicate()
 	print(proc_out.decode('utf-8'))
@@ -150,8 +148,8 @@ async def launch_async(db, workflow, resume):
 
 
 
-def launch(db, workflow, resume):
-	asyncio.run(launch_async(db, workflow, resume))
+def launch(db, workflow, attempt, output_dir, resume):
+	asyncio.run(launch_async(db, workflow, attempt, output_dir, resume))
 
 
 
