@@ -43,10 +43,27 @@ def message(status, message):
 
 
 #-------------------------------------
+# CORS permissions
+#-------------------------------------
+
+# Define your CORSMixin
+class CORSMixin:
+    def set_default_headers(self):
+        self.set_header("Access-Control-Allow-Origin", f"{env.CORS_HOST}:{env.CORS_PORT}")
+        self.set_header("Access-Control-Allow-Headers", "x-requested-with, content-type")
+        self.set_header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PUT")
+
+    def options(self, *args, **kwargs):
+        self.set_status(204)
+        self.finish()
+
+
+
+#-------------------------------------
 # DATASETS Classes
 #-------------------------------------
 
-class DatasetQueryHandler(tornado.web.RequestHandler):
+class DatasetQueryHandler(CORSMixin, tornado.web.RequestHandler):
 
 	async def get(self):
 		page = int(self.get_query_argument('page', 0))
@@ -61,7 +78,7 @@ class DatasetQueryHandler(tornado.web.RequestHandler):
 
 
 
-class DatasetCreateHandler(tornado.web.RequestHandler):
+class DatasetCreateHandler(CORSMixin, tornado.web.RequestHandler):
 
 	REQUIRED_KEYS = set([
 		'experiment'
@@ -121,7 +138,7 @@ class DatasetCreateHandler(tornado.web.RequestHandler):
 
 
 
-class DatasetEditHandler(tornado.web.RequestHandler):
+class DatasetEditHandler(CORSMixin, tornado.web.RequestHandler):
 
 	REQUIRED_KEYS = set([
 		'experiment',
@@ -209,7 +226,7 @@ class DatasetEditHandler(tornado.web.RequestHandler):
 
 
 
-class DatasetUploadHandler(tornado.web.RequestHandler):
+class DatasetUploadHandler(CORSMixin, tornado.web.RequestHandler):
 
 	async def post(self, id, format, parameter):
 		db = self.settings['db']
@@ -302,7 +319,7 @@ class DatasetUploadHandler(tornado.web.RequestHandler):
 # WORKFLOW Classes
 #-------------------------------------
 
-class WorkflowQueryHandler(tornado.web.RequestHandler):
+class WorkflowQueryHandler(CORSMixin, tornado.web.RequestHandler):
 
 	async def get(self):
 		page = int(self.get_query_argument('page', 0))
@@ -317,7 +334,7 @@ class WorkflowQueryHandler(tornado.web.RequestHandler):
 
 
 
-class WorkflowCreateHandler(tornado.web.RequestHandler):
+class WorkflowCreateHandler(CORSMixin, tornado.web.RequestHandler):
 
 	REQUIRED_KEYS = set([
 		'pipeline',
@@ -383,7 +400,7 @@ class WorkflowCreateHandler(tornado.web.RequestHandler):
 
 
 
-class WorkflowEditHandler(tornado.web.RequestHandler):
+class WorkflowEditHandler(CORSMixin, tornado.web.RequestHandler):
 
 	REQUIRED_KEYS = set([])
 
@@ -464,7 +481,7 @@ class WorkflowEditHandler(tornado.web.RequestHandler):
 
 
 
-class WorkflowLaunchHandler(tornado.web.RequestHandler):
+class WorkflowLaunchHandler(CORSMixin, tornado.web.RequestHandler):
 
 	REQUIRED_KEYS = set([
 		'inputs'
@@ -568,7 +585,7 @@ class WorkflowResumeHandler(WorkflowLaunchHandler):
 
 
 
-class WorkflowCancelHandler(tornado.web.RequestHandler):
+class WorkflowCancelHandler(CORSMixin, tornado.web.RequestHandler):
 
 	async def post(self, id):
 		db = self.settings['db']
@@ -595,7 +612,7 @@ class WorkflowCancelHandler(tornado.web.RequestHandler):
 
 
 
-class WorkflowLogHandler(tornado.web.RequestHandler):
+class WorkflowLogHandler(CORSMixin, tornado.web.RequestHandler):
 
 	async def get(self, id):
 		db = self.settings['db']
@@ -648,7 +665,7 @@ class WorkflowLogHandler(tornado.web.RequestHandler):
 # OUTPUTS Classes
 #-------------------------------------
 
-class OutputEditHandler(tornado.web.RequestHandler):
+class OutputEditHandler(CORSMixin, tornado.web.RequestHandler):
 
 	async def get(self, id, attempt):
 		db = self.settings['db']
@@ -700,7 +717,7 @@ class OutputEditHandler(tornado.web.RequestHandler):
 
 
 
-class OutputDownloadHandler(tornado.web.StaticFileHandler):
+class OutputDownloadHandler(CORSMixin, tornado.web.StaticFileHandler):
 
 	def parse_url_path(self, data):
 		# get the given parameters
@@ -717,7 +734,7 @@ class OutputDownloadHandler(tornado.web.StaticFileHandler):
 
 
 
-class OutputMultipleDownloadHandler(tornado.web.RequestHandler):
+class OutputMultipleDownloadHandler(CORSMixin, tornado.web.RequestHandler):
 
 	async def post(self, id, attempt):
 		db = self.settings['db']
@@ -773,7 +790,7 @@ class OutputMultipleDownloadHandler(tornado.web.RequestHandler):
 
 
 
-class OutputArchiveDownloadHandler(tornado.web.StaticFileHandler):
+class OutputArchiveDownloadHandler(CORSMixin, tornado.web.StaticFileHandler):
 
 	def parse_url_path(self, data):
 		# get the given parameters
@@ -795,7 +812,7 @@ class OutputArchiveDownloadHandler(tornado.web.StaticFileHandler):
 # TASKS Classes
 #-------------------------------------
 
-class TaskQueryHandler(tornado.web.RequestHandler):
+class TaskQueryHandler(CORSMixin, tornado.web.RequestHandler):
 
 	async def get(self):
 		page = int(self.get_query_argument('page', 0))
@@ -867,7 +884,7 @@ class TaskQueryHandler(tornado.web.RequestHandler):
 
 
 
-class TaskLogHandler(tornado.web.RequestHandler):
+class TaskLogHandler(CORSMixin, tornado.web.RequestHandler):
 
 	async def get(self, id):
 		db = self.settings['db']
@@ -905,7 +922,7 @@ class TaskLogHandler(tornado.web.RequestHandler):
 
 
 
-class TaskQueryPipelinesHandler(tornado.web.RequestHandler):
+class TaskQueryPipelinesHandler(CORSMixin, tornado.web.RequestHandler):
 
 	async def get(self):
 		db = self.settings['db']
@@ -924,7 +941,7 @@ class TaskQueryPipelinesHandler(tornado.web.RequestHandler):
 
 
 
-class TaskQueryPipelineHandler(tornado.web.RequestHandler):
+class TaskQueryPipelineHandler(CORSMixin, tornado.web.RequestHandler):
 
 	async def get(self, pipeline):
 		db = self.settings['db']
@@ -952,7 +969,7 @@ class TaskQueryPipelineHandler(tornado.web.RequestHandler):
 
 
 
-class TaskArchiveHandler(tornado.web.RequestHandler):
+class TaskArchiveHandler(CORSMixin, tornado.web.RequestHandler):
 
 	async def get(self, pipeline):
 		db = self.settings['db']
@@ -997,7 +1014,7 @@ class TaskArchiveHandler(tornado.web.RequestHandler):
 
 
 
-class TaskArchiveDownloadHandler(tornado.web.StaticFileHandler):
+class TaskArchiveDownloadHandler(CORSMixin, tornado.web.StaticFileHandler):
 
 	def parse_url_path(self, pipeline):
 		# get filename of trace archive
@@ -1008,7 +1025,7 @@ class TaskArchiveDownloadHandler(tornado.web.StaticFileHandler):
 
 
 
-class TaskVisualizeHandler(tornado.web.RequestHandler):
+class TaskVisualizeHandler(CORSMixin, tornado.web.RequestHandler):
 
 	async def post(self):
 		db = self.settings['db']
@@ -1065,7 +1082,7 @@ class TaskVisualizeHandler(tornado.web.RequestHandler):
 
 
 
-class TaskEditHandler(tornado.web.RequestHandler):
+class TaskEditHandler(CORSMixin, tornado.web.RequestHandler):
 
 	async def get(self, id):
 		db = self.settings['db']
@@ -1082,7 +1099,12 @@ class TaskEditHandler(tornado.web.RequestHandler):
 
 
 
-class ModelTrainHandler(tornado.web.RequestHandler):
+
+#-------------------------------------
+# MODEL Classes: NOT IMPLEMENTED!!
+#-------------------------------------
+
+class ModelTrainHandler(CORSMixin, tornado.web.RequestHandler):
 
 	async def post(self):
 		db = self.settings['db']
@@ -1155,7 +1177,7 @@ class ModelTrainHandler(tornado.web.RequestHandler):
 
 
 
-class ModelConfigHandler(tornado.web.RequestHandler):
+class ModelConfigHandler(CORSMixin, tornado.web.RequestHandler):
 
 	async def get(self):
 		try:
@@ -1180,7 +1202,7 @@ class ModelConfigHandler(tornado.web.RequestHandler):
 
 
 
-class ModelPredictHandler(tornado.web.RequestHandler):
+class ModelPredictHandler(CORSMixin, tornado.web.RequestHandler):
 
 	async def post(self):
 		try:

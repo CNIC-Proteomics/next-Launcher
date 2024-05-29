@@ -19,6 +19,10 @@ OUTPUTS_DIR = ''
 TRACES_DIR = os.path.join(BASE_DIR, '_traces')
 MODELS_DIR = os.path.join(BASE_DIR, '_models')
 
+# Frontend: Access-Control-Allow-Origin 
+CORS_HOST = 'http://localhost'
+CORS_PORT = 3000
+
 # validate environment settings
 if NXF_EXECUTOR == 'k8s' and PVC_NAME is None:
 	raise EnvironmentError('Using k8s executor but PVC is not defined')
