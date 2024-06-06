@@ -9,13 +9,22 @@ import reportWebVitals from './reportWebVitals';
 
 
 // icons
-import "@fortawesome/fontawesome-free/css/all.min.css";
+// import "@fortawesome/fontawesome-free/css/all.min.css";
 // bootstrap
-import 'bootstrap/dist/css/bootstrap.min.css';
+// import 'bootstrap/dist/css/bootstrap.min.css';
 // import 'bootstrap-css-only/css/bootstrap.min.css';
 
+// primereact
+import 'primeflex/primeflex.css'; // PrimeFlex is imported
+import "primereact/resources/themes/lara-light-cyan/theme.css"; // Theme style
+import 'primereact/resources/primereact.min.css'; // PrimeReact styles
+import 'primeicons/primeicons.css'; // PrimeIcons
+
+        
+
 // Import APP
-import './index.css';
+import './theme-production.scss';
+import './App.scss';
 import App from './App';
 
 

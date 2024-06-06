@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
-import {
-  MDBIcon,
-  MDBDataTable,
-} from 'mdbreact';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect  } from 'react';
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
+import { Button } from 'primereact/button';
+import { Link, useHistory } from 'react-router-dom';
+import { workflowServices } from '../services/workflowServices';
+
+
 
 // Function to import JSON files dynamically
 const importAll = (r) => {
@@ -17,122 +19,117 @@ const importAll = (r) => {
 // Import all JSON files from the "pipelines" folder
 const pipelineFiles = importAll(require.context('../../public/pipelines', false, /\.json$/));
 
+// Lunch Button that redirect to "Parameters"
+const LunchButton = ({ data, launchPipeline }) => {
+  const history = useHistory();
+  const [navigate, setNavigate] = useState(false);
+  const [workflowId, setWorkflowId] = useState({});
 
-
-const Pipelines = () => {
-  const transform = data => {
-    let icon
-    switch (data.id) {
-        case 0:
-            icon = <MDBIcon id={data.id}  icon="times-circle" size="2x" className="red-text pr-3" />
-            break;
-        case 1:
-            icon = <MDBIcon id={data.id}  icon="check-circle" size="2x" className="green-text pr-3" />
-            break;    
-        case 2:
-            icon = <MDBIcon id={data.id}  icon="fas fa-ban" size="2x" className="red-text pr-3" />
-            break;    
-        default:
-          icon = <MDBIcon id={data.id}  icon="check-circle" size="2x" className="green-text pr-3" />
-            break;
+  useEffect(() => {
+    if (navigate) {
+      console.log("PASA");
+      history.push({
+        pathname: '/parameters',
+        state: { schema: data, workflowId: workflowId }
+      });
     }
-    const action = [
-        <Link to={{
-          pathname: '/parameters',
-          schema: data,
-        }}>
-          <button type="button" className="btn btn-outline-primary btn-sm m-0 mr-3 ">Launch</button>
-        </Link>,
-      ]
-    return {
-        icon: icon,
-        title: data.title,
-        description: data.description,
-        url: data.url,
-        action: action }
-  }
-
-  const [datatable] = useState({
-    columns: [
-      {
-        label: '',
-        field: 'icon',
-        // width: 10,
-      },
-      {
-        label: '',
-        field: 'title',
-        // width: 150,
-      },
-      {
-        label: '',
-        field: 'description',
-        // width: 270,
-      },
-      {
-        label: '',
-        field: 'url',
-        // width: 200,
-      },
-      {
-        label: '',
-        field: 'action',
-        // width: 10,
-      },
-    ],
-    rows: pipelineFiles.map(transform),
-  });
+  }, [navigate, history, data, workflowId]);
 
   return (
-    <div className="table-pipelines">
-    <MDBDataTable
-      key='0'
-      scrollY
-      maxHeight="200px"
-      small
-      paging={false}
-      sortable={false}
-      data={datatable}
+    <Button
+      label='Launch'
+      onClick={() => launchPipeline(data, setNavigate, setWorkflowId)}
+      raised
     />
+  );
+};
+
+// Function that transform the pipeline data
+const Pipelines = () => {
+
+  // Launch the pipeline creating a workflow
+  const launchPipeline = async (data, setNavigate, setWorkflowId) => {
+    // convert the data pipeline to POST
+    let convertDataToPOST = {};
+    try {
+      convertDataToPOST = {
+        pipeline: data.url,
+        revision: data.revision,
+        profiles: 'guess',
+      };
+    } catch (error) {
+      console.error('Error: converting data pipeline to POST request in the creation of a workflow: ', error);
+    }
+    // make the POST request to create a workflow
+    try {
+      if ( Object.keys(convertDataToPOST).length !== 0 && convertDataToPOST.constructor === Object) {
+        console.log(convertDataToPOST);
+        const result = await workflowServices.create(convertDataToPOST);
+        console.log('Success:', result);
+        setWorkflowId(result);
+        setNavigate(true); // Set state to trigger navigation   
+      }
+    } catch (error) {
+      console.error('Error: making a POST request in the creation of a workflow: ', error);
+    }
+  };
+
+  // Define header
+  const columns = [
+    { field: 'status', header: 'Status' },
+    { field: 'title', header: 'Title' },
+    { field: 'description', header: 'Description' },
+    { field: 'url', header: 'URL' },
+    { field: 'action', header: 'Action' },
+  ];
+
+  // Transform the data pipeline for the table
+  const convertDataToTable = data => ({
+    id: data.$id,
+    status: <StatusIcon status={data.status} />,
+    title: data.title,
+    description: data.description,
+    url: <UrlLink url={data.url} />,
+    action: <LunchButton data={data} launchPipeline={launchPipeline} />
+  });
+
+  const [datatable] = useState(pipelineFiles.map(convertDataToTable));
+
+  return (
+    <div className='table-pipelines'>
+      <DataTable value={datatable} tableStyle={{ minWidth: '50rem' }}>
+          {columns.map((col, i) => (
+              // <Column key={i} field={col.field} header={col.header} headerStyle={{display:'none'}} />
+              <Column key={i} field={col.field} header={col.header} />
+          ))}
+      </DataTable>
   </div>
   );
+};
 
+const StatusIcon = ({ status }) => {
+  const iconClass = {
+    0: 'pi pi-check-circle',
+    1: 'pi pi-exclamation-triangle',
+    2: 'pi pi-exclamation-triangle',
+    default: 'pi pi-question-circle'
+  }[status];
+  const color = {
+    0: 'green',
+    1: 'orange',
+    2: 'red',
+    default: 'blue'
+  }[status];
 
-//   <MDBDataTable
-//   scrollY
-//   maxHeight="200px"
-//   small
-//   paging={false}
-//   sortable={false}
-//   searchBottom={false}
-//   noHeader={true}
-//   data={datatable}
-// />
+  return <i className={iconClass} style={{ color }}></i>;
+};
 
-//   <MDBDataTableV5
-//   hover
-//   data={datatable}
-//   searchTop
-//   barReverse
-//   materialSearch
-//   paging={false}
-//   sortable={false}
-//   searchBottom={false}
-//   style={{ width: '50%' }} // Set the width of the DataTable here
-// />
+const UrlLink = ({ url }) => (
+  <div className="flex gap-1">
+    <a href={url} target='_blank' rel="noopener noreferrer">{url}</a>
+    <i className='pi pi-external-link' style={{ fontSize: '0.6rem' }}></i>
+  </div>
+);
 
-  // return (
-  //   <MDBDataTableV5
-  //     hover
-  //     striped
-  //     entriesOptions={[5, 20, 25]}
-  //     entries={5}
-  //     pagesAmount={4}
-  //     data={datatable}
-  //     searchTop
-  //     searchBottom={false}
-  //   />
-  // );  
-}
 
 export default Pipelines;

@@ -1,0 +1,57 @@
+/*
+ * Theme styles for the production web.
+ */
+
+ body {
+  margin: 0;
+  /* font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale; */
+  font-family: var(--nl-font-family);
+  font-size: var(--nl-font-size);
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+
+/*
+ * Declare the common style variables 
+ */
+
+:root {
+  // general variables
+  --nl-font-family: Roboto, Helvetica, Arial, sans-serif;
+  --nl-font-size: 13px;
+  --nl-title-font-size: 14px;
+
+
+  // navbar links links
+  --nl-navbar-font-size: 14px;
+  --nl-navbar-title-font-size: 24px;
+  --nl-navbar-color: rgb(250, 250, 250);
+  --nl-navbar-hover-color: rgb(13, 53, 111);
+  --nl-navbar-bg-color: rgb(13, 103, 157);
+  --nl-navbar-solid-color: rgb(13, 53, 111);
+
+  // tabs links
+  --nl-link-color: rgb(13, 103, 157);
+  --nl-link-hover-color: rgb(13, 192, 157);
+
+  // buttons
+  --nl-btn-font-weight: 410;
+  --nl-btn-font-size: 13px;
+  --nl-btn-color: rgb(13, 103, 157);
+  --nl-btn-border-color: rgb(13, 103, 157);
+
+  --nl-btn-active-color: rgb(13, 103, 157);
+  --nl-btn-active-bg: rgb(13, 103, 157);
+  --nl-btn-active-border-color: rgb(13, 103, 157);
+
+  --nl-btn-hover-color: white;
+  --nl-btn-hover-bg: rgb(13, 131, 157);
+  --nl-btn-hover-border-color: rgb(13, 131, 157);
+
+}
+

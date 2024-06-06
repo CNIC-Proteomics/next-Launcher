@@ -1,141 +1,174 @@
-import React, { useState } from 'react';
+/*
+ * Import libraries
+ */
+
+import React, { useState, useEffect, useRef  } from 'react';
+import { PanelMenu } from 'primereact/panelmenu';
+import { Panel } from 'primereact/panel';
+import { InputText } from 'primereact/inputtext';
 import {
-  MDBIcon,
-  MDBCollapse,
-  MDBRipple,
-  MDBListGroup,
-  MDBListGroupItem,
-} from 'mdb-react-ui-kit';
-import {
-  Container,
-  Row,
-  Col,
-  Card,
-  Button,
-  InputGroup,
-  Form
- } from 'react-bootstrap';
+  FileListDatasetUpload,
+  FolderDatasetUpload,
+  FileDatasetUpload,
+  StringDataset
+} from './formDatasets';
+import { Button } from 'primereact/button';
+import { showInfo, showError, showWarning } from '../services/toastServices';
 
 
-// Component for rendering input properties
-const Inputs = ({ properties }) => {
-  return (
-  <>
-    {(properties.format === 'path' || properties.format === 'directory-path')&& (
-      <InputGroup className="mb-3">
-        <Form.Control />
-        <Button variant="outline-secondary">Select folder</Button>
-      </InputGroup>
-          )}
-    {properties.format === 'file-path' && (
-      <InputGroup className="mb-3">
-        <Form.Control
-          placeholder="Recipient's username"
-          aria-label="Recipient's username"
-          aria-describedby="basic-addon2"
-        />
-        <Button variant="outline-secondary" id="button-addon2">Select file</Button>
-      </InputGroup>
-    )}
-  </>
-  );
-};
+
+/*
+ * Functions
+ */
 
 
-// Component for rendering input properties
-const Properties = ({ definitions }) => {
-  return (
-    <>
-    { Object.keys(definitions).map((i) => (
-      <Card
-        key={i}
-        className="mb-3"
-        border="secondary">
-        <Card.Header>
-          <MDBIcon fas icon={definitions[i].fa_icon} className="me-3" />{definitions[i].title}
-        </Card.Header>
-        { Object.keys(definitions[i].properties).map((j) => (
-          <Card.Body key={j}>
-            <Inputs properties={definitions[i].properties[j]} />
-          </Card.Body>
-        ))}
-      </Card>
-    ))}
-    </>
-  );
-};
+/* Create the Parameters panels */
+const Parameters = (props) => {
 
-const Sidebar = ({ definitions }) => {
+  // Check if workflow ID exist
+  if ( props.location.state.workflowId ) {
+    showError('Error Message', 'This is an error message');
+  }
 
-  const [collapsedMenus, setCollapsedMenus] = useState({});
-
-  const toggleSubMenu = (menuHeader) => {
-    setCollapsedMenus({
-      ...collapsedMenus,
-      [menuHeader]: !collapsedMenus[menuHeader]
-    });
-  };
-
-  return (
-    <div className="parameters-sidenav">
-      <div className="sidebar d-lg-block bg-white">
-        <MDBListGroup className="mx-3 mt-4">
-
-          { Object.keys(definitions).map((i) => (
-            <div key={i}>
-            <MDBRipple rippleTag='span'>     
-              <MDBListGroupItem action className='border-0 border-bottom rounded rounded' onClick={() => toggleSubMenu(definitions[i].title)}>
-                <MDBIcon fas icon={definitions[i].fa_icon} className="me-3" />
-                {definitions[i].title}
-                <MDBIcon icon={collapsedMenus[definitions[i].title] ? "angle-right" : "angle-down"} className="ms-3" />
-              </MDBListGroupItem>
-            </MDBRipple>
-            <MDBCollapse open={collapsedMenus[definitions[i].title]}>
-              <MDBListGroup>
-              { Object.keys(definitions[i].properties).map((j) => ( <MDBListGroupItem key={j} className="py-1" tag='a' action href='#'>{definitions[i].properties[j].title}</MDBListGroupItem> ))}
-              </MDBListGroup>
-            </MDBCollapse>
+  // Pipeline schema
+  if ( props.location.state.schema ) {
+    const schemaData = props.location.state.schema;
+    return (
+      <div className='parameters'>
+        <div className="grid">
+            <div className="col-3">
+              <SideMenu definitions={schemaData.definitions} />
             </div>
-          ))}
+            <div className="col-9">
+              <div className="field">
+                <label htmlFor="username">Describe briefly your workflow:</label>
+                <InputText id="username" className="w-full" aria-describedby="username-help" />
+                {/* <small id="username-help">Enter your username to reset your password.</small> */}
+              </div>
+              <Properties definitions={schemaData.definitions} />
+              {/* <FileListUpload /> */}
+            </div>
+        </div>
+      </div>
+    );
+  }
+  // The component has not received the pipeline schema
+  else {
+    return (
+      <>
+        <p>The pipeline schema is required</p>
+      </>
+    );
+  }
+};
 
-        </MDBListGroup>
+
+/* SideMenu created by "Definitions" data from Pipeline */
+const SideMenu = ({ definitions }) => {
+
+  // init the menu with the "FileList Upload"
+  const [menuItems, setMenuItems] = useState([]);
+
+  // const fileListMenu = {
+  //   label: 'Upload the File List',
+  //   items: [],
+  //   expanded: true
+  // };
+  const fileListMenu = {};
+
+  useEffect(() => {
+    // function to parse Definitions data and generate menu items
+    const parseDefinitionsToMenuItems = (data) => {
+      return Object.keys(data).filter((i) => i !== 'output_options').map((i) => ({
+        label: data[i].title,
+        // icon: data[i].fa_icon,
+        items: data[i].properties ? parseDefinitionsToMenuItems(data[i].properties) : null,
+        expanded: true
+      }));
+    };
+
+    // set the menu items based on the Definitions data
+    setMenuItems([...parseDefinitionsToMenuItems(definitions), fileListMenu]);
+  }, [definitions]);
+
+  return (
+    <div className='parameters-sidemenu'>
+      <div className='flex flex-column gap-4'>
+        <PanelMenu model={menuItems} multiple />
+        <Button label='Lauch' />
       </div>
     </div>
   );
 };
 
 
-const Parameters = (props) => {
+/* Create the "Properties" of parameters */
+const Properties = ({ definitions }) => {
 
-  // Pipeline schema
-  if ( props.location.schema ) {
-    const schemaData = props.location.schema;
+  // create the panel header
+  const header = (definition) => {
     return (
-      <div className='parameters'>
-      <Container fluid>
-        <Row>
-          <Col sm={3}>
-          <Sidebar definitions={schemaData.definitions} />
-          </Col>
-          <Col sm={9}>
-            <Properties definitions={schemaData.definitions} />
-          </Col>
-        </Row>
-      </Container>
+      <div className='parameter-panel-header'>
+        <i className={definition.fa_icon} style={{fontSize:'1.25rem',marginRight:'0.5em'}}></i>{definition.title}
+      </div>      
+    );
+  };
 
-      </div>
-    );
-  
-  }
-  // The component has not received the pipeline schema
-  else {
+  // component for rendering input properties
+  const Inputs = ({ properties }) => {
     return (
-      <div>
-        <p>The pipeline schema is required</p>
-      </div>
+    <>
+      {(properties.format === 'path' || properties.format === 'directory-path') && (
+        <FolderDatasetUpload properties={properties} />
+      )}
+      {properties.format === 'file-path' && (
+        <FileDatasetUpload properties={properties} />
+      )}
+      {properties.format === 'string' && (
+        <StringDataset properties={properties} />
+      )}
+    </>
     );
-  }
+  };
+
+  return (
+    <>
+    { Object.keys(definitions).filter((i) => i !== 'output_options').map((i) => (
+      <div key={i} className="field">
+        <Panel header={header(definitions[i])}>
+          <p className="m-0">
+            { Object.keys(definitions[i].properties).map((j) => (
+              <div key={j} className="field mb-5">
+                <Inputs properties={definitions[i].properties[j]} />
+              </div>
+            ))}
+          </p>
+        </Panel>
+      </div>
+    ))}
+    </>
+  );
 };
+
+
+// /* Component for rendering file list */
+// const FileListUpload = () => {
+
+//   // create the panel header
+//   const header = (
+//       <div className='parameter-panel-header'>
+//         <i className='pi pi-file-export' style={{fontSize:'1.25rem',marginRight:'0.5em'}}></i>Upload the file list
+//       </div>      
+//     );
+
+//   return (
+//     <div className="field">
+//       <Panel header={header}>
+//           <FileListDatasetUpload />
+//       </Panel>
+//     </div>
+//   );
+// };
 
 export default Parameters;
 

@@ -1,16 +1,18 @@
 {
 "$schema": "http://json-schema.org/draft-07/schema",
 "$id": "https://raw.githubusercontent.com/CNIC-Proteomics/nf-PTM-compass/main/nextflow_schema.json",
-"title": "PTM-compass pipeline parameters",
-"description": "PTM-compass workflow",
+"title": "PTM-compass",
+"description": "Nextflow for the PTM-compass pipeline.",
 "url": "https://github.com/CNIC-Proteomics/nf-PTM-compass",
+"revision": "main",
 "icon": "",
+"status": 0,
 "type": "object",
 "definitions": {
     "input_output_options": {
         "title": "Input/Output options",
         "type": "object",
-        "fa_icon": "fas fa-terminal",
+        "fa_icon": "pi pi-box",
         "description": "Inputs and outputs required for the pipeline",
         "required": [
             "re_files",
@@ -21,54 +23,62 @@
         ],
         "properties": {
             "re_files": {
+                "title": "ReFrag results",
+                "description": "ReFrag result files",
+                "help_text": "Under construction...",
+                "fa_icon": "pi pi-folder",
                 "type": "string",
-                "default": "/mnt/tierra/nf-PTM-compass/tests/test1/inputs/re_files/*",
                 "format": "path",
-                "description": "ReFrag (ReCom) result files",
-                "fa_icon": "fas fa-file-import",
-                "help_text": "Under construction: Help for ReFrag results",
+                "default": "",
                 "mimetype": "text/plain"
             },
             "exp_table": {
-                "type": "string",
-                "default": "/mnt/tierra/nf-PTM-compass/tests/test2/params/experiment_table.txt",
+                "title": "Experimental table",
                 "description": "Experimental table file",
+                "help_text": "Under construction...",
+                "fa_icon": "pi pi-file",
+                "type": "string",
                 "format": "file-path",
-                "fa_icon": "fas fa-vials",
-                "help_text": "Under construction"
+                "default": ""
             },
             "database": {
+                "title": "Protein database",
+                "description": "The fasta protein database used during database search",
+                "help_text": "Under construction...",
+                "fa_icon": "pi pi-database",
                 "type": "string",
-                "default": "/mnt/tierra/nf-PTM-compass/tests/test2/dbs/human_202104_uni-sw-tr.target-decoy.fasta",
-                "description": "The fasta protein database used during database searc",
-                "pattern": "^\\S+\\.(?:fasta|fa)$",
                 "format": "file-path",
-                "fa_icon": "fas fa-database",
-                "help_text": "The fasta protein database used during database search."
+                "default": "",
+                "pattern": "^\\S+\\.(?:fasta|fa)$"
+
             },
             "decoy_prefix": {
-                "type": "string",
-                "default": "DECOY_",
+                "title": "Decoy prefix",
                 "description": "Pre- or suffix of decoy proteins in their accession",
-                "fa_icon": "fas fa-font"
+                "help_text": "Under construction...",
+                "fa_icon": "pi pi-pen-to-square",
+                "type": "string",
+                "format": "string",
+                "default": "DECOY_"
             }
         }
     },
     "parameter_options": {
         "title": "Parameter options",
         "type": "object",
-        "fa_icon": "fas fa-terminal",
+        "fa_icon": "pi pi-table",
         "description": "Outputs required for the pipeline",
         "required": [
             "params_file"
         ],
         "properties": {
             "params_file": {
+                "title": "Parameter file",
+                "description": "File with the parameter for the programs in INI format",
+                "help_text": "Under construction...",
+                "fa_icon": "pi pi-file-import",
                 "type": "string",
                 "format": "file-path",
-                "description": "File with the parameter for the programs in INI format",
-                "fa_icon": "fas fa-file-signature",
-                "help_text": "Under construction: Help for ReFrag results",
                 "mimetype": "text/plain"
             }
         }
@@ -83,10 +93,12 @@
         ],
         "properties": {
             "outdir": {
+                "title": "Output directory",
+                "description": "The output directory where the results will be saved.",
+                "help_text": "Under construction...",
+                "fa_icon": "fas fa-folder-open",
                 "type": "string",
-                "format": "directory-path",
-                "description": "The output directory where the results will be saved. You have to use absolute paths to storage on Cloud infrastructure.",
-                "fa_icon": "fas fa-folder-open"
+                "format": "directory-path"
             }
         }
     }

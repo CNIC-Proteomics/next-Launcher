@@ -1,0 +1,78 @@
+/*
+ * Theme styles for the production web.
+ */
+
+
+/* Declare the common variables */
+:root {
+  // main variables
+  --nl-font-family: Roboto, Helvetica, Arial, sans-serif;
+  --nl-font-size: 13px;
+  --nl-title-font-size: 14px;
+  --nl-label-font-size: 14px;
+
+
+  // navbar links links
+  --nl-navbar-font-size: 14px;
+  --nl-navbar-title-font-size: 24px;
+  --nl-navbar-color: rgb(250, 250, 250);
+  --nl-navbar-hover-color: rgb(13, 53, 111);
+  --nl-navbar-bg-color: rgb(13, 103, 157);
+  --nl-navbar-solid-color: rgb(13, 53, 111);
+
+  // tabs links
+  --nl-link-color: rgb(13, 103, 157);
+  --nl-link-hover-color: rgb(13, 192, 157);
+
+  // buttons
+  --nl-btn-font-weight: 410;
+  --nl-btn-font-size: 13px;
+  --nl-btn-color: rgb(255, 255, 255);
+  --nl-btn-bg-color: rgb(6, 182, 212);
+
+  --nl-btn-active-color: rgb(13, 103, 157);
+  --nl-btn-active-bg: rgb(13, 103, 157);
+  --nl-btn-active-border-color: rgb(13, 103, 157);
+
+  --nl-btn-hover-color: rgb(255, 255, 255);
+  --nl-btn-hover-bg-color: rgb(8, 145, 178);
+  --nl-btn-hover-border-color: rgb(13, 131, 157);
+
+  // pipeline table
+  --nl-table-color: rgb(75,85,99);
+}
+
+/* Main */
+
+body {
+  margin: 0;
+  /* font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale; */
+  font-family: var(--nl-font-family);
+  font-size: var(--nl-font-size);
+  min-width: 950px;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+
+/* Navbar */
+
+
+/* Buttons */
+
+.p-button {
+  color: var(--nl-btn-color);
+  background: var(--nl-btn-bg-color);
+  border: 1px solid var(--nl-btn-border-color);
+}
+
+.p-button:not(:disabled):hover {
+  color: var(--nl-btn-hover-color);
+  background: var(--nl-btn-hover-bg-color);
+  border-color: var(--nl-btn-hover-bg-color);
+}
+

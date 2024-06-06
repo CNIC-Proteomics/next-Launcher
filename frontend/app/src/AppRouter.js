@@ -4,7 +4,7 @@ import NavigationTabs from './components/NavigationTabs';
 import MainPage from './components/MainPage';
 import Pipelines from './components/Pipelines';
 import Parameters from './components/Parameters';
-import Launcher from './components/Launcher';
+// import Launcher from './components/Launcher';
 
 
 const AppRouter = () => {
@@ -18,7 +18,7 @@ const AppRouter = () => {
           <Route path="/" exact component={MainPage} />
           <Route path="/pipelines" component={Pipelines} />
           <Route path="/parameters" component={Parameters} />
-          <Route path="/launcher" component={Launcher} />
+          {/* <Route path="/launcher" component={Launcher} /> */}
         </Switch>
       </div>
     </Router>

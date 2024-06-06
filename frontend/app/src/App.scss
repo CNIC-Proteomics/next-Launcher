@@ -1,0 +1,205 @@
+
+/*
+ * APP HEADER
+ */
+
+.app-header-container {
+  width: 100%;
+  position: fixed;
+  z-index: 1000;
+}
+
+.app-header-container * {
+  background: var(--nl-navbar-bg-color);
+  color: var(--nl-navbar-color);
+  font-size: var(--nl-navbar-font-size);
+}
+
+.app-header-container .p-menubar {
+  padding: 0.2rem;
+  border: 0px;
+  border-bottom: 1px solid rgb(13, 53, 111);
+  border-radius: 0px;
+}
+
+.app-header-container .p-menuitem-text {
+  font-size: var(--nl-navbar-title-font-size);
+  font-weight: bolder;
+}
+
+.app-header-container .p-menuitem-content {
+  margin-right: 20px;
+}
+
+.app-header-container .p-menuitem, .app-header-container .p-menuitem, .app-header-container .p-menuitem-title {
+  color: var(--nl-navbar-color);
+  text-decoration: none;
+}
+
+.app-header-container .p-menuitem:hover {
+  text-decoration: underline;
+}
+
+// Disable responsive for menubar
+@media screen and (max-width: 960px) {
+  .p-menubar .p-menubar-button {
+    display: none;
+  }
+  .p-menubar {
+    // position: inherit;
+    position: initial;
+  }
+  .p-menubar .p-menubar-root-list {
+    display: flex;
+    align-items: center;
+    position: unset;
+    padding: unset;
+    background: inherit;
+    border: unset;
+    box-shadow: unset;
+    width: unset;
+  }
+}
+
+/*
+ * APP CONTAINER
+ */
+
+.app-container {
+  font-size: 12px !important;
+  margin-top: 0;
+  border-top: gainsboro solid 2px;
+}
+
+.app-description {
+  height: 100px;
+  text-align: center;
+  font-size: 15px;
+  padding-top: 10px;
+}
+
+.invisible-link {
+  display: none;
+}
+
+/*
+ * NAVIGATION TABS
+ */
+
+.navigation-tabs .p-tabmenu-nav {
+  display: flex;
+  justify-content: left;
+  height: 43px;
+  font-size: var(--nl-navbar-font-size);
+}
+
+.navigation-tabs .p-tabmenuitem {
+  margin: 0 10px;
+}
+
+.navigation-tabs .p-menuitem-link {
+  text-decoration: none;
+  color: var(--nl-link-color);
+  display: flex;
+  align-items: center;
+}
+
+.navigation-tabs .p-menuitem-link:hover {
+  color: var(--nl-link-hover-color);
+  text-decoration: none;
+}
+
+.navigation-tabs .p-tabmenuitem.p-highlight .p-menuitem-link, .navigation-tabs .p-menuitem-link:focus {
+  color: var(--nl-link-hover-color);
+}
+
+
+/*
+ * PIPELINES DATATABLE
+ */
+
+.table-pipelines {
+  margin: 20px 20px;
+  min-width: 900px;
+}
+
+.table-pipelines table {
+  color: var(--nl-table-color);
+  font-size: var(--nl-font-size);
+}
+
+.table-pipelines a {
+  color: var(--nl-table-color);
+  font-size: var(--nl-font-size);
+}
+
+.table-pipelines .p-button {
+  font-size: var(--nl-btn-font-size);
+  padding: 7px;
+}
+
+/*
+ * PARAMETERS SECTION
+ */
+
+.parameters {
+  margin: 20px 10px 10px 10px;
+  min-width: 900px;
+}
+
+.parameters * {
+  font-size: var(--nl-font-size);
+}
+
+
+/* SideMenu */
+
+.parameters-sidemenu {
+  position: fixed;
+  z-index: 1000;
+}
+
+.parameters-sidemenu .p-panelmenu .p-panelmenu-panel {
+  margin-bottom: -1px;
+}
+
+.parameters-sidemenu .p-panelmenu-header > * {
+  height: 40px;
+  padding: 10px;
+  font-size: var(--nl-btn-font-size);
+}
+.parameters-sidemenu .p-panelmenu-header .p-panelmenu-header-link {
+  padding: 0;
+}
+
+.parameters-sidemenu .p-menuitem-text {
+  font-size: var(--nl-font-size);
+}
+
+// don't show the first element (File List Upload menu content)
+// ensure no submenu styles are applied to the last menu item
+.parameters-sidemenu .p-panelmenu-panel:last-child .p-panelmenu-content {
+  display: none !important;
+}
+// Prevent click interactions if necessary
+.parameters-sidemenu .p-panelmenu-panel:last-child {
+  pointer-events: none;
+}
+
+
+/* Panels */
+
+.parameter-panel-header {
+  font-size: var(--nl-title-font-size);
+  align-items: center;
+  display: inline-flex;
+}
+
+.parameters label {
+  font-size: var(--nl-label-font-size);
+}
+
+.parameters .p-inputgroup input {
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+}

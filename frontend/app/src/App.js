@@ -1,9 +1,12 @@
 // src/App.js
 
 import React from 'react';
+// import AppToaster from './services/toastServices';
+import { Toast } from 'primereact/toast';
+import { toastRef } from './services/toastServices';
 import AppHeader from './components/AppHeader';
 import AppRouter from './AppRouter';
-import './App.css';
+
 
 const AppDescription = () => {
   return (
@@ -16,6 +19,8 @@ const AppDescription = () => {
 function App() {
   return (
     <div className="App">
+      {/* <AppToaster /> */}
+      <Toast ref={toastRef} />
       <AppHeader />
       <AppDescription />
       <AppRouter />

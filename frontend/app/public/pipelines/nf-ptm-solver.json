@@ -4,6 +4,8 @@
   "title": "PTM-Solver",
   "description": "Nextflow for PTM-Solver pipeline",
   "url": "https://github.com/CNIC-Proteomics/nf-PTM-Solver",
+  "icon": "",
+  "status": 1,
   "type": "object",
   "definitions": {
       "input_options": {
