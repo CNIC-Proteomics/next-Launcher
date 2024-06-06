@@ -10,7 +10,12 @@ Now that you have your Dockerfile, you can build your image. The docker build co
 
 Open Windows Prompt:
 ```
-cd S:\U_Proteomica\UNIDAD\DatosCrudos\jmrodriguezc\projects\next-Launcher\frontend\build
+S:\U_Proteomica\UNIDAD\DatosCrudos\jmrodriguezc\projects\next-Launcher-core\frontend\build
 
 docker build -t frontend -f frontend.Dockerfile .
+```
+
+Run the nextflow contaniner
+```
+docker run --name frontend -it -v tierra:/mnt/tierra  -v workspace:/workspace -p 3000:3000 frontend
 ```

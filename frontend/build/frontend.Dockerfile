@@ -22,14 +22,17 @@ RUN apt-get install -y zip
 RUN apt-get install -y unzip
 
 # Declare local variables
-ARG LOCAL_DIR=nextflow/
 ARG INSTALLATION_HOME=/opt
 
 ################
 # REQUIREMENTS #
 ################
 
-# Install the requirements for web app
+# Download the Node.js setup script
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x -o nodesource_setup.sh
+# Run the Node.js setup script with sudo 
+RUN bash nodesource_setup.sh
+# Install Node.js
 RUN apt-get install -y nodejs
 
 
@@ -38,14 +41,18 @@ RUN apt-get install -y nodejs
 #################
 
 # Setting up the environment variables
-ENV FRONTEND_HOME  ${INSTALLATION_HOME}/frontend
+ENV NEXTLAUNCHER_HOME  ${INSTALLATION_HOME}/next-launcher
 
 
 ################
 # INSTALLATION #
 ################
 
-RUN git clone https://github.com/CNIC-Proteomics/next-Launcher ${FRONTEND_HOME}
+# Dowload the app code
+RUN git clone https://github.com/CNIC-Proteomics/next-Launcher.git ${NEXTLAUNCHER_HOME}
+
+# Install npm packages for the app
+RUN cd ${NEXTLAUNCHER_HOME}/app && npm install
 
 
 ######################
@@ -56,7 +63,7 @@ RUN git clone https://github.com/CNIC-Proteomics/next-Launcher ${FRONTEND_HOME}
 EXPOSE 3000
 
 # Define the command to execute when the container starts.
-# CMD cd ${FRONTEND_HOME}/fronend/app && npm start
+# CMD cd ${NEXTLAUNCHER_HOME}/app && npm start
 
 # Setting up the environment variables
 WORKDIR /workspace
