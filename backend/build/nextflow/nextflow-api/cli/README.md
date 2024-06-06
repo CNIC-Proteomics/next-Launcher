@@ -37,13 +37,13 @@ bash dataset/delete.sh http://localhost:8080 66212647c63490ba135050a0
 ### Test example for nf-PTM-compass
 ```
 bash dataset/create.sh http://localhost:8080 'dataset_1'
-bash dataset/upload.sh http://localhost:8080 66447dbf309b2cffc914ac87 "directory-path" "re_files" "/mnt/tierra/nf-PTM-compass/tests/test1/inputs/re_files/JAL_Noa3_iT_ALL.txt"
-bash dataset/upload.sh http://localhost:8080 66447dbf309b2cffc914ac87 "directory-path" "re_files" "/mnt/tierra/nf-PTM-compass/tests/test1/inputs/re_files/JAL_NoCD_iTR_ALL.txt"
-bash dataset/upload.sh http://localhost:8080 66447dbf309b2cffc914ac87 "file-path" "exp_table" "/mnt/tierra/nf-PTM-compass/tests/test1/inputs/exp_table.txt"
-bash dataset/upload.sh http://localhost:8080 66447dbf309b2cffc914ac87 "file-path" "database" "/mnt/tierra/nf-PTM-compass/tests/test1/inputs/database.fasta"
-bash dataset/upload.sh http://localhost:8080 66447dbf309b2cffc914ac87 "file-path" "params-file" "/mnt/tierra/nf-PTM-compass/tests/test1/inputs/params.ini"
-bash dataset/upload.sh http://localhost:8080 66447dbf309b2cffc914ac87 "file-path" "sitelist_file" "/mnt/tierra/nf-PTM-compass/tests/test1/inputs/sitelist.txt"
-bash dataset/upload.sh http://localhost:8080 66447dbf309b2cffc914ac87 "file-path" "groupmaker_file" "/mnt/tierra/nf-PTM-compass/tests/test1/inputs/groupmaker.txt"
+bash dataset/upload.sh http://localhost:8080 665ee947343d00bd066d7251 "directory-path" "re_files" "/mnt/tierra/nf-PTM-compass/tests/test1/inputs/re_files/JAL_Noa3_iT_ALL.txt"
+bash dataset/upload.sh http://localhost:8080 665ee947343d00bd066d7251 "directory-path" "re_files" "/mnt/tierra/nf-PTM-compass/tests/test1/inputs/re_files/JAL_NoCD_iTR_ALL.txt"
+bash dataset/upload.sh http://localhost:8080 665ee947343d00bd066d7251 "file-path" "exp_table" "/mnt/tierra/nf-PTM-compass/tests/test1/inputs/exp_table.txt"
+bash dataset/upload.sh http://localhost:8080 665ee947343d00bd066d7251 "file-path" "database" "/mnt/tierra/nf-PTM-compass/tests/test1/inputs/database.fasta"
+bash dataset/upload.sh http://localhost:8080 665ee947343d00bd066d7251 "file-path" "params-file" "/mnt/tierra/nf-PTM-compass/tests/test1/inputs/params.ini"
+bash dataset/upload.sh http://localhost:8080 665ee947343d00bd066d7251 "file-path" "sitelist_file" "/mnt/tierra/nf-PTM-compass/tests/test1/inputs/sitelist.txt"
+bash dataset/upload.sh http://localhost:8080 665ee947343d00bd066d7251 "file-path" "groupmaker_file" "/mnt/tierra/nf-PTM-compass/tests/test1/inputs/groupmaker.txt"
 ```
 
 
@@ -78,13 +78,13 @@ bash workflow/edit.sh http://localhost:8080 66447ecf309b2cffc914ac88 \
 ```
 bash workflow/launch.sh http://localhost:8080 66447ecf309b2cffc914ac88 \
 '{"inputs": [
-    {"name": "--re_files", "type": "directory-path", "value": "66447dbf309b2cffc914ac87/re_files/*"},
-    {"name": "--exp_table", "type": "file-path", "value": "66447dbf309b2cffc914ac87/exp_table.txt"},
-    {"name": "--database", "type": "file-path", "value": "66447dbf309b2cffc914ac87/database.fasta"},
+    {"name": "--re_files", "type": "directory-path", "value": "665ee947343d00bd066d7251/re_files/*"},
+    {"name": "--exp_table", "type": "file-path", "value": "665ee947343d00bd066d7251/exp_table.txt"},
+    {"name": "--database", "type": "file-path", "value": "665ee947343d00bd066d7251/database.fasta"},
     {"name": "--decoy_prefix", "type": "string", "value": "DECOY_"},
-    {"name": "--params_file", "type": "file-path", "value": "66447dbf309b2cffc914ac87/params-file.ini"},
-    {"name": "--sitelist_file", "type": "file-path", "value": "66447dbf309b2cffc914ac87/sitelist_file.txt"},
-    {"name": "--groupmaker_file", "type": "file-path", "value": "66447dbf309b2cffc914ac87/groupmaker_file.txt"}
+    {"name": "--params_file", "type": "file-path", "value": "665ee947343d00bd066d7251/params-file.ini"},
+    {"name": "--sitelist_file", "type": "file-path", "value": "665ee947343d00bd066d7251/sitelist_file.txt"},
+    {"name": "--groupmaker_file", "type": "file-path", "value": "665ee947343d00bd066d7251/groupmaker_file.txt"}
 ]
 }'
 ```
