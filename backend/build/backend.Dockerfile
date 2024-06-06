@@ -1,5 +1,5 @@
 #
-# NEXTFLOW ---------------------------------------------------------------------------------------------
+# NEXT-LAUNCHER: BACKEND ---------------------------------------------------------------------------------------------
 #
 # %labels
 #     Author jmrodriguezc@cnic.es
@@ -7,7 +7,6 @@
 # 
 # %help
 #     This file create the Backend image that contains: nextflow, nextflow-api, etc.
-
 
 # our base image
 FROM ubuntu:22.04
@@ -21,6 +20,24 @@ RUN apt-get install -y wget
 RUN apt-get install -y git
 RUN apt-get install -y zip
 RUN apt-get install -y unzip
+
+
+#
+# NEXTFLOW ---------------------------------------------------------------------------------------------
+#
+
+# # our base image
+# FROM ubuntu:22.04
+# ENV DEBIAN_FRONTEND noninteractive
+
+# # Install main packages
+# RUN apt-get update -y
+# RUN apt-get install -y vim
+# RUN apt-get install -y curl
+# RUN apt-get install -y wget
+# RUN apt-get install -y git
+# RUN apt-get install -y zip
+# RUN apt-get install -y unzip
 
 
 # Declare local variables
