@@ -1,7 +1,4 @@
-# next-Launcher
-
-
-# quantMS-PTM
+# next-Launcher-core
 ------------------------------
 Quantitative Mass Spectrometry and Post-Translational Modifications analysis workflow.
 
