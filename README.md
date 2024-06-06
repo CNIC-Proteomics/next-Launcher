@@ -1,5 +1,7 @@
 # next-Launcher-core
 ------------------------------
+Core for the next-Launcher: backend and frontend systems
+
 Quantitative Mass Spectrometry and Post-Translational Modifications analysis workflow.
 
 
