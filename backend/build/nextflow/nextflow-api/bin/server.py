@@ -518,11 +518,11 @@ class WorkflowLaunchHandler(CORSMixin, tornado.web.RequestHandler):
 			self.write(message(404, 'Failed to get workflow \"%s\"' % id))
 			return
 
-		# # make sure workflow is not already running
-		# if workflow['status'] == 'running':
-		# 	self.set_status(400)
-		# 	self.write(message(400, 'Workflow \"%s\" is already running' % id))
-		# 	return
+		# make sure workflow is not already running
+		if workflow['status'] == 'running':
+			self.set_status(400)
+			self.write(message(400, 'Workflow \"%s\" is already running' % id))
+			return
 
 		try:
 

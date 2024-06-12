@@ -21,6 +21,7 @@ MODELS_DIR = os.path.join(BASE_DIR, '_models')
 
 # Frontend: Access-Control-Allow-Origin 
 CORS_HOST = 'http://localhost'
+# CORS_HOST = 'http://10.142.33.54'
 CORS_PORT = 3000
 
 # validate environment settings
