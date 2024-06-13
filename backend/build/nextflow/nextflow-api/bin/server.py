@@ -531,7 +531,6 @@ class WorkflowLaunchHandler(CORSMixin, tornado.web.RequestHandler):
 
 			# update workflow status
 			workflow['status'] = 'running'
-			workflow['date_submitted'] = int(time.time() * 1000)
 			workflow['n_attempts'] += 1
 
 			# set up the attempt directory
@@ -541,6 +540,8 @@ class WorkflowLaunchHandler(CORSMixin, tornado.web.RequestHandler):
 			attempt = {
 				'id': workflow['n_attempts'],
 				'inputs': data['inputs'],
+				'date_submitted': int(time.time() * 1000),
+				'status': 'running',
 				'output_dir': attempt_dir
 			}
 			workflow['attempts'].append(attempt)
@@ -595,11 +596,15 @@ class WorkflowCancelHandler(CORSMixin, tornado.web.RequestHandler):
 			workflow = await db.workflow_get(id)
 			workflow = {**{ 'pid': -1 }, **workflow}
 
+			# get last attempt because has to be the running one
+			n_attempt = int(workflow['n_attempts'] - 1)
+
 			# cancel workflow
 			Workflow.cancel(workflow)
 
 			# update workflow status
 			workflow['status'] = 'failed'
+			workflow['attempts'][n_attempt]['status'] = 'failed'
 			workflow['pid'] = -1
 
 			await db.workflow_update(id, workflow)
@@ -614,27 +619,37 @@ class WorkflowCancelHandler(CORSMixin, tornado.web.RequestHandler):
 
 class WorkflowLogHandler(CORSMixin, tornado.web.RequestHandler):
 
-	async def get(self, id):
+	async def get(self, id, attempt_id):
 		db = self.settings['db']
 
 		try:
 			# get workflow
 			workflow = await db.workflow_get(id)
 
-			# append log if it exists
-			log_file = os.path.join(env.WORKFLOWS_DIR, id, env.OUTPUTS_DIR, str(workflow['n_attempts']), '.workflow.log')
+			# get atempt
+			# convert the attempt to the index of list (minus one)
+			n_attempt = int(attempt_id) - 1
+			attempt = workflow['attempts'][n_attempt]
 
+			# get append data if it exists
+			log_file = os.path.join(env.WORKFLOWS_DIR, id, env.OUTPUTS_DIR, attempt['output_dir'], '.workflow.log')
 			if os.path.exists(log_file):
 				f = open(log_file)
 				log = ''.join(f.readlines())
+				# get the attempt data
+				status = attempt['status']
+				date_submitted = attempt['date_submitted']
 			else:
 				log = ''
+				status = ''
+				date_submitted = ''
 
 			# construct response data
 			data = {
 				'_id': id,
-				'status': workflow['status'],
-				'n_attempts': workflow['n_attempts'],
+				'attempt': attempt_id,
+				'status': status,
+				'date_submitted': date_submitted,
 				'log': log
 			}
 
@@ -642,9 +657,9 @@ class WorkflowLogHandler(CORSMixin, tornado.web.RequestHandler):
 			self.set_header('content-type', 'application/json')
 			self.set_header('cache-control', 'no-store, no-cache, must-revalidate, max-age=0')
 			self.write(tornado.escape.json_encode(data))
-		except:
+		except Exception as e:
 			self.set_status(404)
-			self.write(message(404, 'Failed to fetch log for workflow \"%s\"' % id))
+			self.write(message(404, 'Failed to fetch log for workflow \"%s\"' % e))
 
 
 
@@ -865,13 +880,18 @@ class TaskQueryHandler(CORSMixin, tornado.web.RequestHandler):
 				# get workflow
 				workflow_id = task['runName'].split('-')[1]
 				workflow = await db.workflow_get(workflow_id)
+				# get the current (last) attempt
+				attempt = workflow['n_attempts'] - 1
 
 				# update workflow status
 				success = task['metadata']['workflow']['success']
 				if success:
 					workflow['status'] = 'completed'
+					workflow['n_attempts'][attempt]['status'] = 'completed'
+
 				else:
 					workflow['status'] = 'failed'
+					workflow['n_attempts'][attempt]['status'] = 'failed'
 
 				await db.workflow_update(workflow['_id'], workflow)
 
@@ -1252,12 +1272,12 @@ if __name__ == '__main__':
 		(r'/api/workflows/([a-zA-Z0-9-]+)/launch', WorkflowLaunchHandler),
 		(r'/api/workflows/([a-zA-Z0-9-]+)/resume', WorkflowResumeHandler),
 		(r'/api/workflows/([a-zA-Z0-9-]+)/cancel', WorkflowCancelHandler),
-		(r'/api/workflows/([a-zA-Z0-9-]+)/log', WorkflowLogHandler),
+		(r'/api/workflows/([a-zA-Z0-9-]+)/([0-9]+)/log', WorkflowLogHandler),
 		# (r'/api/workflows/([a-zA-Z0-9-]+)/download', WorkflowDownloadHandler, dict(path=env.WORKFLOWS_DIR)),
 
-		(r'/api/outputs/([a-zA-Z0-9-]+)/([a-zA-Z0-9-]+)', OutputEditHandler),
+		(r'/api/outputs/([a-zA-Z0-9-]+)/([0-9]+)', OutputEditHandler),
 		(r'/api/outputs/single/(.+)/download', OutputDownloadHandler, dict(path=env.WORKFLOWS_DIR)),
-		(r'/api/outputs/multiple/([a-zA-Z0-9-]+)/([a-zA-Z0-9-]+)/download', OutputMultipleDownloadHandler),
+		(r'/api/outputs/multiple/([a-zA-Z0-9-]+)/([0-9]+)/download', OutputMultipleDownloadHandler),
   		(r'/api/outputs/archive/(.+)/download', OutputArchiveDownloadHandler, dict(path=env.WORKFLOWS_DIR)),
 
 		(r'/api/tasks', TaskQueryHandler),
