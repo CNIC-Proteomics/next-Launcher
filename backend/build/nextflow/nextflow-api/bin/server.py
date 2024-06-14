@@ -18,6 +18,7 @@ import tornado.options
 import tornado.web
 import zipfile
 import io
+import mimetypes
 
 import backend
 import env
@@ -26,13 +27,75 @@ import visualizer as Visualizer
 import workflow as Workflow
 
 
+#-------------------------------------
+# Local functions
+#-------------------------------------
 
+# Retrieves the list of files recursively
 def list_dir_recursive(path, relpath_start=''):
 	files = [os.path.join(dir, f) for (dir, subdirs, filenames) in os.walk(path) for f in filenames]
 	files = [os.path.relpath(f, start=relpath_start) for f in files]
 	files.sort()
 
 	return files
+
+# Convert size to a readable format (bytes to KB, MB, etc.)
+def get_size_readable(size):
+	for unit in ['B', 'KB', 'MB', 'GB', 'TB']:
+		if size < 1024:
+			return f"{size:.2f}{unit}"
+		size /= 1024
+	return f"{size:.2f}PB"
+
+# Build the file tree from a path
+def build_tree(path, relpath_start='', key_prefix=''):
+	tree = []
+	key_counter = 0
+	
+	# get the dir, subdir and files from a given path
+	for dirpath, subdirs, filenames in os.walk(path):
+		# exclude hidden files and directories
+		subdirs[:] = [d for d in subdirs if not d.startswith('.')]
+		filenames = [f for f in filenames if not f.startswith('.')]
+
+		# process directories
+		for subdir in subdirs:
+			key = f"{key_counter}" if key_prefix == '' else f"{key_prefix}-{key_counter}"
+			full_subdir_path = os.path.join(dirpath, subdir)
+			tree.append({
+				'key': key,
+				'data': {
+					'name': subdir,
+					'size': None,
+					'type': 'folder'
+				},
+				'children': build_tree(full_subdir_path, relpath_start, key)
+			})
+			key_counter += 1
+
+		# process files
+		for filename in filenames:
+			key = f"{key_counter}" if key_prefix == '' else f"{key_prefix}-{key_counter}"
+			full_file_path = os.path.join(dirpath, filename)
+			file_size = os.path.getsize(full_file_path)
+			file_type = mimetypes.guess_type(full_file_path, strict=False)[0]
+			tree.append({
+				'key': key,
+				'data': {
+					'name': filename,
+					'size': get_size_readable(file_size),
+					'type': file_type or 'file'
+				}
+			})
+			key_counter += 1
+
+		# Only process the top level of the current directory, not recursively
+		break
+
+	# Sort the tree by the 'name' in 'data'
+	tree = sorted(tree, key=lambda x: x['data']['name'])
+
+	return tree
 
 
 def message(status, message):
@@ -694,18 +757,18 @@ class OutputEditHandler(CORSMixin, tornado.web.RequestHandler):
 			output_dir = os.path.join(workflow_dir, env.OUTPUTS_DIR, attempt)
 
 			if os.path.exists(output_dir):
-				outputs = list_dir_recursive(output_dir, relpath_start=output_dir)
+				outputs = build_tree(output_dir, relpath_start=output_dir)
 				# remove hide files
-				outputs = [o for o in outputs if not o.startswith('.')]
+				# outputs = [o for o in outputs if not o['name'].startswith('.')]
 			else:
 				outputs = []
 
 			self.set_status(200)
 			self.set_header('content-type', 'application/json')
 			self.write(tornado.escape.json_encode(outputs))
-		except:
+		except Exception as e:
 			self.set_status(404)
-			self.write(message(404, 'Failed to get output attempt from workflow \"%s/%s\"' % (id,attempt)))
+			self.write(message(404, 'Failed to get output attempt from workflow \"%s/%s\"' % (id,e)))
 
 	async def delete(self, id, attempt):
 		db = self.settings['db']
