@@ -58,6 +58,9 @@ def build_tree(path, relpath_start='', key_prefix=''):
 		subdirs[:] = [d for d in subdirs if not d.startswith('.')]
 		filenames = [f for f in filenames if not f.startswith('.')]
 
+        # compute the relative path
+		
+
 		# process directories
 		for subdir in subdirs:
 			key = f"{key_counter}" if key_prefix == '' else f"{key_prefix}-{key_counter}"
@@ -76,6 +79,7 @@ def build_tree(path, relpath_start='', key_prefix=''):
 		# process files
 		for filename in filenames:
 			key = f"{key_counter}" if key_prefix == '' else f"{key_prefix}-{key_counter}"
+			relative_dirpath = os.path.relpath(dirpath, start=relpath_start)
 			full_file_path = os.path.join(dirpath, filename)
 			file_size = os.path.getsize(full_file_path)
 			file_type = mimetypes.guess_type(full_file_path, strict=False)[0]
@@ -83,6 +87,7 @@ def build_tree(path, relpath_start='', key_prefix=''):
 				'key': key,
 				'data': {
 					'name': filename,
+					'path': relative_dirpath,
 					'size': get_size_readable(file_size),
 					'type': file_type or 'file'
 				}
@@ -943,18 +948,18 @@ class TaskQueryHandler(CORSMixin, tornado.web.RequestHandler):
 				# get workflow
 				workflow_id = task['runName'].split('-')[1]
 				workflow = await db.workflow_get(workflow_id)
-				# get the current (last) attempt
-				attempt = workflow['n_attempts'] - 1
+				# get last attempt because has to be the running one
+				n_attempt = int(workflow['n_attempts'] - 1)
 
 				# update workflow status
 				success = task['metadata']['workflow']['success']
 				if success:
 					workflow['status'] = 'completed'
-					workflow['n_attempts'][attempt]['status'] = 'completed'
+					workflow['attempts'][n_attempt]['status'] = 'completed'
 
 				else:
 					workflow['status'] = 'failed'
-					workflow['n_attempts'][attempt]['status'] = 'failed'
+					workflow['attempts'][n_attempt]['status'] = 'failed'
 
 				await db.workflow_update(workflow['_id'], workflow)
 
