@@ -95,7 +95,7 @@ def run_workflow(workflow, attempt, output_dir, resume):
 
 
 def save_output(workflow, attempt, output_dir):
-	cmd = os.path.join( os.getcwd(), 'kube-save.sh')
+	cmd = os.path.join( os.getcwd(), 'scripts/kube-save.sh')
 	return subprocess.Popen(
 		[cmd, str(workflow['_id']), str(attempt['id']), output_dir],
 		stdout=subprocess.PIPE,
@@ -106,6 +106,10 @@ def save_output(workflow, attempt, output_dir):
 
 async def set_property(db, workflow, key, value):
 	workflow[key] = value
+	# get last attempt because has to be the running one
+	n_attempt = int(workflow['n_attempts'] - 1)
+	if key in workflow['attempts'][n_attempt]:
+		workflow['attempts'][n_attempt][key] = value
 	await db.workflow_update(workflow['_id'], workflow)
 
 
@@ -128,11 +132,11 @@ async def launch_async(db, workflow, attempt, output_dir, resume):
 	# wait for workflow to complete
 	if proc.wait() == 0:
 		print('%d: workflow completed' % (proc_pid))
-		await set_property(db, workflow, 'status', 'completed')
+		await set_property(db, workflow, 'status', 'completed') # re-updated the previous updating in the "server.py" methods
 	else:
 		print('%d: workflow failed' % (proc_pid))
-		await set_property(db, workflow, 'status', 'failed')
-		return
+		await set_property(db, workflow, 'status', 'failed') # re-updated the previous updating in the "server.py" methods
+		return # return to don't save the data
 
 	print('%d: saving output data...' % (proc_pid))
 

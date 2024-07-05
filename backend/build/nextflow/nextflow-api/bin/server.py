@@ -116,14 +116,16 @@ def message(status, message):
 
 # Define your CORSMixin
 class CORSMixin:
-    def set_default_headers(self):
-        self.set_header("Access-Control-Allow-Origin", f"{env.CORS_HOST}:{env.CORS_PORT}")
-        self.set_header("Access-Control-Allow-Headers", "x-requested-with, content-type")
-        self.set_header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PUT")
+	def set_default_headers(self):
+		origin = self.request.headers.get("Origin")
+		if origin in env.CORS_HOSTS:
+				self.set_header("Access-Control-Allow-Origin", origin)
+		self.set_header("Access-Control-Allow-Headers", "x-requested-with, content-type")
+		self.set_header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PUT")
 
-    def options(self, *args, **kwargs):
-        self.set_status(204)
-        self.finish()
+	def options(self, *args, **kwargs):
+			self.set_status(204)
+			self.finish()
 
 
 
