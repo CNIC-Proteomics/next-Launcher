@@ -64,7 +64,7 @@ RUN python -m pip install --upgrade pip
 # Setting up the environment variables
 ENV MSF_HOME ${INSTALLATION_HOME}/msfragger
 ENV RAWPARSER_HOME  ${INSTALLATION_HOME}/thermorawfileparser
-ENV DECOYPYRAT_HOME  ${INSTALLATION_HOME}/dbscripts
+ENV BIODATAHUB_HOME  ${INSTALLATION_HOME}/biodatahub
 ENV MZEXTRACTOR_HOME  ${INSTALLATION_HOME}/mz_extractor
 
 
@@ -100,7 +100,7 @@ RUN unzip /tmp/${FILE_NAME}.zip -d ${RAWPARSER_HOME}
 ##############
 
 # Clone the CNIC dbscripts repository that contains the DecoyPYrat
-RUN git clone https://github.com/CNIC-Proteomics/iSanXoT-dbscripts.git  ${DECOYPYRAT_HOME}
+RUN git clone https://github.com/CNIC-Proteomics/bioDataHub.git  ${BIODATAHUB_HOME}
 
 # Python environment --
 
@@ -108,11 +108,11 @@ RUN git clone https://github.com/CNIC-Proteomics/iSanXoT-dbscripts.git  ${DECOYP
 ARG PYTHON_REQ_FILE="python_requirements_decoypyrat.txt"
 
 # Create venv
-RUN cd ${DECOYPYRAT_HOME} && python -m venv env
+RUN cd ${BIODATAHUB_HOME} && python -m venv env
 
 # Requirements for Python
 COPY ${LOCAL_DIR}${PYTHON_REQ_FILE} /tmp/.
-RUN cd ${DECOYPYRAT_HOME} && /bin/bash -c "source ${DECOYPYRAT_HOME}/env/bin/activate && pip install -r /tmp/${PYTHON_REQ_FILE}"
+RUN cd ${BIODATAHUB_HOME} && /bin/bash -c "source ${BIODATAHUB_HOME}/env/bin/activate && pip install -r /tmp/${PYTHON_REQ_FILE}"
 
 
 ################

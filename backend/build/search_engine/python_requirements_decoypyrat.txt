@@ -1,2 +1,0 @@
-# Install Python packages for DecoyPYrat
-biopython==1.81

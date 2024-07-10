@@ -41,6 +41,9 @@ RUN mkdir -p "${INSTALLATION_HOME}"
 # REQUIREMENTS #
 ################
 
+# Update packages
+RUN apt-get update -y
+
 # Install the requirements for nextflow
 RUN apt-get install -y openjdk-19-jre-headless
 
