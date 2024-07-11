@@ -1,21 +1,25 @@
 # Install Docker Desktop on Windows
-------------------------------
 
 Reference: https://docs.docker.com/desktop/install/windows-install/
 
 
 # Build the image of Nextflow core
+
+
+Build the Docker image
 ------------------------------
 Now that you have your Dockerfile, you can build your image. The docker build command does the heavy-lifting of creating a docker image from a Dockerfile.
 
 Open Windows Prompt:
 ```
-S:\U_Proteomica\UNIDAD\DatosCrudos\jmrodriguezc\projects\next-Launcher-core\frontend\build
+cd S:\U_Proteomica\UNIDAD\Softwares\jmrodriguezc\next-Launcher-core\frontend\build
 
-docker build -t frontend -f frontend.Dockerfile .
+docker build --no-cache -t proteomicscnic/next-launcher-app:1.0.0 -f frontend.Dockerfile .
+
 ```
 
 Run the nextflow contaniner
+------------------------------
 ```
-docker run --name frontend -it -v tierra:/mnt/tierra  -v workspace:/workspace -p 3000:3000 frontend
+docker run --name next-launcher-app -it -v workspace:/workspace -p 3001:3000 proteomicscnic/next-launcher-app:1.0.0
 ```

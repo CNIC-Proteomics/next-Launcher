@@ -1,17 +1,20 @@
-# next-Launcher-core
-------------------------------
+# next-Launcher
+
+next-Laucher is a system that execute Nextflow pipelines
+
 Core for the next-Launcher: backend and frontend systems
 
 Quantitative Mass Spectrometry and Post-Translational Modifications analysis workflow.
 
 
 # Requirements
-------------------------------
 
 - Make
 - Docker engine
 
-### Install Make on Windows
+Install Make on Windows
+------------------------------
+
 
 Directly download from Make for Windows:
 https://gnuwin32.sourceforge.net/packages/make.htm
