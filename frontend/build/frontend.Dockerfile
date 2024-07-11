@@ -21,8 +21,6 @@ RUN apt-get install -y git
 RUN apt-get install -y zip
 RUN apt-get install -y unzip
 
-# Declare local variables
-ARG INSTALLATION_HOME=/opt
 
 ################
 # REQUIREMENTS #
@@ -40,6 +38,10 @@ RUN apt-get install -y nodejs
 # ENV VARIABLES #
 #################
 
+# Declare local variables
+ARG NEXTLAUNCHER_VERSION=0.0.1
+ARG INSTALLATION_HOME=/opt
+
 # Setting up the environment variables
 ENV NEXTLAUNCHER_HOME  ${INSTALLATION_HOME}/next-launcher
 
@@ -49,7 +51,7 @@ ENV NEXTLAUNCHER_HOME  ${INSTALLATION_HOME}/next-launcher
 ################
 
 # Dowload the app code
-RUN git clone https://github.com/CNIC-Proteomics/next-Launcher.git ${NEXTLAUNCHER_HOME}
+RUN git clone https://github.com/CNIC-Proteomics/next-Launcher-app.git  --branch ${NEXTLAUNCHER_VERSION}  ${NEXTLAUNCHER_HOME}
 
 # Install npm packages for the app
 RUN cd ${NEXTLAUNCHER_HOME}/app && npm install
