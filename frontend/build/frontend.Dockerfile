@@ -61,8 +61,16 @@ RUN cd ${NEXTLAUNCHER_HOME}/app && npm install
 # EXPOSE and COMMAND #
 ######################
 
-# Expose port (the port your server will listen on).
-EXPOSE 3000
+# Use ARG to define a build-time variable with a default value
+ARG PORT_APP=3000
+ARG HOST_IP
+
+# Use that ARG to set an environment variable
+ENV PORT_APP ${PORT_APP}
+ENV HOST_IP ${HOST_IP}
+
+# Expose port given by input parameter.
+EXPOSE ${PORT_APP}
 
 # Define the command to execute when the container starts.
 # CMD cd ${NEXTLAUNCHER_HOME}/app && npm start

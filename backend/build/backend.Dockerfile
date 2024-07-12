@@ -256,8 +256,18 @@ USER root
 COPY nextflow/setup.root.sh /tmp/.
 RUN cat "/tmp/setup.root.sh" >> /root/.bashrc
 
-# Expose port 8080 (the port your server will listen on).
-EXPOSE 8080
+# Use ARG to define a build-time variable with a default value
+ARG PORT_CORE=8080
+ARG PORT_APP=3000
+ARG HOST_IP
+
+# Use that ARG to set an environment variable
+ENV PORT_CORE ${PORT_CORE}
+ENV PORT_APP ${PORT_APP}
+ENV HOST_IP ${HOST_IP}
+
+# Expose port given by input parameter.
+EXPOSE ${PORT_CORE}
 
 # Define the command to execute when the container starts.
 # CMD cd ${NXF_API_HOME} && ./scripts/startup-local.sh mongo
