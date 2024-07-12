@@ -3,17 +3,18 @@ services:
   next-launcher-core:
     image: 'proteomicscnic/next-launcher-core:1.0.0'
     ports:
-      - "8082:8080"
+      - "8080:8080"
+    environment:
+      - HOST_IP=$HOST_IP
     volumes:
       - workspace:/workspace
-      - databuild:/databuild
     networks:
       - app-network
 
   next-launcher-app:
     image: 'proteomicscnic/next-launcher-app:1.0.0'
     ports:
-      - "3002:3000"
+      - "3000:3000"
     volumes:
       - workspace:/workspace
     networks:
@@ -24,14 +25,11 @@ volumes:
 
   workspace:
     name: 'workspace'
-    driver: 'local'
+    driver: local
     driver_opts:
-      type: 'cifs'
-      o: 'addr=tierra.cnic.es,domain=CNIC,username=jmrodriguezc,password=JaDe20-34!;'
-      device: '\\tierra.cnic.es\sc\U_Proteomica\UNIDAD\DatosCrudos\next-Launcher\'
-
-  databuild:
-    name: 'databuild'
+      type: 'none'
+      o: 'bind'
+      device: 'D:\\next-Launcher\\production'
 
 
 networks:
