@@ -9,10 +9,11 @@ Quantitative Mass Spectrometry and Post-Translational Modifications analysis wor
 
 # Requirements
 
+- Git, git-LFS
 - Make
 - Docker engine
 
-Install Make on Windows
+Install Make on Windows????
 ------------------------------
 
 
@@ -20,25 +21,19 @@ Directly download from Make for Windows:
 https://gnuwin32.sourceforge.net/packages/make.htm
 
 
-### Install Docker Desktop on Windows
+Install Docker Desktop on Windows
+------------------------------
 
 This following page contains the information about system requirements, and instructions on how to install Docker Desktop for Windows:
 https://docs.docker.com/desktop/install/windows-install/
 
 
-# Build the environment
-------------------------------
+
+# Installation
 
 ```
-make build
-```
+HOST_IP=10.142.33.54 docker-compose up -d
 
-# Run locally
-------------------------------
-
+docker compose up
 ```
-make run
-```
-
-See docker-compose.yml file for details.
 
