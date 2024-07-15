@@ -8,49 +8,61 @@ From: ubuntu:22.04
 %help
     This Singularity container is used for the PTM pipelines:
     1. SearchEngine
-    2. ReFrag
+    2. RefMod
     3. SHIFTS
-    4. PTM-Solver
+    4. SOLVER
 
 %arguments
     # Declare local folder
     SEARCH_LOCAL=search_engine
-    REFRAG_LOCAL=refrag
-    SHIFTS_LOCAL=shifts
-    SOLVER_LOCAL=solver
 
     # Declare variables
     # SEARCH_ENGINE ---------------------------------------------------------------------------------------------
     SEARCH_HOME=/opt/search_engine
-    MSF_NAME=MSFragger-3.8
+    
+    # MSFRAGGER: Declare the file name (with version)
+    MSF_FILE_NAME=MSFragger-3.8
     MSF_HOME=/opt/search_engine/msfragger
-    TPARSER_HOME=/opt/search_engine/thermorawfileparser
+
+    # THERMORAWPARSER: Declare the file name (with version)
+    RAWPARSER_FILE_NAME=ThermoRawFileParser1.4.2
+    RAWPARSER_HOME=/opt/search_engine/thermorawfileparser
+
+    # DECOYPYRAT: Setting up variables (with version)
+    BIODATAHUB_VERSION=v2.13
     BIODATAHUB_HOME=/opt/search_engine/biodatahub
+
+    # MZ_EXTRACTOR: Setting up variables (with version)
+    MZEXTRACTOR_VERSION=v1.0
     MZEXTRACTOR_HOME=/opt/search_engine/mzextractor
     
-    # REFRAG ---------------------------------------------------------------------------------------------
-    PTM_COMPASS_HOME=/opt/ptm-compass
-    REFRAG_HOME=/opt/ptm-compass/refrag
 
-    # SHIFTS ---------------------------------------------------------------------------------------------
+    # PTM-COMPASS ---------------------------------------------------------------------------------------------
     PTM_COMPASS_HOME=/opt/ptm-compass
+
+    # REFMOD: Setting up the variables
+    REFMOD_VERSION=v0.4.3
+    REFMOD_HOME=/opt/ptm-compass/refmod
+
+    # SHIFTS: Setting up the variables
+    SHIFTS_VERSION=v0.4.3
     SHIFTS_HOME=/opt/ptm-compass/shifts
 
-    # SOLVER ---------------------------------------------------------------------------------------------
-    PTM_COMPASS_HOME=/opt/ptm-compass
+    # SOLVER: Setting up the variables
+    SOLVER_VERSION=v1.0
     SOLVER_HOME=/opt/ptm-compass/solver
 
 
 %environment
     # Export env
-    # export MSF_HOME TPARSER_HOME
+    # export MSF_HOME RAWPARSER_HOME
 
 %setup
     # Create the home
     mkdir -p "${SINGULARITY_ROOTFS}{{SEARCH_HOME}}"
 
     # Create the ThermoRawFileParser home
-    mkdir -p "${SINGULARITY_ROOTFS}{{TPARSER_HOME}}"
+    mkdir -p "${SINGULARITY_ROOTFS}{{RAWPARSER_HOME}}"
 
     # Create the home
     mkdir -p "${SINGULARITY_ROOTFS}{{PTM_COMPASS_HOME}}"
@@ -58,52 +70,32 @@ From: ubuntu:22.04
 %files
     # SEARCH_ENGINE ---------------------------------------------------------------------------------------------
     # Obtain the MSFragger file
-    {{SEARCH_LOCAL}}/MSFragger-3.8.zip {{SEARCH_HOME}}/MSFragger.zip
+    {{SEARCH_LOCAL}}/{{MSF_FILE_NAME}}.zip {{SEARCH_HOME}}/MSFragger.zip
 
     # Obtain ThermoRawFileParser
-    {{SEARCH_LOCAL}}/ThermoRawFileParser1.4.2.zip {{SEARCH_HOME}}/ThermoRawFileParser.zip
-
-    # Copy Python requirements
-    {{SEARCH_LOCAL}}/python_requirements_decoypyrat.txt  {{SEARCH_HOME}}
-    {{SEARCH_LOCAL}}/python_requirements_mzextractor.txt {{SEARCH_HOME}}
-
-    # REFRAG ---------------------------------------------------------------------------------------------
-    # Obtain the REFRAG folder
-    {{REFRAG_LOCAL}}/ReFrag/ {{REFRAG_HOME}}
-
-    # Obtain Python requirements
-    {{REFRAG_LOCAL}}/python_requirements_refrag.txt {{PTM_COMPASS_HOME}}
-
-    # SHIFTS ---------------------------------------------------------------------------------------------
-    # Obtain the SHIFTS folder
-    {{SHIFTS_LOCAL}}/SHIFTS-4/ {{SHIFTS_HOME}}
-
-    # Obtain Python requirements
-    {{SHIFTS_LOCAL}}/python_requirements_shifts.txt {{PTM_COMPASS_HOME}}
-
-    # SOLVER ---------------------------------------------------------------------------------------------
-    # Obtain the SOLVER folder
-    {{SOLVER_LOCAL}}/Solvers-PTMap/ {{SOLVER_HOME}}
-
-    # Obtain Python requirements
-    {{SOLVER_LOCAL}}/python_requirements_solver.txt {{PTM_COMPASS_HOME}}
+    {{SEARCH_LOCAL}}/{{RAWPARSER_FILE_NAME}}.zip {{SEARCH_HOME}}/ThermoRawFileParser.zip
 
 %post
     # Install main packages
     apt-get update -y
+    apt-get install -y vim
     apt-get install -y git
     apt-get install -y unzip
+
+    ################
+    # REQUIREMENTS #
+    ################
+
+    # Update main packages (just in case)
+    apt-get update -y
+
+    # Requirements for MSFragger
+    apt-get install -y openjdk-19-jre-headless
 
     # Install Python packages
     apt-get -y install python-is-python3 python3-pip python3-venv
     python -m pip install --upgrade pip
     DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata python3-tk
-
-
-    # SEARCH_ENGINE ---------------------------------------------------------------------------------------------
-
-    # Requirements for MSFragger
-    apt-get install -y openjdk-19-jre-headless
 
     # Requeriments for ThermoRawFileParser
     apt-get install -y ca-certificates gnupg
@@ -113,59 +105,90 @@ From: ubuntu:22.04
     apt-get update -y
     apt-get install -y mono-devel
 
-
-    # Uncompress MSFragger and rename jar file
-    unzip {{SEARCH_HOME}}/MSFragger.zip -d {{SEARCH_HOME}}
-    mv {{SEARCH_HOME}}/{{MSF_NAME}} {{MSF_HOME}}
-    mv {{MSF_HOME}}/{{MSF_NAME}}.jar {{MSF_HOME}}/MSFragger.jar
-
-
-    # Uncompress thermorawfileparser
-    unzip {{SEARCH_HOME}}/ThermoRawFileParser.zip -d {{TPARSER_HOME}}
-
-
-    # Clone the CNIC dbscripts repository that contains the DecoyPYrat
-    git clone https://github.com/CNIC-Proteomics/bioDataHub.git {{BIODATAHUB_HOME}}
-    # create venv
-    cd {{BIODATAHUB_HOME}} && python -m venv env
-    # requirements for Python
-    . {{BIODATAHUB_HOME}}/env/bin/activate && pip install -r {{SEARCH_HOME}}/python_requirements_decoypyrat.txt
-
-
-    # Clone the programa that extract the qauntifications
-    git clone https://github.com/CNIC-Proteomics/mz_extractor.git {{MZEXTRACTOR_HOME}}
-    # create venv
-    cd {{MZEXTRACTOR_HOME}} && python -m venv env
-    # requirements for Python
-    . {{MZEXTRACTOR_HOME}}/env/bin/activate && pip install -r {{SEARCH_HOME}}/python_requirements_mzextractor.txt
-
-
-    # REFRAG ---------------------------------------------------------------------------------------------
-
-    # Requirements for ReFrag (pyopenms)
+    # Requirements for RefMod (pyopenms)
     apt-get install -y libglib2.0-0
 
 
-    # create venv
-    cd {{REFRAG_HOME}} && python -m venv env
-    # requirements for Python
-    . {{REFRAG_HOME}}/env/bin/activate && pip install -r {{PTM_COMPASS_HOME}}/python_requirements_refrag.txt
+    #
+    # SEARCH_ENGINE ---------------------------------------------------------------------------------------------
+    #
+
+    #############
+    # MSFRAGGER #
+    #############
+
+    # Uncompress MSFragger and rename jar file
+    unzip {{SEARCH_HOME}}/MSFragger.zip -d {{SEARCH_HOME}}
+    mv {{SEARCH_HOME}}/{{MSF_FILE_NAME}} {{MSF_HOME}}
+    mv {{MSF_HOME}}/{{MSF_FILE_NAME}}.jar {{MSF_HOME}}/MSFragger.jar
+
+    ###################
+    # THERMORAWPARSER #
+    ###################
+
+    # Uncompress thermorawfileparser
+    unzip {{SEARCH_HOME}}/ThermoRawFileParser.zip -d {{RAWPARSER_HOME}}
+
+    ##############
+    # DECOYPYRAT #
+    ##############
+
+    # Clone the repository
+    git clone https://github.com/CNIC-Proteomics/bioDataHub.git  --branch {{BIODATAHUB_VERSION}}  {{BIODATAHUB_HOME}}
+
+    # Python environment --
+    cd {{BIODATAHUB_HOME}} && python -m venv env
+    . {{BIODATAHUB_HOME}}/env/bin/activate && pip install -r {{BIODATAHUB_HOME}}/python_requirements.txt
+
+    ################
+    # MZ_EXTRACTOR #
+    ################
+
+    # Clone the repository
+    git clone https://github.com/CNIC-Proteomics/mz_extractor.git  --branch {{MZEXTRACTOR_VERSION}}  {{MZEXTRACTOR_HOME}}
+
+    # Python environment --
+    cd {{MZEXTRACTOR_HOME}} && python -m venv env
+    . {{MZEXTRACTOR_HOME}}/env/bin/activate && pip install -r {{MZEXTRACTOR_HOME}}/python_requirements.txt
 
 
+    #
+    # REFMOD ---------------------------------------------------------------------------------------------
+    #
+
+    # Clone the repository
+    git clone https://github.com/CNIC-Proteomics/ReFrag.git  --branch {{REFMOD_VERSION}}  {{REFMOD_HOME}}
+
+    # Python environment --
+    cd {{REFMOD_HOME}} && python -m venv env
+    . {{REFMOD_HOME}}/env/bin/activate && pip install -r {{REFMOD_HOME}}/python_requirements.txt
+
+
+    #
     # SHIFTS ---------------------------------------------------------------------------------------------
+    #
 
-    # create venv
+    # Clone the repository
+    git clone https://github.com/CNIC-Proteomics/SHIFTS.git  --branch {{SHIFTS_VERSION}}  {{SHIFTS_HOME}}
+
+    # Python environment --
     cd {{SHIFTS_HOME}} && python -m venv env
-    # requirements for Python
-    . {{SHIFTS_HOME}}/env/bin/activate && pip install -r {{PTM_COMPASS_HOME}}/python_requirements_shifts.txt
+    . {{SHIFTS_HOME}}/env/bin/activate && pip install -r {{SHIFTS_HOME}}/python_requirements.txt
+
+    RUN cd ${SHIFTS_HOME} && python -m venv env
+    RUN cd ${SHIFTS_HOME} && /bin/bash -c "source ${SHIFTS_HOME}/env/bin/activate && pip install -r ${SHIFTS_HOME}/python_requirements.txt"
 
 
+    #
     # SOLVER ---------------------------------------------------------------------------------------------
+    #
 
-    # create venv
+    # Clone the repository
+    git clone https://github.com/CNIC-Proteomics/Solvers-PTMap.git  --branch {{SOLVER_VERSION}}  {{SOLVER_HOME}}
+
+    # Python environment --
     cd {{SOLVER_HOME}} && python -m venv env
-    # requirements for Python
-    . {{SOLVER_HOME}}/env/bin/activate && pip install -r {{PTM_COMPASS_HOME}}/python_requirements_solver.txt
+    . {{SOLVER_HOME}}/env/bin/activate && pip install -r {{SOLVER_HOME}}/python_requirements.txt
 
 
 
@@ -235,10 +258,10 @@ From: ubuntu:22.04
         exit 1
     fi
 
-    # REFRAG ---------------------------------------------------------------------------------------------
+    # REFMOD ---------------------------------------------------------------------------------------------
 
-    # Check if REFRAG has been installed
-    DIR={{REFRAG_HOME}}
+    # Check if REFMOD has been installed
+    DIR={{REFMOD_HOME}}
     if [ -d "${DIR}" ]; then
         echo "The ${DIR} directory exists."
     else
@@ -246,12 +269,12 @@ From: ubuntu:22.04
         exit 1
     fi
 
-    # Check if REFRAG has been installed
-    REFRAG_test=$(cd {{REFRAG_HOME}} && . env/bin/activate && python ReFrag.py 2>&1 | grep "usage:")
-    if [ "${REFRAG_test}" != "" ]; then
-        echo "REFRAG ${REFRAG_test} has been installed as expected."
+    # Check if REFMOD has been installed
+    REFMOD_test=$(cd {{REFMOD_HOME}} && . env/bin/activate && python ReFrag.py 2>&1 | grep "usage:")
+    if [ "${REFMOD_test}" != "" ]; then
+        echo "REFMOD ${REFMOD_test} has been installed as expected."
     else
-        echo "REFRAG has not been installed."
+        echo "REFMOD has not been installed."
         exit 1
     fi
 
