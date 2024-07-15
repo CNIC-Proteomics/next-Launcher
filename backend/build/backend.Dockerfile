@@ -86,19 +86,19 @@ ENV RAWPARSER_HOME  ${SEARCH_ENGINE_HOME}/thermorawfileparser
 RUN mkdir -p "${RAWPARSER_HOME}"
 ENV BIODATAHUB_HOME  ${SEARCH_ENGINE_HOME}/biodatahub
 RUN mkdir -p "${BIODATAHUB_HOME}"
-ENV MZEXTRACTOR_HOME  ${SEARCH_ENGINE_HOME}/mz_extractor
+ENV MZEXTRACTOR_HOME  ${SEARCH_ENGINE_HOME}/mzextractor
 RUN mkdir -p "${MZEXTRACTOR_HOME}"
 
-# MSFRAGGER: Setting up the environment variables
+# MSFRAGGER: Declare the file name (with version)
 ARG MSF_FILE_NAME=MSFragger-3.8
 
 # THERMORAWPARSER: Declare the file name (with version)
 ARG RAWPARSER_FILE_NAME=ThermoRawFileParser1.4.2
 
-# DECOYPYRAT: Setting up variables
+# DECOYPYRAT: Setting up variables (with version)
 ARG BIODATAHUB_VERSION=v2.13
 
-# MZ_EXTRACTOR: 
+# MZ_EXTRACTOR: Setting up variables (with version)
 ARG MZEXTRACTOR_VERSION=v1.0
 
 # PTM-COMPASS: Setting up the environment variables
@@ -111,7 +111,7 @@ ENV REFMOD_HOME ${PTM_COMPASS_HOME}/refmod
 RUN mkdir -p "${REFMOD_HOME}"
 
 # SHIFTS: Setting up the environment variables
-ARG SHIFTS_VERSION=v0.4.2
+ARG SHIFTS_VERSION=v0.4.3
 ENV SHIFTS_HOME ${PTM_COMPASS_HOME}/shifts
 RUN mkdir -p "${SHIFTS_HOME}"
 
@@ -253,7 +253,7 @@ RUN cd ${SOLVER_HOME} && /bin/bash -c "source ${SOLVER_HOME}/env/bin/activate &&
 
 # Setting up the enviroment of 'root' and 'nextflow' user
 USER root
-COPY nextflow/setup.root.sh /tmp/.
+COPY setup.root.sh /tmp/.
 RUN cat "/tmp/setup.root.sh" >> /root/.bashrc
 
 # Use ARG to define a build-time variable with a default value
