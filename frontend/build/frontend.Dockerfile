@@ -39,7 +39,7 @@ RUN apt-get install -y nodejs
 #################
 
 # Declare local variables
-ARG NEXTLAUNCHER_VERSION=0.0.1
+ARG NEXTLAUNCHER_VERSION=0.1.0
 ARG INSTALLATION_HOME=/opt
 
 # Setting up the environment variables
