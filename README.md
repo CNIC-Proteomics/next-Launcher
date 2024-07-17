@@ -54,7 +54,7 @@ docker compose up
 | 0.1.0   | First stable version         |                                                                                                                      |                             |         |
 |         |                              | [proteomicscnic/next-launcher-core:0.1.0](https://cloud.sylabs.io/library/proteomicscnic/next-launcher/ptm-compass)	|                             |         |
 |         |                              |                                                                                                                      | Nextflow                    | 23.10.1 |
-|         |                              |                                                                                                                      | Nextflow-API                | 0.0.1   |
+|         |                              |                                                                                                                      | Nextflow-API                | 1.0     |
 |         |                              |                                                                                                                      | MSFragger                   | 3.8     |
 |         |                              |                                                                                                                      | ThermoRawFileParser         | 1.4.2   |
 |         |                              |                                                                                                                      | bioDataHub (DecoyPYrat)     | 2.13    |

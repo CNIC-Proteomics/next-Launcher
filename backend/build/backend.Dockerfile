@@ -73,7 +73,7 @@ ENV NXF_LOG=${INSTALLATION_HOME}/nextflow/log
 RUN mkdir -p "${NXF_LOG}"
 
 # NEXTFLOW-API: Setting up the environment variables
-ARG NXF_API_VERSION=v0.0.1
+ARG NXF_API_VERSION=1.0
 ENV NXF_API_HOME=${INSTALLATION_HOME}/nextflow-api
 RUN mkdir -p "${NXF_API_HOME}"
 

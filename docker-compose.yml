@@ -12,7 +12,7 @@ services:
       - workspace:/workspace
     networks:
       - app-network
-    command: [ "sh", "-c", "cd ${NXF_API_HOME} && ./scripts/startup-local.sh file" ]
+    command: [ "sh", "-c", "/opt/nextflow-api/scripts/startup-local.sh file" ]
 
   next-launcher-app:
     image: 'proteomicscnic/next-launcher-app:0.1.0'
@@ -26,7 +26,7 @@ services:
       - workspace:/workspace
     networks:
       - app-network
-    command: [ "sh", "-c", "cd ${NEXTLAUNCHER_HOME}/app && npm start" ]
+    command: [ "sh", "-c", "cd /opt/next-launcher-app/app && REACT_APP_HOST_IP=$HOST_IP REACT_APP_PORT_CORE=$PORT_CORE npm start" ]
 
 
 volumes:
