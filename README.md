@@ -6,34 +6,61 @@ Core for the next-Launcher: backend and frontend systems
 
 Quantitative Mass Spectrometry and Post-Translational Modifications analysis workflow.
 
+# Installation
 
-# Requirements
+## Prerequisites
+Before you begin, ensure you have met the following requirements:
 
-- Git, git-LFS
-- Make
-- Docker engine
+- You have **Docker Desktop**, that is a platform designed to help developers build, share, and run container applications.
 
-Install Make on Windows????
-------------------------------
+For further information on how to install Docker, visit the official website: https://www.docker.com
 
-
-Directly download from Make for Windows:
-https://gnuwin32.sourceforge.net/packages/make.htm
-
-
-Install Docker Desktop on Windows
-------------------------------
+### Install Docker Desktop on Windows
 
 This following page contains the information about system requirements, and instructions on how to install Docker Desktop for Windows:
 https://docs.docker.com/desktop/install/windows-install/
 
 
+### Install Docker Desktop on Mac
 
-# Installation
+This following page contains the information about system requirements, and instructions on how to install Docker Desktop for Mac:
+https://docs.docker.com/desktop/install/mac-install/
+
+
+<!-- 
+- Git, git-LFS??
+- Make??
+- Docker engine
+
+Install Make on Windows????
+
+Directly download from Make for Windows:
+https://gnuwin32.sourceforge.net/packages/make.htm
+ -->
+
+
+## Installation
+
+Modify **.env** file
 
 ```
-HOST_IP=10.142.33.54 docker-compose up -d
-
 docker compose up
 ```
 
+# Version history
+
+| Version | Description                  | Docker images                                                                        			                          | Software                    | Version |
+|---------|------------------------------|----------------------------------------------------------------------------------------------------------------------|-----------------------------|---------|
+| 0.1.0   | First stable version         |                                                                                                                      |                             |         |
+|         |                              | [proteomicscnic/next-launcher-core:0.1.0](https://cloud.sylabs.io/library/proteomicscnic/next-launcher/ptm-compass)	|                             |         |
+|         |                              |                                                                                                                      | Nextflow                    | 23.10.1 |
+|         |                              |                                                                                                                      | Nextflow-API                | 0.0.1   |
+|         |                              |                                                                                                                      | MSFragger                   | 3.8     |
+|         |                              |                                                                                                                      | ThermoRawFileParser         | 1.4.2   |
+|         |                              |                                                                                                                      | bioDataHub (DecoyPYrat)     | 2.13    |
+|         |                              |                                                                                                                      | MZ_extractor                | 1.0     |
+|         |                              |                                                                                                                      | RefMod                      | 0.4.3   |
+|         |                              |                                                                                                                      | SHIFTS                      | 0.4.3   |
+|         |                              |                                                                                                                      | SOLVER                      | 1.0     |
+|         |                              | [proteomicscnic/next-launcher-app:0.1.0](https://cloud.sylabs.io/library/proteomicscnic/next-launcher/ptm-compass)	  |                             |         |
+|         |                              |                                                                                                                      | next-Launcher-app           | 0.1.0   |

@@ -10,7 +10,7 @@
 
 # our base image
 FROM ubuntu:22.04
-ENV DEBIAN_FRONTEND noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
 
 # Install main packages
 RUN apt-get update -y
@@ -63,30 +63,30 @@ ARG INSTALLATION_HOME=/opt
 RUN mkdir -p "${INSTALLATION_HOME}"
 
 # NEXTFLOW: Setting up the environment variables
-ENV NXF_HOME ${INSTALLATION_HOME}/nextflow
+ENV NXF_HOME=${INSTALLATION_HOME}/nextflow
 RUN mkdir -p "${NXF_HOME}"
-ENV NXF_CONF ${INSTALLATION_HOME}/nextflow/conf
+ENV NXF_CONF=${INSTALLATION_HOME}/nextflow/conf
 RUN mkdir -p "${NXF_CONF}"
-ENV NXF_WORK ${INSTALLATION_HOME}/nextflow/work
+ENV NXF_WORK=${INSTALLATION_HOME}/nextflow/work
 RUN mkdir -p "${NXF_WORK}"
-ENV NXF_LOG ${INSTALLATION_HOME}/nextflow/log
+ENV NXF_LOG=${INSTALLATION_HOME}/nextflow/log
 RUN mkdir -p "${NXF_LOG}"
 
 # NEXTFLOW-API: Setting up the environment variables
 ARG NXF_API_VERSION=v0.0.1
-ENV NXF_API_HOME ${INSTALLATION_HOME}/nextflow-api
+ENV NXF_API_HOME=${INSTALLATION_HOME}/nextflow-api
 RUN mkdir -p "${NXF_API_HOME}"
 
 # SEARCH_ENGINE: Setting up the environment variables
-ENV SEARCH_ENGINE_HOME ${INSTALLATION_HOME}/search_engine
+ENV SEARCH_ENGINE_HOME=${INSTALLATION_HOME}/search_engine
 RUN mkdir -p "${SEARCH_ENGINE_HOME}"
-ENV MSF_HOME ${SEARCH_ENGINE_HOME}/msfragger
+ENV MSF_HOME=${SEARCH_ENGINE_HOME}/msfragger
 # RUN mkdir -p "${MSF_HOME}" # not required
-ENV RAWPARSER_HOME  ${SEARCH_ENGINE_HOME}/thermorawfileparser
+ENV RAWPARSER_HOME=${SEARCH_ENGINE_HOME}/thermorawfileparser
 RUN mkdir -p "${RAWPARSER_HOME}"
-ENV BIODATAHUB_HOME  ${SEARCH_ENGINE_HOME}/biodatahub
+ENV BIODATAHUB_HOME=${SEARCH_ENGINE_HOME}/biodatahub
 RUN mkdir -p "${BIODATAHUB_HOME}"
-ENV MZEXTRACTOR_HOME  ${SEARCH_ENGINE_HOME}/mzextractor
+ENV MZEXTRACTOR_HOME=${SEARCH_ENGINE_HOME}/mzextractor
 RUN mkdir -p "${MZEXTRACTOR_HOME}"
 
 # MSFRAGGER: Declare the file name (with version)
@@ -102,22 +102,22 @@ ARG BIODATAHUB_VERSION=v2.13
 ARG MZEXTRACTOR_VERSION=v1.0
 
 # PTM-COMPASS: Setting up the environment variables
-ENV PTM_COMPASS_HOME ${INSTALLATION_HOME}/ptm-compass
+ENV PTM_COMPASS_HOME=${INSTALLATION_HOME}/ptm-compass
 RUN mkdir -p "${PTM_COMPASS_HOME}"
 
 # REFMOD: Setting up the environment variables
 ARG REFMOD_VERSION=v0.4.3
-ENV REFMOD_HOME ${PTM_COMPASS_HOME}/refmod
+ENV REFMOD_HOME=${PTM_COMPASS_HOME}/refmod
 RUN mkdir -p "${REFMOD_HOME}"
 
 # SHIFTS: Setting up the environment variables
 ARG SHIFTS_VERSION=v0.4.3
-ENV SHIFTS_HOME ${PTM_COMPASS_HOME}/shifts
+ENV SHIFTS_HOME=${PTM_COMPASS_HOME}/shifts
 RUN mkdir -p "${SHIFTS_HOME}"
 
 # SOLVER: Setting up the environment variables
 ARG SOLVER_VERSION=v1.0
-ENV SOLVER_HOME ${PTM_COMPASS_HOME}/solver
+ENV SOLVER_HOME=${PTM_COMPASS_HOME}/solver
 RUN mkdir -p "${SOLVER_HOME}"
 
 
@@ -259,12 +259,12 @@ RUN cat "/tmp/setup.root.sh" >> /root/.bashrc
 # Use ARG to define a build-time variable with a default value
 ARG PORT_CORE=8080
 ARG PORT_APP=3000
-ARG HOST_IP
+# ARG HOST_IP
 
 # Use that ARG to set an environment variable
-ENV PORT_CORE ${PORT_CORE}
-ENV PORT_APP ${PORT_APP}
-ENV HOST_IP ${HOST_IP}
+ENV PORT_CORE=${PORT_CORE}
+ENV PORT_APP=${PORT_APP}
+# ENV HOST_IP=${HOST_IP}
 
 # Expose port given by input parameter.
 EXPOSE ${PORT_CORE}
@@ -272,6 +272,7 @@ EXPOSE ${PORT_CORE}
 # Define the command to execute when the container starts.
 # CMD cd ${NXF_API_HOME} && ./scripts/startup-local.sh mongo
 # CMD cd ${NXF_API_HOME} && ./scripts/startup-local.sh file
+# CMD [ "sh", "-c", "cd ${NXF_API_HOME} && ./scripts/startup-local.sh file" ]
 
 # Setting up the environment variables
 WORKDIR /workspace

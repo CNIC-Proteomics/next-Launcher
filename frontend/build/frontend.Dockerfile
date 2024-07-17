@@ -10,7 +10,7 @@
 
 # our base image
 FROM ubuntu:22.04
-ENV DEBIAN_FRONTEND noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
 
 # Install main packages
 RUN apt-get update -y
@@ -43,7 +43,7 @@ ARG NEXTLAUNCHER_VERSION=0.1.0
 ARG INSTALLATION_HOME=/opt
 
 # Setting up the environment variables
-ENV NEXTLAUNCHER_HOME  ${INSTALLATION_HOME}/next-launcher
+ENV NEXTLAUNCHER_HOME=${INSTALLATION_HOME}/next-launcher-app
 
 
 ################
@@ -63,17 +63,18 @@ RUN cd ${NEXTLAUNCHER_HOME}/app && npm install
 
 # Use ARG to define a build-time variable with a default value
 ARG PORT_APP=3000
-ARG HOST_IP
+# ARG HOST_IP
 
 # Use that ARG to set an environment variable
-ENV PORT_APP ${PORT_APP}
-ENV HOST_IP ${HOST_IP}
+ENV PORT_APP=${PORT_APP}
+# ENV HOST_IP=${HOST_IP}
 
 # Expose port given by input parameter.
 EXPOSE ${PORT_APP}
 
 # Define the command to execute when the container starts.
 # CMD cd ${NEXTLAUNCHER_HOME}/app && npm start
+# CMD [ "sh", "-c", "cd ${NEXTLAUNCHER_HOME}/app && npm start" ]
 
 # Setting up the environment variables
 WORKDIR /workspace
