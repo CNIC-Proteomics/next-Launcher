@@ -47,7 +47,3 @@ Modify **.env** file
 docker compose up
 ```
 
-# Version history
-
-For futher information, read the [VERSIONS](VERSIONS.md) file.
-
