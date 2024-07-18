@@ -39,7 +39,7 @@ RUN apt-get install -y nodejs
 #################
 
 # Declare local variables
-ARG NEXTLAUNCHER_VERSION=0.1.0
+ARG NEXTLAUNCHER_VERSION=0.1.1
 ARG INSTALLATION_HOME=/opt
 
 # Setting up the environment variables
@@ -63,17 +63,14 @@ RUN cd ${NEXTLAUNCHER_HOME}/app && npm install
 
 # Use ARG to define a build-time variable with a default value
 ARG PORT_APP=3000
-# ARG HOST_IP
 
 # Use that ARG to set an environment variable
 ENV PORT_APP=${PORT_APP}
-# ENV HOST_IP=${HOST_IP}
 
 # Expose port given by input parameter.
 EXPOSE ${PORT_APP}
 
 # Define the command to execute when the container starts.
-# CMD cd ${NEXTLAUNCHER_HOME}/app && npm start
 # CMD [ "sh", "-c", "cd ${NEXTLAUNCHER_HOME}/app && npm start" ]
 
 # Setting up the environment variables
