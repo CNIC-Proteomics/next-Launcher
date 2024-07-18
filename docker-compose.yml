@@ -15,7 +15,7 @@ services:
     command: [ "sh", "-c", "/opt/nextflow-api/scripts/startup-local.sh file" ]
 
   next-launcher-app:
-    image: 'proteomicscnic/next-launcher-app:0.1.0'
+    image: 'proteomicscnic/next-launcher-app:0.1.1'
     ports:
       - "3000:3000"
     environment:

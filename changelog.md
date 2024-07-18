@@ -1,12 +1,30 @@
 ___
-## 0.1.1
+## 0.1.2
 ```
-DATE: 2024_08
+DATE: 2024_07
 ```
 
 ### Highlights
 
-+ Release the first beta version.
+
+### Changes in the Backend (next-launcher-core)
+
+
+### Changes in the Frontend (next-launcher-app)
+
+
+### Version history
+
+
+___
+## 0.1.1
+```
+DATE: 2024_07
+```
+
+### Highlights
+
++ Really the first beta version.
 
 ### Changes in the Backend (next-launcher-core)
 
@@ -17,18 +35,18 @@ DATE: 2024_08
 
 ### Version history
 
-| Version | Docker images                                                                                                                   | Software                    | Version |
-|---------|---------------------------------------------------------------------------------------------------------------------------------|-----------------------------|---------|
-| 0.1.1   | [proteomicscnic/next-launcher-core:0.1.0](https://hub.docker.com/repository/docker/proteomicscnic/next-launcher-core/general)   | Nextflow                    | 23.10.1 |
-|         |                                                                                                                                 | Nextflow-API                | 1.0     |
-|         |                                                                                                                                 | MSFragger                   | 3.8     |
-|         |                                                                                                                                 | ThermoRawFileParser         | 1.4.2   |
-|         |                                                                                                                                 | bioDataHub (DecoyPYrat)     | 2.13    |
-|         |                                                                                                                                 | MZ_extractor                | 1.0     |
-|         |                                                                                                                                 | RefMod                      | 0.4.3   |
-|         |                                                                                                                                 | SHIFTS                      | 0.4.3   |
-|         |                                                                                                                                 | SOLVER                      | 1.0     |
-|         | [proteomicscnic/next-launcher-app:0.1.1](https://hub.docker.com/repository/docker/proteomicscnic/next-launcher-app/general)	    | next-Launcher-app           | 0.1.1   |
+| Docker images                                                                                                                   | Software                    | Version |
+|---------------------------------------------------------------------------------------------------------------------------------|-----------------------------|---------|
+| [proteomicscnic/next-launcher-core:0.1.0](https://hub.docker.com/repository/docker/proteomicscnic/next-launcher-core/general)   | Nextflow                    | 23.10.1 |
+|                                                                                                                                 | Nextflow-API                | 1.0     |
+|                                                                                                                                 | MSFragger                   | 3.8     |
+|                                                                                                                                 | ThermoRawFileParser         | 1.4.2   |
+|                                                                                                                                 | bioDataHub (DecoyPYrat)     | 2.13    |
+|                                                                                                                                 | MZ_extractor                | 1.0     |
+|                                                                                                                                 | RefMod                      | 0.4.3   |
+|                                                                                                                                 | SHIFTS                      | 0.4.3   |
+|                                                                                                                                 | SOLVER                      | 1.0     |
+| [proteomicscnic/next-launcher-app:0.1.1](https://hub.docker.com/repository/docker/proteomicscnic/next-launcher-app/general)	    | next-Launcher-app           | 0.1.1   |
 
 ___
 ## 0.1.0
