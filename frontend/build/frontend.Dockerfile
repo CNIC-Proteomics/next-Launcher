@@ -27,7 +27,10 @@ RUN apt-get install -y unzip
 ################
 
 # Download the Node.js setup script
-RUN curl -fsSL https://deb.nodesource.com/setup_22.x -o nodesource_setup.sh
+# node v22
+# RUN curl -fsSL https://deb.nodesource.com/setup_22.x -o nodesource_setup.sh
+# node v21
+RUN curl -fsSL https://deb.nodesource.com/setup_21.x -o nodesource_setup.sh
 # Run the Node.js setup script with sudo 
 RUN bash nodesource_setup.sh
 # Install Node.js

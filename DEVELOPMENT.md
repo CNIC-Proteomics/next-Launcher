@@ -241,9 +241,45 @@ echo 'export PATH=~/softwares/nextflow:$PATH' >> ~/.bashrc && \
 
 # Install SGE in Ubuntu
 
-
 https://svennd.be/SGE_on_Ubuntu_20.04_LTS/
 
 
+# Docker compose
 
+Common Docker Compose Commands with a Specific File
+Here are some common Docker Compose commands using a specific file:
 
+- Start services:
+```
+docker-compose -f docker-compose.dev.yml up
+```
+
+- Start services in detached mode:
+```
+docker-compose -f docker-compose.dev.yml up -d
+```
+
+- Stop services:
+```
+docker-compose -f docker-compose.dev.yml down
+```
+
+- Build services:
+```
+docker-compose -f docker-compose.dev.yml build
+```
+
+- View logs:
+```
+docker-compose -f docker-compose.dev.yml logs
+```
+
+- List running services:
+```
+docker-compose -f docker-compose.dev.yml ps
+```
+
+- Execute a command in a running service:
+```
+docker-compose -f docker-compose.dev.yml exec app sh
+```
