@@ -126,3 +126,14 @@ fi
 #   setfacl -R -d -m g::rwx,o::rwx /opt/nextflow/work
 # fi
 
+# Export environment variables for next-launcher-core
+# JWT variables
+export JWT_SECRET='your_jwt_secret'
+export JWT_ALGORITHM='HS256'
+export JWT_EXP_DELTA_SECONDS=3600
+# guest user
+export USER_GUEST='guest'
+export PWD_GUEST='guest'
+# admin user
+export USER_ADMIN='admin'
+export PWD_ADMIN='123.qwe'
