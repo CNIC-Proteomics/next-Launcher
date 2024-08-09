@@ -2,6 +2,7 @@ services:
 
   next-launcher-core:
     image: 'proteomicscnic/next-launcher-core:0.1.0'
+    container_name: 'next-launcher-core'
     ports:
       - "${PORT_CORE}:${PORT_CORE}"
     environment:
@@ -16,6 +17,7 @@ services:
 
   next-launcher-app:
     image: 'proteomicscnic/next-launcher-app:0.1.1'
+    container_name: 'next-launcher-app'
     ports:
       - "${PORT_APP}:${PORT_APP}"
     environment:
