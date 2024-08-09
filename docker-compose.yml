@@ -3,7 +3,7 @@ services:
   next-launcher-core:
     image: 'proteomicscnic/next-launcher-core:0.1.0'
     ports:
-      - "8080:8080"
+      - "${PORT_CORE}:${PORT_CORE}"
     environment:
       - PORT_CORE=$PORT_CORE
       - PORT_APP=$PORT_APP
@@ -12,12 +12,12 @@ services:
       - workspace:/workspace
     networks:
       - app-network
-    command: [ "sh", "-c", "/opt/nextflow-api/scripts/startup-local.sh file" ]
+    command: [ "sh", "-c", "/opt/nextflow-api/scripts/startup-local.sh mongo" ]
 
   next-launcher-app:
     image: 'proteomicscnic/next-launcher-app:0.1.1'
     ports:
-      - "3000:3000"
+      - "${PORT_APP}:${PORT_APP}"
     environment:
       - PORT_CORE=$PORT_CORE
       - PORT_APP=$PORT_APP
@@ -26,7 +26,7 @@ services:
       - workspace:/workspace
     networks:
       - app-network
-    command: [ "sh", "-c", "cd /opt/next-launcher-app/app && REACT_APP_HOST_IP=$HOST_IP REACT_APP_PORT_CORE=$PORT_CORE npm start" ]
+    command: [ "sh", "-c", "cd /opt/next-launcher-app/app && PORT=$PORT_APP  REACT_APP_HOST_IP=$HOST_IP  REACT_APP_PORT_CORE=$PORT_CORE  npm start" ]
 
 
 volumes:
