@@ -35,6 +35,8 @@ RUN curl -fsSL https://deb.nodesource.com/setup_21.x -o nodesource_setup.sh
 RUN bash nodesource_setup.sh
 # Install Node.js
 RUN apt-get install -y nodejs
+# Install serve
+RUN npm install -g serve
 
 
 #################
@@ -42,7 +44,7 @@ RUN apt-get install -y nodejs
 #################
 
 # Declare local variables
-ARG NEXTLAUNCHER_VERSION=0.1.1
+ARG NEXTLAUNCHER_VERSION=0.1.2
 ARG INSTALLATION_HOME=/opt
 
 # Setting up the environment variables
@@ -59,6 +61,8 @@ RUN git clone https://github.com/CNIC-Proteomics/next-Launcher-app.git  --branch
 # Install npm packages for the app
 RUN cd ${NEXTLAUNCHER_HOME}/app && npm install
 
+# # Make build
+# RUN cd ${NEXTLAUNCHER_HOME}/app && npm run build
 
 ######################
 # EXPOSE and COMMAND #
