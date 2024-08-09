@@ -259,10 +259,12 @@ RUN cat "/tmp/setup.root.sh" >> /root/.bashrc
 # Use ARG to define a build-time variable with a default value
 ARG PORT_CORE=8080
 ARG PORT_APP=3000
+ARG HOST_IP=localhost
 
 # Use that ARG to set an environment variable
 ENV PORT_CORE=${PORT_CORE}
 ENV PORT_APP=${PORT_APP}
+ENV HOST_IP=${HOST_IP}
 
 # Expose port given by input parameter.
 EXPOSE ${PORT_CORE}
