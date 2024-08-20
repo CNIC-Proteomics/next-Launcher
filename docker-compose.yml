@@ -1,11 +1,37 @@
 services:
 
+  mongodb:
+    image: mongo:7.0.12
+    container_name: 'next-launcher-db'
+    environment:
+      - MONGODB_HOST=$MONGODB_HOST
+      - MONGODB_PORT=$MONGODB_PORT
+      - MONGO_INITDB_ROOT_USERNAME=$MONGODB_USER
+      - MONGO_INITDB_ROOT_PASSWORD=$MONGODB_PWD
+    # volumes:
+    #   - ./mongodb_data:/data/db
+    volumes:
+      - workspace:/workspace
+    ports:
+      - "${MONGODB_PORT}:${MONGODB_PORT}"
+    networks:
+      - app-network
+
   next-launcher-core:
     image: 'proteomicscnic/next-launcher-core:0.1.0'
     container_name: 'next-launcher-core'
     ports:
       - "${PORT_CORE}:${PORT_CORE}"
+    depends_on:
+      - mongodb
     environment:
+      # mongodb 
+      - MONGO_HOST=$MONGODB_HOST
+      - MONGO_PORT=$MONGODB_PORT
+      - MONGO_USER=$MONGODB_USER
+      - MONGO_PASSWORD=$MONGODB_PWD
+      - MONGO_DB=$MONGODB_DB
+      # rest api (core) and app
       - PORT_CORE=$PORT_CORE
       - PORT_APP=$PORT_APP
       - HOST_IP=$HOST_IP
@@ -29,6 +55,7 @@ services:
     networks:
       - app-network
     command: [ "sh", "-c", "cd /opt/next-launcher-app/app && PORT=$PORT_APP  REACT_APP_HOST_IP=$HOST_IP  REACT_APP_PORT_CORE=$PORT_CORE  npm start" ]
+
 
 
 volumes:
