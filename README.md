@@ -41,8 +41,9 @@ https://gnuwin32.sourceforge.net/packages/make.htm
 
 ## Installation
 
-Modify **.env** file
+1. Modify **.env** file
 
+2. Compose the service
 ```
 docker compose up
 ```
