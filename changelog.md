@@ -1,19 +1,39 @@
 ___
 ## 0.1.2
 ```
-DATE: 2024_07
+DATE: 2024_08
 ```
 
 ### Highlights
 
++ Add the authentication
 
 ### Changes in the Backend (next-launcher-core)
 
++ nextflow-api:
+  - Add the authentication
+  - Add the MongoDB in remote mode
 
 ### Changes in the Frontend (next-launcher-app)
 
++ next-Launcher-app:
+  - Add the authentication pages
+
 
 ### Version history
+
+| Docker images                                                                                                                   | Software                    | Version |
+|---------------------------------------------------------------------------------------------------------------------------------|-----------------------------|---------|
+| [proteomicscnic/next-launcher-core:0.1.2](https://hub.docker.com/repository/docker/proteomicscnic/next-launcher-core/general)   | Nextflow                    | 23.10.1 |
+|                                                                                                                                 | MSFragger                   | 3.8     |
+|                                                                                                                                 | ThermoRawFileParser         | 1.4.2   |
+|                                                                                                                                 | bioDataHub (DecoyPYrat)     | 2.13    |
+|                                                                                                                                 | MZ_extractor                | 1.0     |
+|                                                                                                                                 | RefMod                      | 0.4.3   |
+|                                                                                                                                 | SHIFTS                      | 0.4.3   |
+|                                                                                                                                 | SOLVER                      | 1.0     |
+|                                                                                                                                 | nextflow-api                | 1.1     |
+| [proteomicscnic/next-launcher-app:0.1.2](https://hub.docker.com/repository/docker/proteomicscnic/next-launcher-app/general)	    | next-Launcher-app           | 0.1.2   |
 
 
 ___

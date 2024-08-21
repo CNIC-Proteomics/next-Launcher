@@ -248,31 +248,58 @@ RUN cd ${SOLVER_HOME} && /bin/bash -c "source ${SOLVER_HOME}/env/bin/activate &&
 
 
 #
-# EXPOSE and COMMAND ---------------------------------------------------------------------------------------------
+# ENVIRONMENT ---------------------------------------------------------------------------------------------
 #
 
-# Setting up the enviroment of 'root' and 'nextflow' user
+# Setting up the environment of 'root' and 'nextflow' user
 USER root
 COPY setup.root.sh /tmp/.
 RUN cat "/tmp/setup.root.sh" >> /root/.bashrc
 
-# Use ARG to define a build-time variable with a default value
-ARG PORT_CORE=8080
-ARG PORT_APP=3000
-ARG HOST_IP=localhost
+# Use ARG to define a build-time variable
+# server connection
+ARG PORT_CORE
+ARG PORT_APP
+ARG HOST_IP
+# mongodb connection
+ARG MONGODB_HOST
+ARG MONGODB_PORT
+ARG MONGODB_USER
+ARG MONGODB_PWD
+ARG MONGODB_DB
+# nextflow-api: guest user
+ARG USER_GUEST
+ARG PWD_GUEST
+# nextflow-api: admin user
+ARG USER_ADMIN
+ARG PWD_ADMIN
 
-# Use that ARG to set an environment variable
+# Use that ARG to set an ENV environment variable
+# server connection
 ENV PORT_CORE=${PORT_CORE}
 ENV PORT_APP=${PORT_APP}
 ENV HOST_IP=${HOST_IP}
+# mongodb connection
+ENV MONGODB_HOST=${MONGODB_HOST}
+ENV MONGODB_PORT=${MONGODB_PORT}
+ENV MONGODB_USER=${MONGODB_USER}
+ENV MONGODB_PWD=${MONGODB_PWD}
+ENV MONGODB_DB=${MONGODB_DB}
+# nextflow-api: guest user
+ENV USER_GUEST=${USER_GUEST}
+ENV PWD_GUEST=${PWD_GUEST}
+# nextflow-api: admin user
+ENV USER_ADMIN=${USER_ADMIN}
+ENV PWD_ADMIN=${PWD_ADMIN}
+
+
+
+#
+# EXPOSE and COMMAND ---------------------------------------------------------------------------------------------
+#
 
 # Expose port given by input parameter.
 EXPOSE ${PORT_CORE}
 
-# Define the command to execute when the container starts.
-# CMD [ "sh", "-c", "cd ${NXF_API_HOME} && ./scripts/startup-local.sh mongo" ]
-# CMD [ "sh", "-c", "cd ${NXF_API_HOME} && ./scripts/startup-local.sh file" ]
-
 # Setting up the environment variables
 WORKDIR /workspace
-

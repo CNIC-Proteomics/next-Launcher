@@ -64,21 +64,22 @@ RUN cd ${NEXTLAUNCHER_HOME}/app && npm install
 # # Make build
 # RUN cd ${NEXTLAUNCHER_HOME}/app && npm run build
 
-######################
-# EXPOSE and COMMAND #
-######################
+###############
+# ENVIRONMENT #
+###############
 
-# Use ARG to define a build-time variable with a default value
-ARG PORT_APP=3000
+# Use ARG to define a build-time variable
+ARG PORT_APP
 
 # Use that ARG to set an environment variable
 ENV PORT_APP=${PORT_APP}
 
+######################
+# EXPOSE and COMMAND #
+######################
+
 # Expose port given by input parameter.
 EXPOSE ${PORT_APP}
-
-# Define the command to execute when the container starts.
-# CMD [ "sh", "-c", "cd ${NEXTLAUNCHER_HOME}/app && npm start" ]
 
 # Setting up the environment variables
 WORKDIR /workspace

@@ -125,24 +125,3 @@ fi
 #   echo "-- set the permissions for the 'Working directory'"
 #   setfacl -R -d -m g::rwx,o::rwx /opt/nextflow/work
 # fi
-
-# Export environment variables for next-launcher-core
-# MongoDB
-export MONGODB_HOST='next-launcher-db'
-export MONGODB_PORT=27017
-export MONGODB_USER='root'
-export MONGODB_PWD='123.qwe'
-export MONGODB_DB='nextflow-api'
-
-# JWT variables
-export JWT_SECRET='your_jwt_secret'
-export JWT_ALGORITHM='HS256'
-export JWT_EXP_DELTA_SECONDS=3600
-
-# guest user
-export USER_GUEST='guest'
-export PWD_GUEST='guest'
-
-# admin user
-export USER_ADMIN='admin'
-export PWD_ADMIN='123.qwe'
