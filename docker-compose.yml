@@ -13,7 +13,7 @@ services:
     volumes:
       - workspace:/workspace
     networks:
-      - app-network
+      - next-launcher-network
     command: [ "mongod" ]
 
   next-launcher-core:
@@ -24,7 +24,6 @@ services:
     environment:
       # mongodb
       - MONGODB_HOST=$MONGODB_HOST
-      - MONGODB_PORT=$MONGODB_PORT
       - MONGODB_USER=$MONGODB_USER
       - MONGODB_PWD=$MONGODB_PWD
       - MONGODB_DB=$MONGODB_DB
@@ -42,7 +41,7 @@ services:
     volumes:
       - workspace:/workspace
     networks:
-      - app-network
+      - next-launcher-network
     command: [ "sh", "-c", "/opt/nextflow-api/scripts/startup-local.sh mongo" ]
 
   next-launcher-app:
@@ -57,7 +56,7 @@ services:
     volumes:
       - workspace:/workspace
     networks:
-      - app-network
+      - next-launcher-network
     command: [ "sh", "-c", "cd /opt/next-launcher-app/app && PORT=$PORT_APP  REACT_APP_HOST_IP=$HOST_IP  REACT_APP_PORT_CORE=$PORT_CORE  npm start" ]
 
 
@@ -75,4 +74,4 @@ volumes:
 
 networks:
 
-  app-network:
+  next-launcher-network:

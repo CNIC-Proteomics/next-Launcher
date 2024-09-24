@@ -216,10 +216,19 @@ java -version
 ```
 Otherwise:
 ```
-sudo apt install openjdk-21-jre-headless
-  or
 sudo apt install openjdk-19-jre-headless
 ```
+
+Update JAVA_HOME:
+
+First, find the path to the newly installed Java version:
+
+```
+sudo update-alternatives --config java
+```
+
+You'll see a list of available Java versions. Note the path of the version you want to use (e.g., /usr/lib/jvm/java-17-openjdk-amd64 for Java 17).
+
 
 ## Set up
 Dead easy to install
@@ -236,6 +245,10 @@ Set the Environment variable PATH to point to ~/bin:
 ```
 echo 'export PATH=~/softwares/nextflow:$PATH' >> ~/.bashrc && \
   source ~/.bashrc
+```
+or add into "/usr/local/bin":
+```
+sudo ln -s ~/softwares/nextflow/nextflow /usr/local/bin/nextflow
 ```
 
 
