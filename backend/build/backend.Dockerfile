@@ -273,6 +273,8 @@ ARG PWD_GUEST
 # nextflow-api: admin user
 ARG USER_ADMIN
 ARG PWD_ADMIN
+# shared volumes
+ARG SHARED_VOLUMES
 
 # Use that ARG to set an ENV environment variable
 # server connection
@@ -291,6 +293,8 @@ ENV PWD_GUEST=${PWD_GUEST}
 # nextflow-api: admin user
 ENV USER_ADMIN=${USER_ADMIN}
 ENV PWD_ADMIN=${PWD_ADMIN}
+# shared volumes
+ENV SHARED_VOLUMES=${SHARED_VOLUMES}
 
 
 
@@ -300,6 +304,3 @@ ENV PWD_ADMIN=${PWD_ADMIN}
 
 # Expose port given by input parameter.
 EXPOSE ${PORT_CORE}
-
-# Setting up the environment variables
-WORKDIR /workspace

@@ -16,6 +16,3 @@ ENV MONGO_INITDB_ROOT_PASSWORD=${MONGODB_PWD}
 
 # Expose port given by input parameter
 EXPOSE ${MONGODB_PORT}
-
-# Setting up the environment variables
-WORKDIR /workspace
