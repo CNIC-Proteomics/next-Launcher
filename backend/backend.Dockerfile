@@ -73,7 +73,7 @@ ENV NXF_LOG=${INSTALLATION_HOME}/nextflow/log
 RUN mkdir -p "${NXF_LOG}"
 
 # NEXTFLOW-API: Setting up the environment variables
-ARG NXF_API_VERSION=1.1
+ARG NXF_API_VERSION
 ENV NXF_API_HOME=${INSTALLATION_HOME}/nextflow-api
 RUN mkdir -p "${NXF_API_HOME}"
 
@@ -90,33 +90,33 @@ ENV MZEXTRACTOR_HOME=${SEARCH_ENGINE_HOME}/mzextractor
 RUN mkdir -p "${MZEXTRACTOR_HOME}"
 
 # MSFRAGGER: Declare the file name (with version)
-ARG MSF_FILE_NAME=MSFragger-3.8
+ARG MSF_FILE_NAME
 
 # THERMORAWPARSER: Declare the file name (with version)
-ARG RAWPARSER_FILE_NAME=ThermoRawFileParser1.4.2
+ARG RAWPARSER_FILE_NAME
 
 # DECOYPYRAT: Setting up variables (with version)
-ARG BIODATAHUB_VERSION=v2.13
+ARG BIODATAHUB_VERSION
 
 # MZ_EXTRACTOR: Setting up variables (with version)
-ARG MZEXTRACTOR_VERSION=v1.0
+ARG MZEXTRACTOR_VERSION
 
 # PTM-COMPASS: Setting up the environment variables
 ENV PTM_COMPASS_HOME=${INSTALLATION_HOME}/ptm-compass
 RUN mkdir -p "${PTM_COMPASS_HOME}"
 
 # REFMOD: Setting up the environment variables
-ARG REFMOD_VERSION=v0.4.3
+ARG REFMOD_VERSION
 ENV REFMOD_HOME=${PTM_COMPASS_HOME}/refmod
 RUN mkdir -p "${REFMOD_HOME}"
 
 # SHIFTS: Setting up the environment variables
-ARG SHIFTS_VERSION=v0.4.3
+ARG SHIFTS_VERSION
 ENV SHIFTS_HOME=${PTM_COMPASS_HOME}/shifts
 RUN mkdir -p "${SHIFTS_HOME}"
 
 # SOLVER: Setting up the environment variables
-ARG SOLVER_VERSION=v1.0
+ARG SOLVER_VERSION
 ENV SOLVER_HOME=${PTM_COMPASS_HOME}/solver
 RUN mkdir -p "${SOLVER_HOME}"
 
@@ -256,45 +256,46 @@ USER root
 COPY setup.root.sh /tmp/.
 RUN cat "/tmp/setup.root.sh" >> /root/.bashrc
 
-# Use ARG to define a build-time variable
-# server connection
-ARG PORT_CORE
-ARG PORT_APP
-ARG HOST_IP
-# mongodb connection
-ARG MONGODB_HOST
-ARG MONGODB_PORT=27017
-ARG MONGODB_USER
-ARG MONGODB_PWD
-ARG MONGODB_DB
-# nextflow-api: guest user
-ARG USER_GUEST
-ARG PWD_GUEST
-# nextflow-api: admin user
-ARG USER_ADMIN
-ARG PWD_ADMIN
-# shared volumes
-ARG SHARED_VOLUMES
+# # Use ARG to define a build-time variable
+# # server connection
+# ARG PORT_CORE
+# ARG PORT_APP
+# ARG HOST_IP
+# # mongodb connection.
+# # Default PORT is required
+# ARG MONGODB_HOST
+# ARG MONGODB_PORT=27017
+# ARG MONGODB_USER
+# ARG MONGODB_PWD
+# ARG MONGODB_DB
+# # nextflow-api: guest user
+# ARG USER_GUEST
+# ARG PWD_GUEST
+# # nextflow-api: admin user
+# ARG USER_ADMIN
+# ARG PWD_ADMIN
+# # shared volumes
+# ARG SHARED_VOLUMES
 
-# Use that ARG to set an ENV environment variable
-# server connection
-ENV PORT_CORE=${PORT_CORE}
-ENV PORT_APP=${PORT_APP}
-ENV HOST_IP=${HOST_IP}
-# mongodb connection
-ENV MONGODB_HOST=${MONGODB_HOST}
-ENV MONGODB_PORT=${MONGODB_PORT}
-ENV MONGODB_USER=${MONGODB_USER}
-ENV MONGODB_PWD=${MONGODB_PWD}
-ENV MONGODB_DB=${MONGODB_DB}
-# nextflow-api: guest user
-ENV USER_GUEST=${USER_GUEST}
-ENV PWD_GUEST=${PWD_GUEST}
-# nextflow-api: admin user
-ENV USER_ADMIN=${USER_ADMIN}
-ENV PWD_ADMIN=${PWD_ADMIN}
-# shared volumes
-ENV SHARED_VOLUMES=${SHARED_VOLUMES}
+# # Use that ARG to set an ENV environment variable
+# # server connection
+# ENV PORT_CORE=${PORT_CORE}
+# ENV PORT_APP=${PORT_APP}
+# ENV HOST_IP=${HOST_IP}
+# # mongodb connection
+# ENV MONGODB_HOST=${MONGODB_HOST}
+# ENV MONGODB_PORT=${MONGODB_PORT}
+# ENV MONGODB_USER=${MONGODB_USER}
+# ENV MONGODB_PWD=${MONGODB_PWD}
+# ENV MONGODB_DB=${MONGODB_DB}
+# # nextflow-api: guest user
+# ENV USER_GUEST=${USER_GUEST}
+# ENV PWD_GUEST=${PWD_GUEST}
+# # nextflow-api: admin user
+# ENV USER_ADMIN=${USER_ADMIN}
+# ENV PWD_ADMIN=${PWD_ADMIN}
+# # shared volumes
+# ENV SHARED_VOLUMES=${SHARED_VOLUMES}
 
 
 

@@ -45,6 +45,6 @@ https://gnuwin32.sourceforge.net/packages/make.htm
 
 2. Compose the service
 ```
-docker compose up
+docker-compose --env-file .env -f docker-compose.yml up -d
 ```
 

@@ -1,298 +1,494 @@
-# How to install WSL2 (Windows Subsystem for Linux 2) on Windows 10
+# Working in development mode
 
-https://pureinfotech.com/install-windows-subsystem-linux-2-windows-10/#install_wsl_command_2004_windows10
-https://ubuntu.com/tutorials/install-ubuntu-on-wsl2-on-windows-11-with-gui-support#1-overview
-https://linuxconfig.org/ubuntu-22-04-on-wsl-windows-subsystem-for-linux
 
-1. Open Start on Windows 10.
-
-2. Search for Command Prompt, right-click the top result, and select the Run as administrator option.
-
-3. Type the following command to install the WSL on Windows 10 and press Enter:
-```
-wsl --install
-```
-
-4. Restart your computer to finish the WSL installation on Windows 10.
-
-## Install WSL with specific distro
-
-To install WSL with a specific distro on Windows 10, use these steps:
-
-1. Open Start.
-
-2. Search for Command Prompt, right-click the top result, and select the Run as administrator option.
-
-3. Type the following command to view a list of available WSL distros to install on Windows 10 and press Enter:
-```
-	wsl --list --online
-```
-Quick note: At the time of this writing, you can install Ubuntu, Debian, Kali Linux, openSUSE, and SUSE Linux Enterprise Server.
-
-4. Install the Ubuntu 22.04 from the Windows Store!!!
-
-UNUSEFUL:
-Type the following command to install the WSL with a specific distro on Windows 10 and press Enter:
-```
-wsl --install -d Ubuntu
-```
-
-## Increase the limiting Memory Usage in WSL2
-
-https://www.aleksandrhovhannisyan.com/blog/limiting-memory-usage-in-wsl-2/
-
-1. Check the current memory
-You can check how much memory and swap space are allocated to WSL using the free command from within a WSL distribution:
-```
-free -h --giga
-```
-
-2. Create .wslconfig
-Refer to the Microsoft docs on configuration settings for **.wslconfig** if you need help with this step. Below is the config that I’m currently using for my machine since I don't have a lot of RAM to work with:
-
-"C:\Users\YourUsername\.wslconfig"
-```
-[wsl2]
-memory=100GB
-```
-
-3. Restart WSL
-You can either close out of WSL manually and wait a few seconds for it to fully shut down, or you could launch Command Prompt or PowerShell and run the following command to forcibly shut down all WSL distributions:
-```
-wsl --shutdown
-```
-4. Verify That WSL Respects .wslconfig
-Finally, run the free command again to verify that WSL respects your specified resource limits:
-```
-free -h --giga
-```
-
-# Connect to tierra using Ubuntu
-
-
-0. Update the apt packages:
-```
-sudo apt update -y
-```
-
-
-1. Install needed packages:
-```
-sudo apt install net-tools cifs-utils
-```
-
-2. Mount the Windows network using the "drvfs".
-
-```
-sudo mkdir /mnt/tierra
-```
-
-Add into the "/etc/fstab" to be permanent.
-
-```
-sudo vim /etc/fstab
-```
-```
-//tierra.cnic.es/sc     /mnt/tierra     drvfs   credentials=/root/creds_smb_library_core,uid=jmrodriguezc,guid=jmrodriguezc     0 0
-```
-
-3. Create the credentials file
-```
-sudo vim /root/creds_smb_library_core
-```
-
-```
-username=CNIC/jmrodriguezc
-password=XXXXXXXXX
-```
-
-4. Mount all
-```
-sudo mount -a
-```
-<!--
-sudo apt install samba-common samba smbclient
-
-smbclient //tierra.cnic.es/SC --user=CNIC/jmrodriguezc
-
-sudo mount.cifs //tierra.cnic.es/SC /mnt/tierra -o user=CNIC/jmrodriguezc
-sudo mount -t cifs //tierra.cnic.es/SC /mnt/tierra -o user=CNIC/jmrodriguezc
- -->
-
-
-
-# Install Singularity
-
-## Install system dependencies
-You must first install development tools and libraries to your host.
-
-On Debian-based systems, including Ubuntu:
-
-
-```
-sudo apt-get update
-sudo apt-get install -y \
-    autoconf \
-    automake \
-    cryptsetup \
-    fuse2fs \
-    git \
-    fuse \
-    libfuse-dev \
-    libglib2.0-dev \
-    libseccomp-dev \
-    libtool \
-    pkg-config \
-    runc \
-    squashfs-tools \
-    squashfs-tools-ng \
-    uidmap \
-    wget \
-    zlib1g-dev
-```
-
-## Install Go
-SingularityCE is written in Go, and may require a newer version of Go than is available in the repositories of your distribution. We recommend installing the latest version of Go from the official binaries (https://golang.org/dl/)
-
-```
-export VERSION=1.22.1 OS=linux ARCH=amd64 && \
-  cd /tmp && \
-  wget https://dl.google.com/go/go$VERSION.$OS-$ARCH.tar.gz && \
-  sudo tar -C /usr/local -xzvf go$VERSION.$OS-$ARCH.tar.gz && \
-  rm go$VERSION.$OS-$ARCH.tar.gz
-```
-
-Set the Environment variable PATH to point to Go:
-```
-echo 'export PATH=/usr/local/go/bin:${PATH}' >> ~/.bashrc
-source ~/.bashrc
-```
-
-## Download SingularityCE from a release
-You can download SingularityCE from one of the releases. To see a full list, visit the GitHub release page (https://github.com/sylabs/singularity/releases).
-
-After deciding on a release to install, you can run the following commands to proceed with the installation.
-```
-cd ${HOME}/softwares
-export VERSION=4.1.2 && \
-  wget https://github.com/sylabs/singularity/releases/download/v${VERSION}/singularity-ce-${VERSION}.tar.gz
-  tar -xzf singularity-ce-${VERSION}.tar.gz && \
-  cd singularity-ce-${VERSION}
-```
-
-## Compile the SingularityCE source code
-Now you are ready to build SingularityCE. Dependencies will be automatically downloaded. You can build SingularityCE using the following commands:
-```
-./mconfig && \
-  make -C builddir && \
-  sudo make -C builddir install
-```
-
-
-## Using singularity run from within the Docker container
-**It is strongly recommended that you don't use the Docker container for running Singularity images**, only for creating them, since the Singularity command runs within the container as the root user.
-
-However, for the purposes of this simple example, and potentially for testing/debugging purposes it is useful to know how to run a Singularity container within the Docker Singularity container. You may recall from the Running a container from the image section in the previous episode that we used the --contain switch with the singularity command. If you don’t use this switch, it is likely that you will get an error relating to /etc/localtime similar to the following:
-```
-WARNING: skipping mount of /etc/localtime: no such file or directory
-FATAL:   container creation failed: mount /etc/localtime->/etc/localtime error: while mounting /etc/localtime: mount source /etc/localtime doesn't exist
-```
-This occurs because the /etc/localtime file that provides timezone configuration is not present within the Docker container. If you want to use the Docker container to test that your newly created image runs, you can use the --contain switch, or you can open a shell in the Docker container and add a timezone configuration as described in the Alpine Linux documentation:
-
-```
-sudo apt-get install tzdata
-sudo cp /usr/share/zoneinfo/Europe/Madrid /etc/localtime
-```
-The singularity run command should now work successfully without needing to use --contain. Bear in mind that once you exit the Docker Singularity container shell and shutdown the container, this configuration will not persist.
-
-
-# Install Nextflow
-
-## Check prerequisites
-
-Make sure 11 or later is installed on your computer by using the command:
-```
-java -version
-```
-Otherwise:
-```
-sudo apt install openjdk-19-jre-headless
-```
-
-Update JAVA_HOME:
-
-First, find the path to the newly installed Java version:
-
-```
-sudo update-alternatives --config java
-```
-
-You'll see a list of available Java versions. Note the path of the version you want to use (e.g., /usr/lib/jvm/java-17-openjdk-amd64 for Java 17).
-
-
-## Set up
-Dead easy to install
-
-Enter this command in your terminal:
-```
-mkdir -p ~/softwares/nextflow && \
-cd ~/softwares/nextflow && \
-curl -s https://get.nextflow.io | bash
-```
-(it creates a file nextflow in a bin folder in your home)
-
-Set the Environment variable PATH to point to ~/bin:
-```
-echo 'export PATH=~/softwares/nextflow:$PATH' >> ~/.bashrc && \
-  source ~/.bashrc
-```
-or add into "/usr/local/bin":
-```
-sudo ln -s ~/softwares/nextflow/nextflow /usr/local/bin/nextflow
-```
-
-
-# Install SGE in Ubuntu
-
-https://svennd.be/SGE_on_Ubuntu_20.04_LTS/
-
-
-# Docker compose
+## Docker compose for development
 
 Common Docker Compose Commands with a Specific File
 Here are some common Docker Compose commands using a specific file:
 
-- Start services:
++ Open Windows Prompt
 ```
-docker-compose -f docker-compose.dev.yml up
-```
-
-- Start services in detached mode:
-```
-docker-compose -f docker-compose.dev.yml up -d
+cd S:\U_Proteomica\UNIDAD\Softwares\jmrodriguezc\next-Launcher
+s:
 ```
 
-- Stop services:
++ Build services
 ```
-docker-compose -f docker-compose.dev.yml down
-```
-
-- Build services:
-```
-docker-compose -f docker-compose.dev.yml build
+docker-compose --env-file .env_cnic_dev -f docker-compose.cnic_dev.yml build --no-cache
 ```
 
-- View logs:
++ Start service
 ```
-docker-compose -f docker-compose.dev.yml logs
-```
-
-- List running services:
-```
-docker-compose -f docker-compose.dev.yml ps
+docker-compose --env-file .env_cnic_dev -f docker-compose.cnic_dev.yml up -d
 ```
 
-- Execute a command in a running service:
+
+# Working in production mode
+
+## Docker compose
+
+Common Docker Compose Commands with a Specific File
+Here are some common Docker Compose commands using a specific file:
+
++ Compose services
 ```
-docker-compose -f docker-compose.dev.yml exec app sh
+docker-compose --env-file .env_cnic -f docker-compose.cnic.yml up -d
 ```
+
+## Push images to DockerHub
+
+1. Authenticating
+```
+docker login -u proteomicscnic
+    Authenticating with existing credentials...
+```
+
+2. Tag the the image
+```
+docker image tag proteomicscnic/next-launcher-core:latest proteomicscnic/next-launcher-core:0.1.2
+```
+
+2. Push the images
+```
+docker push proteomicscnic/next-launcher-core:0.1.2
+```
+
+
+
+
+______________________________
+
+
+# BACKEND
+
+---
+
+
+# Working in development mode
+
+
+## Create a user-defined bridge network
+
+```
+docker network create next-launcher-network_dev
+```
+
+
+## Create volumes in Docker
+
+Create workspace volumes (production and development) for the Nextflow pipelines in the container:
+```
+docker volume create --name workspace --driver local
+```
+
+Workspace for production and development created on the D disk:
+```
+docker volume create --name workspace --driver local --opt type=none --opt device=D:\\next-Launcher\\workspace --opt o=bind
+```
+
+Create the 'tierra' volumes for the connection with the container:
+```
+docker volume create --name lab --driver local --opt type=cifs --opt device=\\tierra.cnic.es\sc\LAB_JVC\ --opt o=addr=tierra.cnic.es,domain=CNIC,username=jmrodriguezc,password="JaDe20-34!;"
+docker volume create --name unit --driver local --opt type=cifs --opt device=\\tierra.cnic.es\sc\U_Proteomica\ --opt o=addr=tierra.cnic.es,domain=CNIC,username=jmrodriguezc,password="JaDe20-34!;"
+```
+
+
+## Create MongoDB in Docker
+
++ Edit the '.env' file using '.env_cnic' template
+
++ Build MongoDB core (Docker image)
+
+Now that you have your Dockerfile, you can build your image. The docker build command does the heavy-lifting of creating a docker image from a Dockerfile.
+
+Open Windows Prompt
+```
+cd S:\U_Proteomica\UNIDAD\Softwares\jmrodriguezc\next-Launcher
+s:
+@echo off & for /f "tokens=1,2 delims==" %i in (.env_cnic_dev) do set %i=%j
+docker build ^
+  --no-cache ^
+  --build-arg MONGODB_HOST=%MONGODB_HOST% ^
+  --build-arg MONGODB_PORT=%MONGODB_PORT% ^
+  --build-arg MONGODB_USER=%MONGODB_USER% ^
+  --build-arg MONGODB_PWD=%MONGODB_PWD% ^
+  -t proteomicscnic/next-launcher-db:latest ^
+  -f backend/build/mongodb.Dockerfile  .
+@echo on
+```
+Load the env variables from the '.env' file and build the image
+
++ Run the MongoDB contaniner
+```
+@echo off & for /f "tokens=1,2 delims==" %i in (.env_cnic_dev) do set %i=%j
+docker run -d ^
+  --name next-launcher-db_dev ^
+  --network next-launcher-network_dev ^
+  -p %MONGODB_PORT%:%MONGODB_PORT% ^
+  proteomicscnic/next-launcher-db:latest
+@echo on
+```
+
++ Start the MongoDB contaniner (if the container was already created)
+```
+docker start next-launcher-db_dev
+```
+
++ Execute MongoDB container
+```
+docker exec -it next-launcher-db_dev bash
+```
+
+
+## Create next-Launcher-core in Docker
+
++ Build next-Launcher core
+
+Now that you have your Dockerfile, you can build your image. The docker build command does the heavy-lifting of creating a docker image from a Dockerfile.
+
+Open Windows Prompt
+```
+cd S:\U_Proteomica\UNIDAD\Softwares\jmrodriguezc\next-Launcher
+s:
+@echo off & for /f "tokens=1,2 delims==" %i in (.env_cnic_dev) do set %i=%j
+docker build ^
+  --no-cache ^
+  --build-arg HOST_IP=%HOST_IP% ^
+  --build-arg PORT_CORE=%PORT_CORE% ^
+  --build-arg PORT_APP=%PORT_APP% ^
+  ^
+  --build-arg MONGODB_HOST=%MONGODB_HOST% ^
+  --build-arg MONGODB_USER=%MONGODB_USER% ^
+  --build-arg MONGODB_PWD=%MONGODB_PWD% ^
+  --build-arg MONGODB_DB=%MONGODB_DB% ^
+  ^
+  --build-arg USER_GUEST=%USER_GUEST% ^
+  --build-arg PWD_GUEST=%PWD_GUEST% ^
+  ^
+  --build-arg USER_ADMIN=%USER_ADMIN% ^
+  --build-arg PWD_ADMIN=%PWD_ADMIN% ^
+  ^
+  --build-arg SHARED_VOLUMES=%SHARED_VOLUMES% ^
+  ^
+  -t proteomicscnic/next-launcher-core:latest ^
+  -f backend/build/backend.Dockerfile  backend/build/.
+@echo on
+```
+Load the env variables from the '.env' file and build the image
+
+Open Linux shell
+```
+export $(grep -v '^#' .env_cnic_dev | xargs)
+docker build \
+  --no-cache \
+  --build-arg HOST_IP=${HOST_IP} \
+  --build-arg PORT_CORE=${PORT_CORE} \
+  --build-arg PORT_APP=${PORT_APP} \
+  \
+  --build-arg MONGODB_HOST=${MONGODB_HOST} \
+  --build-arg MONGODB_USER=${MONGODB_USER} \
+  --build-arg MONGODB_PWD=${MONGODB_PWD} \
+  --build-arg MONGODB_DB=${MONGODB_DB} \
+  \
+  --build-arg USER_GUEST=${USER_GUEST} \
+  --build-arg PWD_GUEST=${PWD_GUEST} \
+  \
+  --build-arg USER_ADMIN=${USER_ADMIN} \
+  --build-arg PWD_ADMIN=${PWD_ADMIN} \
+  \
+  --build-arg SHARED_VOLUMES=${SHARED_VOLUMES} \
+  \
+  -t proteomicscnic/next-launcher-core:latest \
+  -f backend/build/backend.Dockerfile  backend/build/.
+```
+
++ Run the contaniner
+
+Run the next-launcher core container adding the volumenes, ports, and link to mongodb container
+```
+@echo off & for /f "tokens=1,2 delims==" %i in (.env_cnic_dev) do set %i=%j
+docker run ^
+  -it ^
+  --name next-launcher-core_dev ^
+  --network next-launcher-network_dev ^
+  --link next-launcher-db_dev:mongo ^
+  -v %SHARED_VOLUME_1% ^
+  -v %SHARED_VOLUME_2% ^
+  -v %SHARED_VOLUME_3% ^
+  -p %PORT_CORE%:%PORT_CORE% ^
+  proteomicscnic/next-launcher-core:latest
+```
+
++ Start the contaniner
+
+In the case the container has been already created but it is not started... Start the nextflow container
+```
+docker start next-launcher-core_dev
+```
+
++ Execute the container
+
+Exec a shell of container that already exists
+```
+docker exec -it next-launcher-core_dev bash
+```
+
+
+______________________________
+
+# FRONTEND
+
+---
+
+# Working in production mode
+
+## Docker compose for development
+...
+
+## Push images to DockerHub
+
+1. Authenticating
+```
+docker login -u proteomicscnic
+    Authenticating with existing credentials...
+```
+
+2. Tag the the image
+```
+docker image tag proteomicscnic/next-launcher-app:latest proteomicscnic/next-launcher-app:0.1.2
+```
+
+2. Push the images
+```
+docker push proteomicscnic/next-launcher-app:0.1.2
+```
+
+
+# Working in development mode
+
+## Create next-Launcher-app in Docker
+
++ Build next-Launcher app
+
+Now that you have your Dockerfile, you can build your image. The docker build command does the heavy-lifting of creating a docker image from a Dockerfile.
+
+Open Windows Prompt
+```
+cd S:\U_Proteomica\UNIDAD\Softwares\jmrodriguezc\next-Launcher
+s:
+@echo off & for /f "tokens=1,2 delims==" %i in (.env_cnic_dev) do set %i=%j
+docker build ^
+  --no-cache ^
+  --build-arg HOST_IP=%HOST_IP% ^
+  --build-arg PORT_CORE=%PORT_CORE% ^
+  --build-arg PORT_APP=%PORT_APP% ^
+  ^
+  --build-arg SHARED_VOLUMES=%SHARED_VOLUMES% ^
+  ^
+  -t proteomicscnic/next-launcher-app:latest ^
+  -f frontend/build/frontend.Dockerfile  frontend/build/.
+@echo on
+```
+
++ Run the contaniner
+
+```
+@echo off & for /f "tokens=1,2 delims==" %i in (.env_cnic_dev) do set %i=%j
+docker run -it ^
+  --name next-launcher-app_dev ^
+  -v %SHARED_VOLUME_1% ^
+  -p %PORT_APP%:%PORT_APP% ^
+  proteomicscnic/next-launcher-app:latest
+```
+
++ Execute the container
+
+Exec a shell of container that already exists
+```
+docker exec -it next-launcher-app_dev bash
+```
+
+In the case the container has been already created but it is not started... Start the nextflow container
+```
+docker start next-launcher-app_dev
+```
+
+
+
+
+
+
+
+
+
+______________________________
+
+FOR MORE INFORMATION:
+
+
+## Create volumes in Docker
+
+Create workspace volumes (production and development) for the Nextflow pipelines in the container:
+```
+docker volume create --name workspace --driver local
+docker volume create --name workspace_dev --driver local
+```
+
+Workspace for production and development created on the D disk:
+```
+docker volume create --name workspace --driver local --opt type=none --opt device=D:\\next-Launcher\\production --opt o=bind
+docker volume create --name workspace_dev --driver local --opt type=none --opt device=D:\\next-Launcher\\development --opt o=bind
+```
+
+Create the 'tierra' volume for the connection with the container:
+```
+docker volume create --name tierra --driver local --opt type=cifs --opt device=\\tierra.cnic.es\sc\ --opt o=addr=tierra.cnic.es,domain=CNIC,username=jmrodriguezc,password="JaDe20-34!;"
+```
+
+
+<!-- THIS DOES NOT WORK... ASK EDU IF I CAN CREATE SYMBOLIC LINK -->
+<!-- docker volume create --name workspace --driver local --opt type=cifs --opt device=\\tierra.cnic.es\sc\U_Proteomica\UNIDAD\DatosCrudos\next-Launcher\ --opt o=addr=tierra.cnic.es,domain=CNIC,username=jmrodriguezc,password="JaDe20-34!;" -->
+<!-- docker volume create --name tierra --driver local --opt type=cifs --opt device=\\tierra.cnic.es\sc\U_Proteomica\UNIDAD\Softwares\jmrodriguezc\ --opt o=addr=tierra.cnic.es,domain=CNIC,username=jmrodriguezc,password="JaDe20-34!;" -->
+
+
+
+
+## Run the Docker contaniner
+
+Run the next-launcher core container:
+```
+docker run --name next-launcher-core -it -v workspace_dev:/workspace -v tierra:/mnt/tierra -p 8081:8081 proteomicscnic/next-launcher-core:latest
+```
+
+Run the nextflow contaniner with privileged but **Be Carefull!!**
+```
+docker run --security-opt seccomp=unconfined --name backend -it -v tierra:/mnt/tierra backend
+docker run --privileged --name backend -it -v tierra:/mnt/tierra backend
+```
+
+export PORT_CORE=8081 && export HOST_IP=localhost && export PORT_APP=3031 && ./scripts/startup-local.sh mongo
+cd /opt/nextflow-api/
+cp -r /mnt/tierra/U_Proteomica/UNIDAD/Softwares/jmrodriguezc/nextflow-api/bin/backend.py bin/backend.py
+
+
+<!--
+References:
+    Why is python slower inside a docker container?
+    https://stackoverflow.com/questions/76130370/why-is-python-slower-inside-a-docker-container/76133102#76133102
+
+    Why A Privileged Container in Docker Is a Bad Idea
+    https://www.trendmicro.com/en_sg/research/19/l/why-running-a-privileged-container-in-docker-is-a-bad-idea.html
+ -->
+
+
+
+Remove a container
+```
+docker rm next-launcher-core
+```
+
+Remove an image
+```
+docker rmi proteomicscnic/next-launcher-core:latest
+```
+
+
+
+<!-- 
+
+# TESTING ---
+
+
+
+
+Run the nextflow contaniner
+```
+docker run --name backend -it backend
+
+docker run --name backend -it --volume S:\U_Proteomica\UNIDAD:/mnt/tierra backend
+
+docker run --name backend -it --volume \\tierra.cnic.es\SC:/mnt/tierra backend
+
+
+docker run --name backend -it -v //tierra.cnic.es/SC:/mnt/tierra backend
+
+docker run --name backend -it -v C:\Users\jmrodriguezc:/mnt/tierra backend
+
+
+""
+
+
+docker run --name backend --mount type=bind,source="S:\U_Proteomica\UNIDAD"/target,target=/mnt/tierra backend
+
+docker run --name backend --mount type=bind,source="S:\U_Proteomica\UNIDAD"/target,target=/mnt/tierra backend
+
+docker run --name backend --mount type=bind,source="\\tierra.cnic.es\SC"/target,target=/mnt/tierra -it backend 
+
+
+docker run --name backend --mount type=bind,source="\\tierra.cnic.es\SC"/target,target=/mnt/tierra -it backend 
+
+docker run --name backend -it backend --mount type=bind,source="\\tierra.cnic.es\SC"/target,target=/mnt/tierra
+
+
+docker volume create \
+	--driver local \
+	--opt type=cifs \
+	--opt device=//uxxxxx.your-server.de/backup \
+	--opt o=addr=uxxxxx.your-server.de,username=uxxxxxxx,password=*****,file_mode=0777,dir_mode=0777 \
+	--name cif-volume
+
+
+docker volume create --driver local --opt type=cifs --opt device=\\tierra.cnic.es\sc --opt o=addr=tierra.cnic.es,username=CNIC/jmrodriguezc,password=JaDe20-32!;,file_mode=0777,dir_mode=0777 --name tierra2
+
+docker volume create --driver local --opt type=cifs --opt device=\\tierra.cnic.es\sc --opt o=addr=tierra.cnic.es,domain=CNIC,username=jmrodriguezc,password="JaDe20-32!;" --name tierra
+
+docker volume create --driver local --opt type=cifs --opt device=\\tierra.cnic.es\sc --opt o=addr=tierra.cnic.es,credentials="S:\U_Proteomica\UNIDAD\Softwares\jmrodriguezc\PTMs_nextflow\docker\build\creds_smb_library",vers=3.0 --name tierra4
+
+
+docker volume create --driver local --opt type=cifs --opt device=//tierra.cnic.es/sc --opt o=addr=tierra.cnic.es,username=CNIC/jmrodriguezc,password=JaDe20-32!;,file_mode=0777,dir_mode=0777 --name tierra
+
+docker volume create --driver local --opt type=cifs --opt device=\\tierra.cnic.es\sc --opt o=addr=tierra.cnic.es,credentials="S:\U_Proteomica\UNIDAD\Softwares\jmrodriguezc\PTMs_nextflow\docker\build\creds_smb_library" --name tierra
+
+docker volume create --driver local --opt type=cifs --opt device="\\\\tierra.cnic.es\\sc" --opt o=addr=tierra.cnic.es,username=CNIC/jmrodriguezc,password=JaDe20-32!; --name tierra2
+
+docker volume create --driver local --opt type=cifs --opt device=\\tierra.cnic.es\sc --opt o=addr=tierra.cnic.es,username=CNIC/jmrodriguezc,password=JaDe20-32!;,file_mode=0777,dir_mode=0777 --name tierra2
+
+docker volume create --driver local --name persistent --opt type=cifs --opt device=\\tierra.cnic.es\sc --opt o=vers=3.0,credentials="S:\U_Proteomica\UNIDAD\Softwares\jmrodriguezc\PTMs_nextflow\docker\build\creds_smb_library" --name tierra3
+
+docker volume create --driver local --name persistent --opt type=cifs --opt device=\\tierra.cnic.es\sc --opt o=credentials="S:\U_Proteomica\UNIDAD\Softwares\jmrodriguezc\PTMs_nextflow\docker\build\creds_smb_library" --name tierra
+
+docker volume create --driver local --name persistent --opt type=cifs --opt device=\\tierra.cnic.es\sc --opt o=vers=3.0,credentials=/root/creds_smb_library --name tierra3
+
+
+
+docker run -d --name backend --mount source=tierra,target=/mnt/tierra backend 
+
+docker run -d --name backend --mount source=tierra2,target=/mnt/tierra backend
+
+
+
+$ docker service create \
+    --mount 'type=volume,src=<VOLUME-NAME>,dst=<CONTAINER-PATH>,volume-driver=local,volume-opt=type=nfs,volume-opt=device=<nfs-server>:<nfs-path>,"volume-opt=o=addr=<nfs-address>,vers=4,soft,timeo=180,bg,tcp,rw"'
+    --name myservice \
+    <IMAGE>
+
+$ docker service create \
+    --mount 'type=volume,src=cif-volume,dst=/mnt/tierra,volume-driver=local,volume-opt=type=cifs,volume-opt=device=<nfs-server>:<nfs-path>,"volume-opt=o=addr=<nfs-address>,vers=4,soft,timeo=180,bg,tcp,rw"'
+    --name myservice \
+    backend
+
+
+
+
+
+
+Note: When you "run" nextflow, you can decide how many process to use?? Or not...
+
+
+
+Get all the drives in windows (cmd)???
+```
+wmic logicaldisk get caption
+```
+
+-->

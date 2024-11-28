@@ -1,7 +1,7 @@
 services:
 
   mongodb:
-    image: mongo:7.0.12
+    image: mongo:$MONGODB_VERSION
     container_name: 'next-launcher-db'
     environment:
       # mongodb
@@ -16,7 +16,7 @@ services:
     command: [ "mongod" ]
 
   next-launcher-core:
-    image: 'proteomicscnic/next-launcher-core:0.1.2'
+    image: 'proteomicscnic/next-launcher-core:$NL_CORE_VERSION'
     container_name: 'next-launcher-core'
     depends_on:
       - mongodb
@@ -35,32 +35,36 @@ services:
       - PWD_GUEST=$PWD_GUEST
       - USER_ADMIN=$USER_ADMIN
       - PWD_ADMIN=$PWD_ADMIN
+      # workspace
+      - WORKSPACE_HOME=${WORKSPACE_HOME}
       # shared volumes
       - SHARED_VOLUMES=$SHARED_VOLUMES
     ports:
       - "${PORT_CORE}:${PORT_CORE}"
     volumes:
+      - "workspace:${WORKSPACE_HOME}"
       - "${SHARED_VOLUME_1}"
-      - "${SHARED_VOLUME_2}"
     networks:
       - next-launcher-network
     command: [ "sh", "-c", "/opt/nextflow-api/scripts/startup-local.sh mongo" ]
 
   next-launcher-app:
-    image: 'proteomicscnic/next-launcher-app:0.1.2'
+    image: 'proteomicscnic/next-launcher-app:$NL_APP_VERSION'
     container_name: 'next-launcher-app'
     environment:
       # servers
       - PORT_CORE=$PORT_CORE
       - PORT_APP=$PORT_APP
       - HOST_IP=$HOST_IP
+      # workspace
+      - WORKSPACE_HOME=${WORKSPACE_HOME}
       # shared volumes
       - SHARED_VOLUMES=$SHARED_VOLUMES
     ports:
       - "${PORT_APP}:${PORT_APP}"
     volumes:
+      - "workspace:${WORKSPACE_HOME}"
       - "${SHARED_VOLUME_1}"
-      - "${SHARED_VOLUME_2}"
     networks:
       - next-launcher-network
     command: [ "sh", "-c", "cd /opt/next-launcher-app/app && PORT=$PORT_APP  REACT_APP_HOST_IP=$HOST_IP  REACT_APP_PORT_CORE=$PORT_CORE  npm start" ]

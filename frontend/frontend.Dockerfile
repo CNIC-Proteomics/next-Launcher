@@ -44,7 +44,7 @@ RUN npm install -g serve
 #################
 
 # Declare local variables
-ARG NEXTLAUNCHER_VERSION=0.1.3
+ARG NEXTLAUNCHER_VERSION
 ARG INSTALLATION_HOME=/opt
 
 # Setting up the environment variables
@@ -68,13 +68,13 @@ RUN cd ${NEXTLAUNCHER_HOME}/app && npm install
 # ENVIRONMENT #
 ###############
 
-# Use ARG to define a build-time variable
-ARG PORT_APP
-ARG SHARED_VOLUMES
+# # Use ARG to define a build-time variable
+# ARG PORT_APP
+# ARG SHARED_VOLUMES
 
-# Use that ARG to set an environment variable
-ENV PORT_APP=${PORT_APP}
-ENV SHARED_VOLUMES=${SHARED_VOLUMES}
+# # Use that ARG to set an environment variable
+# ENV PORT_APP=${PORT_APP}
+# ENV SHARED_VOLUMES=${SHARED_VOLUMES}
 
 ######################
 # EXPOSE and COMMAND #
