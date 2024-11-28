@@ -1,4 +1,2 @@
-backend/build/search_engine/MSFragger-3.8.zip filter=lfs diff=lfs merge=lfs -text
-backend/build/search_engine/ThermoRawFileParser1.4.2.zip filter=lfs diff=lfs merge=lfs -text
 backend/search_engine/MSFragger-4.1.zip filter=lfs diff=lfs merge=lfs -text
 backend/search_engine/ThermoRawFileParser1.4.2.zip filter=lfs diff=lfs merge=lfs -text
