@@ -8,6 +8,7 @@ DATE: 2024_XX
 
 + Add dataset components.
 + Add shared volumes.
++ Improve the installation.
 
 
 ### Changes in the Backend (next-launcher-core)
