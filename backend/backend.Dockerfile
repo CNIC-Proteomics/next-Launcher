@@ -33,7 +33,7 @@ RUN apt-get update -y
 RUN apt-get install -y openjdk-19-jre-headless
 
 # Install the requirements for nf-core, and some modules
-RUN apt-get -y install python-is-python3 python3-pip python3-venv
+RUN apt-get -y install python-is-python3 python3-pip python3-venv python3-tk
 RUN python -m pip install --upgrade pip
 
 # ThermoRawFileParser:
@@ -66,7 +66,7 @@ RUN mkdir -p "${INSTALLATION_HOME}"
 ENV NXF_HOME=${INSTALLATION_HOME}/nextflow
 RUN mkdir -p "${NXF_HOME}"
 ENV NXF_CONF=${INSTALLATION_HOME}/nextflow/conf
-RUN mkdir -p "${NXF_CONF}"
+# RUN mkdir -p "${NXF_CONF}" # not required
 ENV NXF_WORK=${INSTALLATION_HOME}/nextflow/work
 RUN mkdir -p "${NXF_WORK}"
 ENV NXF_LOG=${INSTALLATION_HOME}/nextflow/log
@@ -102,23 +102,12 @@ ARG BIODATAHUB_VERSION
 ARG MZEXTRACTOR_VERSION
 
 # PTM-COMPASS: Setting up the environment variables
+ARG PTM_COMPASS_VERSION
 ENV PTM_COMPASS_HOME=${INSTALLATION_HOME}/ptm-compass
-RUN mkdir -p "${PTM_COMPASS_HOME}"
 
 # REFMOD: Setting up the environment variables
 ARG REFMOD_VERSION
-ENV REFMOD_HOME=${PTM_COMPASS_HOME}/refmod
-RUN mkdir -p "${REFMOD_HOME}"
-
-# SHIFTS: Setting up the environment variables
-ARG SHIFTS_VERSION
-ENV SHIFTS_HOME=${PTM_COMPASS_HOME}/shifts
-RUN mkdir -p "${SHIFTS_HOME}"
-
-# SOLVER: Setting up the environment variables
-ARG SOLVER_VERSION
-ENV SOLVER_HOME=${PTM_COMPASS_HOME}/solver
-RUN mkdir -p "${SOLVER_HOME}"
+ENV REFMOD_HOME=${PTM_COMPASS_HOME}/src/refmod
 
 
 
@@ -126,8 +115,8 @@ RUN mkdir -p "${SOLVER_HOME}"
 # COPY REQUIREMENTS #
 #####################
 
-# NEXTFLOW: Copy Nextflow config files
-COPY nextflow/conf ${NXF_CONF}/.
+# # NEXTFLOW: Copy Nextflow config files
+# COPY nextflow/conf ${NXF_CONF}/.
 
 # MSFRAGGER: Copy file (with version)
 COPY search_engine/${MSF_FILE_NAME}.zip /tmp/.
@@ -209,6 +198,19 @@ RUN cd ${MZEXTRACTOR_HOME} && /bin/bash -c "source ${MZEXTRACTOR_HOME}/env/bin/a
 
 
 #
+# PTM-COMPASS ---------------------------------------------------------------------------------------------
+#
+
+# Clone the repository
+RUN git clone https://github.com/CNIC-Proteomics/PTM-compass.git  --branch ${PTM_COMPASS_VERSION}  ${PTM_COMPASS_HOME}
+
+# Python environment --
+RUN cd ${PTM_COMPASS_HOME} && python -m venv env
+RUN cd ${PTM_COMPASS_HOME} && /bin/bash -c "source ${PTM_COMPASS_HOME}/env/bin/activate && pip install -r ${PTM_COMPASS_HOME}/python_requirements.txt"
+
+
+
+#
 # REFMOD ---------------------------------------------------------------------------------------------
 #
 
@@ -218,32 +220,6 @@ RUN git clone https://github.com/CNIC-Proteomics/ReFrag.git  --branch ${REFMOD_V
 # Python environment --
 RUN cd ${REFMOD_HOME} && python -m venv env
 RUN cd ${REFMOD_HOME} && /bin/bash -c "source ${REFMOD_HOME}/env/bin/activate && pip install -r ${REFMOD_HOME}/python_requirements.txt"
-
-
-
-#
-# SHIFTS ---------------------------------------------------------------------------------------------
-#
-
-# Clone the repository
-RUN git clone https://github.com/CNIC-Proteomics/SHIFTS.git  --branch ${SHIFTS_VERSION}  ${SHIFTS_HOME}
-
-# Python environment --
-RUN cd ${SHIFTS_HOME} && python -m venv env
-RUN cd ${SHIFTS_HOME} && /bin/bash -c "source ${SHIFTS_HOME}/env/bin/activate && pip install -r ${SHIFTS_HOME}/python_requirements.txt"
-
-
-
-#
-# SOLVER ---------------------------------------------------------------------------------------------
-#
-
-# Clone the repository
-RUN git clone https://github.com/CNIC-Proteomics/Solvers-PTMap.git  --branch ${SOLVER_VERSION}  ${SOLVER_HOME}
-
-# Python environment --
-RUN cd ${SOLVER_HOME} && python -m venv env
-RUN cd ${SOLVER_HOME} && /bin/bash -c "source ${SOLVER_HOME}/env/bin/activate && pip install -r ${SOLVER_HOME}/python_requirements.txt"
 
 
 
