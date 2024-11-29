@@ -42,7 +42,7 @@ services:
     ports:
       - "${PORT_CORE}:${PORT_CORE}"
     volumes:
-      - "./backend/nextflow/conf:/opt/nextflow/conf" # Mount config folder: host folder mapped to container folder
+      - "conf:/opt/nextflow/conf" # Mount config folder: host folder mapped to container folder
       - "workspace:${WORKSPACE_HOME}"
       - "${SHARED_VOLUME_1}"
     networks:
@@ -73,6 +73,14 @@ services:
 
 
 volumes:
+
+  conf:
+    name: 'conf'
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: './backend/nextflow/conf'
 
   workspace:
     name: 'workspace'

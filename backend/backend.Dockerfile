@@ -66,7 +66,7 @@ RUN mkdir -p "${INSTALLATION_HOME}"
 ENV NXF_HOME=${INSTALLATION_HOME}/nextflow
 RUN mkdir -p "${NXF_HOME}"
 ENV NXF_CONF=${INSTALLATION_HOME}/nextflow/conf
-# RUN mkdir -p "${NXF_CONF}" # not required
+RUN mkdir -p "${NXF_CONF}"
 ENV NXF_WORK=${INSTALLATION_HOME}/nextflow/work
 RUN mkdir -p "${NXF_WORK}"
 ENV NXF_LOG=${INSTALLATION_HOME}/nextflow/log
@@ -115,8 +115,8 @@ ENV REFMOD_HOME=${PTM_COMPASS_HOME}/src/refmod
 # COPY REQUIREMENTS #
 #####################
 
-# # NEXTFLOW: Copy Nextflow config files
-# COPY nextflow/conf ${NXF_CONF}/.
+# NEXTFLOW: Copy Nextflow config files
+COPY nextflow/conf ${NXF_CONF}/.
 
 # MSFRAGGER: Copy file (with version)
 COPY search_engine/${MSF_FILE_NAME}.zip /tmp/.
