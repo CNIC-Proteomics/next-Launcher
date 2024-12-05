@@ -1,7 +1,7 @@
 ___
 ## 0.1.3
 ```
-DATE: 2024_XX
+DATE: 2024_12
 ```
 
 ### Highlights
@@ -9,7 +9,6 @@ DATE: 2024_XX
 + Add dataset components.
 + Add shared volumes.
 + Improve the installation.
-
 
 ### Changes in the Backend (next-launcher-core)
 
@@ -36,9 +35,8 @@ DATE: 2024_XX
 |                                                                                                                                 | ThermoRawFileParser         | 1.4.2   |
 |                                                                                                                                 | bioDataHub (DecoyPYrat)     | 2.13    |
 |                                                                                                                                 | MZ_extractor                | 1.0     |
-|                                                                                                                                 | RefMod                      | 0.4.3   |
-|                                                                                                                                 | SHIFTS                      | 0.5.0   |
-|                                                                                                                                 | SOLVER                      | 1.0     |
+|                                                                                                                                 | PTM-compass                 | 1.1     |
+|                                                                                                                                 | RefMod                      | 0.4.4   |
 |                                                                                                                                 | nextflow-api                | 1.3     |
 | [proteomicscnic/next-launcher-app:0.1.3](https://hub.docker.com/repository/docker/proteomicscnic/next-launcher-app/general)	    | next-Launcher-app           | 0.1.3   |
 

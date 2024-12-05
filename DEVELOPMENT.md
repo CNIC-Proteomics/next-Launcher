@@ -22,6 +22,31 @@ docker-compose --env-file .env_cnic_dev -f docker-compose.cnic_dev.yml build --n
 docker-compose --env-file .env_cnic_dev -f docker-compose.cnic_dev.yml up -d
 ```
 
+## Push images to DockerHub
+
+1. Build services
+```
+docker-compose --env-file .env_cnic_dev -f docker-compose.cnic_dev.yml build --no-cache
+```
+
+2. Authenticating
+```
+docker login -u proteomicscnic
+    Authenticating with existing credentials...
+```
+
+3. Tag the the image
+```
+docker image tag proteomicscnic/next-launcher-core:latest proteomicscnic/next-launcher-core:0.1.3
+docker image tag proteomicscnic/next-launcher-app:latest  proteomicscnic/next-launcher-app:0.1.3
+```
+
+4. Push the images
+```
+docker push proteomicscnic/next-launcher-core:0.1.3
+docker push proteomicscnic/next-launcher-app:0.1.3
+```
+
 
 # Working in production mode
 
@@ -35,23 +60,6 @@ Here are some common Docker Compose commands using a specific file:
 docker-compose --env-file .env_cnic -f docker-compose.cnic.yml up -d
 ```
 
-## Push images to DockerHub
-
-1. Authenticating
-```
-docker login -u proteomicscnic
-    Authenticating with existing credentials...
-```
-
-2. Tag the the image
-```
-docker image tag proteomicscnic/next-launcher-core:latest proteomicscnic/next-launcher-core:0.1.2
-```
-
-2. Push the images
-```
-docker push proteomicscnic/next-launcher-core:0.1.2
-```
 
 
 

@@ -88,6 +88,8 @@ ENV BIODATAHUB_HOME=${SEARCH_ENGINE_HOME}/biodatahub
 RUN mkdir -p "${BIODATAHUB_HOME}"
 ENV MZEXTRACTOR_HOME=${SEARCH_ENGINE_HOME}/mzextractor
 RUN mkdir -p "${MZEXTRACTOR_HOME}"
+ENV SEARCHTOOLKIT_HOME=${SEARCH_ENGINE_HOME}/searchtoolkit
+RUN mkdir -p "${SEARCHTOOLKIT_HOME}"
 
 # MSFRAGGER: Declare the file name (with version)
 ARG MSF_FILE_NAME
@@ -100,6 +102,9 @@ ARG BIODATAHUB_VERSION
 
 # MZ_EXTRACTOR: Setting up variables (with version)
 ARG MZEXTRACTOR_VERSION
+
+# SEARCH_TOOLKIT: Setting up variables (with version)
+ARG SEARCHTOOLKIT_VERSION
 
 # PTM-COMPASS: Setting up the environment variables
 ARG PTM_COMPASS_VERSION
@@ -194,6 +199,17 @@ RUN git clone https://github.com/CNIC-Proteomics/mz_extractor.git  --branch ${MZ
 # Python environment --
 RUN cd ${MZEXTRACTOR_HOME} && python -m venv env
 RUN cd ${MZEXTRACTOR_HOME} && /bin/bash -c "source ${MZEXTRACTOR_HOME}/env/bin/activate && pip install -r ${MZEXTRACTOR_HOME}/python_requirements.txt"
+
+##################
+# SEARCH_TOOLKIT #
+##################
+
+# Clone the repository
+RUN git clone https://github.com/CNIC-Proteomics/SearchToolkit.git  --branch ${SEARCHTOOLKIT_VERSION}  ${SEARCHTOOLKIT_HOME}
+
+# Python environment --
+RUN cd ${SEARCHTOOLKIT_HOME} && python -m venv env
+RUN cd ${SEARCHTOOLKIT_HOME} && /bin/bash -c "source ${SEARCHTOOLKIT_HOME}/env/bin/activate && pip install -r ${SEARCHTOOLKIT_HOME}/python_requirements.txt"
 
 
 
