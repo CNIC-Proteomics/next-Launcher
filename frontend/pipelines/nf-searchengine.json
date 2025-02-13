@@ -1,0 +1,132 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema",
+	"$id": "https://raw.githubusercontent.com/CNIC-Proteomics/nf-SearchEngine/main/nextflow_schema.json",
+	"title": "SearchEngine",
+	"description": "Nextflow for the SearchEngine pipeline using raw files",
+	"url": "https://github.com/CNIC-Proteomics/nf-SearchEngine",
+	"revision": "0.1.3",
+	"icon": "",
+	"status": 0,
+	"type": "object",
+	"definitions": {
+			"input_output_options": {
+					"title": "Input/Output options",
+					"type": "object",
+					"fa_icon": "pi pi-box",
+					"description": "Inputs and outputs required for the pipeline",
+					"required": [
+							"raw_files",
+							"create_mzml",
+							"database",
+							"add_decoy",
+							"decoy_prefix"
+					],
+					"properties": {
+							"raw_files": {
+									"title": "MS data",
+									"description": "MS data files (.raw format and .mzML format)",
+									"help_text": "Under construction...",
+									"fa_icon": "pi pi-folder",
+									"type": "string",
+									"format": "directory-path",
+									"default": "",
+									"mimetype": "text/plain"
+							},
+							"create_mzml": {
+								"title": "Create mzML",
+								"description": "Generate the mzML's files from the RAW's",
+								"help_text": "Under construction...",
+								"fa_icon": "pi pi-pen-to-square",
+								"type": "boolean",
+								"format": "boolean",
+								"default": true
+							},
+							"database": {
+									"title": "Protein database",
+									"description": "The fasta protein database used during database search",
+									"help_text": "Under construction...",
+									"fa_icon": "pi pi-database",
+									"type": "string",
+									"format": "file-path",
+									"default": "",
+									"pattern": "^\\S+\\.(?:fasta|fa)$"
+	
+							},
+							"add_decoys": {
+									"title": "Add decoys",
+									"description": "Generate and append decoys to the given protein database",
+									"help_text": "Under construction...",
+									"fa_icon": "pi pi-pen-to-square",
+									"type": "boolean",
+									"format": "boolean",
+									"default": true
+							},
+							"decoy_prefix": {
+									"title": "Decoy prefix",
+									"description": "Pre- or suffix of decoy proteins in their accession",
+									"help_text": "Under construction...",
+									"fa_icon": "pi pi-pen-to-square",
+									"type": "string",
+									"format": "string",
+									"default": "DECOY_"
+							}
+					}
+			},
+			"parameter_options": {
+					"title": "Parameter options",
+					"type": "object",
+					"fa_icon": "pi pi-table",
+					"description": "Outputs required for the pipeline",
+					"required": [
+							"msf_params_file"
+					],
+					"properties": {
+							"msf_params_file": {
+									"title": "MSFragger parameter file",
+									"description": "File with the parameters for the MSFragger program",
+									"help_text": "Under construction...",
+									"fa_icon": "pi pi-file-import",
+									"type": "string",
+									"format": "file-path",
+									"mimetype": "text/plain"
+							},
+							"reporter_ion_isotopic": {
+									"title": "Ion isotopic reporter file",
+									"description": "The ion isotopic reporter file",
+									"help_text": "Under construction...",
+									"fa_icon": "pi pi-file-import",
+									"type": "string",
+									"format": "file-path",
+									"mimetype": "text/plain"
+							}
+					}
+			},
+			"output_options": {
+					"title": "Output options",
+					"type": "object",
+					"fa_icon": "fas fa-terminal",
+					"description": "Outputs required for the pipeline",
+					"required": [
+						"outdir"
+					],
+					"properties": {
+							"outdir": {
+									"title": "Output directory",
+									"description": "The output directory where the results will be saved.",
+									"help_text": "Under construction...",
+									"fa_icon": "fas fa-folder-open",
+									"type": "string",
+									"format": "directory-path"
+							}
+					}
+			}
+	},
+	"allOf": [
+			{
+					"$ref": "#/definitions/input_output_options"
+			},
+			{
+					"$ref": "#/definitions/parameter_options"
+			}
+	]
+}
