@@ -7,8 +7,7 @@ Here are some common Docker Compose commands using a specific file:
 
 + Open Windows Prompt
 ```
-cd S:\U_Proteomica\UNIDAD\Softwares\jmrodriguezc\next-Launcher
-s:
+cd C:\Users\jmrodriguezc\next-Launcher
 ```
 
 + Compose services depeding on the previous version or not

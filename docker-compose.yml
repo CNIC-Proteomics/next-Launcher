@@ -97,7 +97,6 @@ volumes:
       o: 'bind'
       device: './frontend/pipelines'
 
-
   workspace:
     name: 'workspace'
     driver: 'local'
@@ -113,7 +112,6 @@ volumes:
       type: 'none'
       o: 'bind'
       device: 'C:\\next-Launcher\\workspace\\production'
-
 
   c:
     name: 'c'
