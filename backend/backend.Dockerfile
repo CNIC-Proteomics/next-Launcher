@@ -86,8 +86,6 @@ ENV RAWPARSER_HOME=${SEARCH_ENGINE_HOME}/thermorawfileparser
 RUN mkdir -p "${RAWPARSER_HOME}"
 ENV BIODATAHUB_HOME=${SEARCH_ENGINE_HOME}/biodatahub
 RUN mkdir -p "${BIODATAHUB_HOME}"
-ENV MZEXTRACTOR_HOME=${SEARCH_ENGINE_HOME}/mzextractor
-RUN mkdir -p "${MZEXTRACTOR_HOME}"
 ENV SEARCHTOOLKIT_HOME=${SEARCH_ENGINE_HOME}/searchtoolkit
 RUN mkdir -p "${SEARCHTOOLKIT_HOME}"
 
@@ -99,9 +97,6 @@ ARG RAWPARSER_FILE_NAME
 
 # DECOYPYRAT: Setting up variables (with version)
 ARG BIODATAHUB_VERSION
-
-# MZ_EXTRACTOR: Setting up variables (with version)
-ARG MZEXTRACTOR_VERSION
 
 # SEARCH_TOOLKIT: Setting up variables (with version)
 ARG SEARCHTOOLKIT_VERSION
@@ -188,17 +183,6 @@ RUN git clone https://github.com/CNIC-Proteomics/bioDataHub.git  --branch ${BIOD
 # Python environment --
 RUN cd ${BIODATAHUB_HOME} && python -m venv env
 RUN cd ${BIODATAHUB_HOME} && /bin/bash -c "source ${BIODATAHUB_HOME}/env/bin/activate && pip install -r ${BIODATAHUB_HOME}/python_requirements.txt"
-
-################
-# MZ_EXTRACTOR #
-################
-
-# Clone the repository
-RUN git clone https://github.com/CNIC-Proteomics/mz_extractor.git  --branch ${MZEXTRACTOR_VERSION}  ${MZEXTRACTOR_HOME}
-
-# Python environment --
-RUN cd ${MZEXTRACTOR_HOME} && python -m venv env
-RUN cd ${MZEXTRACTOR_HOME} && /bin/bash -c "source ${MZEXTRACTOR_HOME}/env/bin/activate && pip install -r ${MZEXTRACTOR_HOME}/python_requirements.txt"
 
 ##################
 # SEARCH_TOOLKIT #
