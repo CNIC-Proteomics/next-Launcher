@@ -1,5 +1,25 @@
-# Working in development mode
+# Working in production mode
 
+## Docker compose
+
+Common Docker Compose Commands with a Specific File
+Here are some common Docker Compose commands using a specific file:
+
++ Open Windows Prompt
+```
+cd S:\U_Proteomica\UNIDAD\Softwares\jmrodriguezc\next-Launcher
+s:
+```
+
++ Compose services depeding on the previous version or not
+```
+.\bin\start-up.bat .env_cnic docker-compose.cnic.yml
+```
+
+
+
+
+# Working in development mode
 
 ## Docker compose for development
 
@@ -22,7 +42,17 @@ docker-compose --env-file .env_cnic_dev -f docker-compose.cnic_dev.yml build --n
 docker-compose --env-file .env_cnic_dev -f docker-compose.cnic_dev.yml up -d
 ```
 
+
+
+
+
+
 ## Push images to DockerHub
+
+1. Export current version
+```
+export NL_VERSION=0.1.5
+```
 
 1. Build services
 ```
@@ -37,28 +67,20 @@ docker login -u proteomicscnic
 
 3. Tag the the image
 ```
-docker image tag proteomicscnic/next-launcher-core:latest proteomicscnic/next-launcher-core:0.1.3
-docker image tag proteomicscnic/next-launcher-app:latest  proteomicscnic/next-launcher-app:0.1.3
+docker image tag proteomicscnic/next-launcher-db:latest proteomicscnic/next-launcher-db:${NL_VERSION}
+docker image tag proteomicscnic/next-launcher-core:latest proteomicscnic/next-launcher-core:${NL_VERSION}
+docker image tag proteomicscnic/next-launcher-app:latest  proteomicscnic/next-launcher-app:${NL_VERSION}
 ```
 
 4. Push the images
 ```
-docker push proteomicscnic/next-launcher-core:0.1.3
-docker push proteomicscnic/next-launcher-app:0.1.3
+docker push proteomicscnic/next-launcher-db:${NL_VERSION}
+docker push proteomicscnic/next-launcher-core:${NL_VERSION}
+docker push proteomicscnic/next-launcher-app:${NL_VERSION}
 ```
 
 
-# Working in production mode
 
-## Docker compose
-
-Common Docker Compose Commands with a Specific File
-Here are some common Docker Compose commands using a specific file:
-
-+ Compose services
-```
-docker-compose --env-file .env_cnic -f docker-compose.cnic.yml up -d
-```
 
 
 
