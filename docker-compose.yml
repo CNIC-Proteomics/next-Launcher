@@ -1,7 +1,7 @@
 services:
 
-  mongodb:
-    image: mongo:$MONGODB_VERSION
+  next-launcher-db:
+    image: 'proteomicscnic/next-launcher-db:$NL_VERSION'
     container_name: 'next-launcher-db'
     environment:
       # mongodb
@@ -16,10 +16,10 @@ services:
     command: [ "mongod" ]
 
   next-launcher-core:
-    image: 'proteomicscnic/next-launcher-core:$NL_CORE_VERSION'
+    image: 'proteomicscnic/next-launcher-core:$NL_VERSION'
     container_name: 'next-launcher-core'
     depends_on:
-      - mongodb
+      - next-launcher-db
     environment:
       # mongodb
       - MONGODB_HOST=$MONGODB_HOST
@@ -37,20 +37,23 @@ services:
       - PWD_ADMIN=$PWD_ADMIN
       # workspace
       - WORKSPACE_HOME=${WORKSPACE_HOME}
+      # outspace
+      - OUTSPACE_HOME=${OUTSPACE_HOME}
       # shared volumes
       - SHARED_VOLUMES=$SHARED_VOLUMES
     ports:
       - "${PORT_CORE}:${PORT_CORE}"
     volumes:
-      - "conf:/opt/nextflow/conf" # Mount config folder: host folder mapped to container folder
+      - "conf:/opt/nextflow/conf" # mount config folder: host folder mapped to container folder
       - "workspace:${WORKSPACE_HOME}"
+      - "outspace:${OUTSPACE_HOME}"
       - "${SHARED_VOLUME_1}"
     networks:
       - next-launcher-network
     command: [ "sh", "-c", "/opt/nextflow-api/scripts/startup-local.sh mongo" ]
 
   next-launcher-app:
-    image: 'proteomicscnic/next-launcher-app:$NL_APP_VERSION'
+    image: 'proteomicscnic/next-launcher-app:$NL_VERSION'
     container_name: 'next-launcher-app'
     environment:
       # servers
@@ -59,12 +62,16 @@ services:
       - HOST_IP=$HOST_IP
       # workspace
       - WORKSPACE_HOME=${WORKSPACE_HOME}
+      # outspace
+      - OUTSPACE_HOME=${OUTSPACE_HOME}
       # shared volumes
       - SHARED_VOLUMES=$SHARED_VOLUMES
     ports:
       - "${PORT_APP}:${PORT_APP}"
     volumes:
+      - "pipelines:/opt/next-launcher-app/app/public/pipelines" # mount pipeline folder: host folder mapped to container folder
       - "workspace:${WORKSPACE_HOME}"
+      - "outspace:${OUTSPACE_HOME}"
       - "${SHARED_VOLUME_1}"
     networks:
       - next-launcher-network
@@ -76,23 +83,41 @@ volumes:
 
   conf:
     name: 'conf'
-    driver: local
+    driver: 'local'
     driver_opts:
       type: 'none'
       o: 'bind'
       device: './backend/nextflow/conf'
 
+  pipelines:
+    name: 'pipelines'
+    driver: 'local'
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: './frontend/pipelines'
+
+
   workspace:
     name: 'workspace'
-    driver: local
+    driver: 'local'
     driver_opts:
       type: 'none'
       o: 'bind'
       device: 'C:\\next-Launcher\\workspace\\production'
 
+  outspace:
+    name: 'outspace'
+    driver: 'local'
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: 'C:\\next-Launcher\\workspace\\production'
+
+
   c:
     name: 'c'
-    driver: local
+    driver: 'local'
     driver_opts:
       type: 'none'
       o: 'bind'
