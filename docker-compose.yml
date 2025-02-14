@@ -1,7 +1,7 @@
 services:
 
   next-launcher-db:
-    image: 'proteomicscnic/next-launcher-db:$NL_VERSION'
+    image: 'proteomicscnic/next-launcher-db:$NL_DB_VERSION'
     container_name: 'next-launcher-db'
     environment:
       # mongodb
@@ -11,6 +11,8 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=$MONGODB_PWD
     ports:
       - "${MONGODB_PORT}:${MONGODB_PORT}"
+    volumes:
+      - "nl_db:/data/db" # mount data folder
     networks:
       - next-launcher-network
     command: [ "mongod" ]
@@ -44,9 +46,9 @@ services:
     ports:
       - "${PORT_CORE}:${PORT_CORE}"
     volumes:
-      - "conf:/opt/nextflow/conf" # mount config folder: host folder mapped to container folder
-      - "workspace:${WORKSPACE_HOME}"
-      - "outspace:${OUTSPACE_HOME}"
+      - "nl_conf:/opt/nextflow/conf" # mount folder for nextflow config
+      - "nl_workspace:${WORKSPACE_HOME}"
+      - "nl_outspace:${OUTSPACE_HOME}"
       - "${SHARED_VOLUME_1}"
     networks:
       - next-launcher-network
@@ -69,9 +71,9 @@ services:
     ports:
       - "${PORT_APP}:${PORT_APP}"
     volumes:
-      - "pipelines:/opt/next-launcher-app/app/public/pipelines" # mount pipeline folder: host folder mapped to container folder
-      - "workspace:${WORKSPACE_HOME}"
-      - "outspace:${OUTSPACE_HOME}"
+      - "nl_pipelines:/opt/next-launcher-app/app/public/pipelines" # mount folder with the pipeline schemas
+      - "nl_workspace:${WORKSPACE_HOME}"
+      - "nl_outspace:${OUTSPACE_HOME}"
       - "${SHARED_VOLUME_1}"
     networks:
       - next-launcher-network
@@ -81,32 +83,40 @@ services:
 
 volumes:
 
-  conf:
-    name: 'conf'
+  nl_db:
+    name: 'nl_db'
+    driver: 'local'
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: './backend/db'
+
+  nl_conf:
+    name: 'nl_conf'
     driver: 'local'
     driver_opts:
       type: 'none'
       o: 'bind'
       device: './backend/nextflow/conf'
 
-  pipelines:
-    name: 'pipelines'
+  nl_pipelines:
+    name: 'nl_pipelines'
     driver: 'local'
     driver_opts:
       type: 'none'
       o: 'bind'
       device: './frontend/pipelines'
 
-  workspace:
-    name: 'workspace'
+  nl_workspace:
+    name: 'nl_workspace'
     driver: 'local'
     driver_opts:
       type: 'none'
       o: 'bind'
       device: 'C:\\next-Launcher\\workspace\\production'
 
-  outspace:
-    name: 'outspace'
+  nl_outspace:
+    name: 'nl_outspace'
     driver: 'local'
     driver_opts:
       type: 'none'
