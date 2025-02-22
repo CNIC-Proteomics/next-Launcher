@@ -4,7 +4,7 @@
 	"title": "SearchEngine",
 	"description": "Nextflow for the SearchEngine pipeline using raw files",
 	"url": "https://github.com/CNIC-Proteomics/nf-SearchEngine",
-	"revision": "0.1.3",
+	"revision": "0.1.4",
 	"icon": "",
 	"status": 0,
 	"type": "object",
