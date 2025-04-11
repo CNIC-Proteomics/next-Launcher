@@ -10,10 +10,15 @@ Here are some common Docker Compose commands using a specific file:
 cd C:\Users\jmrodriguezc\next-Launcher
 ```
 
-+ Compose services depeding on the previous version or not
++ Start service
+```
+docker-compose --env-file .env_cnic -f docker-compose.cnic.yml up -d
+```
+
+<!-- + Compose services depeding on the previous version or not
 ```
 .\bin\start-up.bat .env_cnic docker-compose.cnic.yml
-```
+``` -->
 
 
 
@@ -66,18 +71,38 @@ docker login -u proteomicscnic
 
 3. Tag the the image
 ```
-docker image tag proteomicscnic/next-launcher-db:latest proteomicscnic/next-launcher-db:${NL_VERSION}
 docker image tag proteomicscnic/next-launcher-core:latest proteomicscnic/next-launcher-core:${NL_VERSION}
 docker image tag proteomicscnic/next-launcher-app:latest  proteomicscnic/next-launcher-app:${NL_VERSION}
 ```
 
 4. Push the images
 ```
-docker push proteomicscnic/next-launcher-db:${NL_VERSION}
 docker push proteomicscnic/next-launcher-core:${NL_VERSION}
 docker push proteomicscnic/next-launcher-app:${NL_VERSION}
 ```
 
+### Push DB image to DockerHub
+
+1. Export current version
+```
+export NL_DB_VERSION=0.1
+```
+
+1. Build services
+```
+docker-compose --env-file .env_cnic_dev -f docker-compose.cnic_dev.yml build --no-cache next-launcher-db
+```
+
+2. Authenticating
+```
+docker login -u proteomicscnic
+    Authenticating with existing credentials...
+```
+
+3. Push the images
+```
+docker push proteomicscnic/next-launcher-db:${NL_DB_VERSION}
+```
 
 
 

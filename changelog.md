@@ -1,4 +1,69 @@
 ___
+## 0.1.5
+
+### Date 📅 *2025_04*
+
+### Changes in the detail
+
++ Create a dedicated Docker image named **next-launcher-db** for the next-Launcher.  
++ Add a volume to persist database data.  
++ Add a volume containing the pipelines displayed in the frontend application.  
++ Introduce a new volume for output results, named **outspace**.  
++ The **base.config** file is now deprecated.
++ Create a local workspace for the next-Launcher production (version out of CNIC).
+
+### Repositories Version History
+
+| Docker images                                                                                                                   | Software                    | Version   |
+|---------------------------------------------------------------------------------------------------------------------------------|-----------------------------|-----------|
+| [proteomicscnic/next-launcher-core:0.1.5](https://hub.docker.com/repository/docker/proteomicscnic/next-launcher-core/general)   |                             |           |
+|                                                                                                                                 | Nextflow                    | >=24.10.5 |
+|                                                                                                                                 | nextflow-api                | 1.5       |
+|                                                                                                                                 | MSFragger                   | 4.2-rc14  |
+|                                                                                                                                 | ThermoRawFileParser         | 1.4.5     |
+|                                                                                                                                 | bioDataHub (DecoyPYrat)     | 2.14      |
+|                                                                                                                                 | SearchToolkit               | 1.3       |
+|                                                                                                                                 | PTM-compass                 | 1.4       |
+|                                                                                                                                 | REFMOD                      | 0.4.5     |
+|                                                                                                                                 | PTM-Analyzer                | v1.04     |
+| [proteomicscnic/next-launcher-app:0.1.5](https://hub.docker.com/repository/docker/proteomicscnic/next-launcher-app/general)	    |                             |           |
+|                                                                                                                                 | next-Launcher-app           | 0.1.5     |
+
+
+___
+## 0.1.4
+```
+DATE: 2024_12
+```
+
+### Highlights
+
++ Upgrade versions.
+
+### Changes in the Backend (next-launcher-core)
+
++ Fixing a bug creating the global output.
+
+### Changes in the Frontend (next-launcher-app)
+
+
+### Version history
+
+| Docker images                                                                                                                   | Software                    | Version  |
+|---------------------------------------------------------------------------------------------------------------------------------|-----------------------------|----------|
+| [proteomicscnic/next-launcher-core:0.1.4](https://hub.docker.com/repository/docker/proteomicscnic/next-launcher-core/general)   | Nextflow                    | 23.10.1  |
+|                                                                                                                                 | MSFragger                   | 4.2-rc14 |
+|                                                                                                                                 | ThermoRawFileParser         | 1.4.5    |
+|                                                                                                                                 | bioDataHub (DecoyPYrat)     | 2.13     |
+|                                                                                                                                 | SearchToolkit               | 1.2      |
+|                                                                                                                                 | PTM-compass                 | 1.2      |
+|                                                                                                                                 | RefMod                      | 0.4.4    |
+|                                                                                                                                 | nextflow-api                | 1.3      |
+| [proteomicscnic/next-launcher-app:0.1.4](https://hub.docker.com/repository/docker/proteomicscnic/next-launcher-app/general)	    | next-Launcher-app           | 0.1.4    |
+
+
+
+___
 ## 0.1.3
 ```
 DATE: 2024_12

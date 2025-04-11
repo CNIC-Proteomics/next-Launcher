@@ -53,6 +53,9 @@ RUN apt update -y
 RUN apt install -y mongodb-org
 RUN apt install -y cron
 
+# Install R
+RUN apt-get install -y r-base
+
 
 #################
 # ENV VARIABLES #
@@ -101,13 +104,17 @@ ARG BIODATAHUB_VERSION
 # SEARCH_TOOLKIT: Setting up variables (with version)
 ARG SEARCHTOOLKIT_VERSION
 
+# REFMOD: Setting up the environment variables
+ARG REFMOD_VERSION
+ENV REFMOD_HOME=${SEARCH_ENGINE_HOME}/refmod
+
 # PTM-COMPASS: Setting up the environment variables
 ARG PTM_COMPASS_VERSION
 ENV PTM_COMPASS_HOME=${INSTALLATION_HOME}/ptm-compass
 
-# REFMOD: Setting up the environment variables
-ARG REFMOD_VERSION
-ENV REFMOD_HOME=${PTM_COMPASS_HOME}/src/refmod
+# PTM-ANALYZER: Setting up the environment variables
+ARG PTM_ANALYZER_VERSION
+ENV PTM_ANALYZER_HOME=${INSTALLATION_HOME}/report-analysis
 
 
 
@@ -198,19 +205,6 @@ RUN cd ${SEARCHTOOLKIT_HOME} && /bin/bash -c "source ${SEARCHTOOLKIT_HOME}/env/b
 
 
 #
-# PTM-COMPASS ---------------------------------------------------------------------------------------------
-#
-
-# Clone the repository
-RUN git clone https://github.com/CNIC-Proteomics/PTM-compass.git  --branch ${PTM_COMPASS_VERSION}  ${PTM_COMPASS_HOME}
-
-# Python environment --
-RUN cd ${PTM_COMPASS_HOME} && python -m venv env
-RUN cd ${PTM_COMPASS_HOME} && /bin/bash -c "source ${PTM_COMPASS_HOME}/env/bin/activate && pip install -r ${PTM_COMPASS_HOME}/python_requirements.txt"
-
-
-
-#
 # REFMOD ---------------------------------------------------------------------------------------------
 #
 
@@ -224,6 +218,37 @@ RUN cd ${REFMOD_HOME} && /bin/bash -c "source ${REFMOD_HOME}/env/bin/activate &&
 
 
 #
+# PTM-COMPASS ---------------------------------------------------------------------------------------------
+#
+
+# Clone the repository
+RUN git clone https://github.com/CNIC-Proteomics/PTM-compass.git  --branch ${PTM_COMPASS_VERSION}  ${PTM_COMPASS_HOME}
+
+# Python environment --
+RUN cd ${PTM_COMPASS_HOME} && python -m venv env
+RUN cd ${PTM_COMPASS_HOME} && /bin/bash -c "source ${PTM_COMPASS_HOME}/env/bin/activate && pip install -r ${PTM_COMPASS_HOME}/python_requirements.txt"
+
+
+
+#
+# PTM-ANALYZER ---------------------------------------------------------------------------------------------
+#
+
+# Clone the repository
+RUN git clone https://github.com/CNIC-Proteomics/ReportAnalysis.git  --branch ${PTM_ANALYZER_VERSION}  ${PTM_ANALYZER_HOME}
+
+# Python environment --
+RUN cd ${PTM_ANALYZER_HOME} && python -m venv env
+RUN cd ${PTM_ANALYZER_HOME} && /bin/bash -c "source ${PTM_ANALYZER_HOME}/env/bin/activate && pip install -r ${PTM_ANALYZER_HOME}/python_requirements.txt"
+
+# Install R packages
+RUN Rscript -e 'if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager"); BiocManager::install("limma")'
+RUN Rscript -e 'install.packages("logging")'
+RUN Rscript -e 'install.packages("yaml")'
+RUN Rscript -e 'install.packages("optparse")'
+
+
+#
 # ENVIRONMENT ---------------------------------------------------------------------------------------------
 #
 
@@ -231,47 +256,6 @@ RUN cd ${REFMOD_HOME} && /bin/bash -c "source ${REFMOD_HOME}/env/bin/activate &&
 USER root
 COPY setup.root.sh /tmp/.
 RUN cat "/tmp/setup.root.sh" >> /root/.bashrc
-
-# # Use ARG to define a build-time variable
-# # server connection
-# ARG PORT_CORE
-# ARG PORT_APP
-# ARG HOST_IP
-# # mongodb connection.
-# # Default PORT is required
-# ARG MONGODB_HOST
-# ARG MONGODB_PORT=27017
-# ARG MONGODB_USER
-# ARG MONGODB_PWD
-# ARG MONGODB_DB
-# # nextflow-api: guest user
-# ARG USER_GUEST
-# ARG PWD_GUEST
-# # nextflow-api: admin user
-# ARG USER_ADMIN
-# ARG PWD_ADMIN
-# # shared volumes
-# ARG SHARED_VOLUMES
-
-# # Use that ARG to set an ENV environment variable
-# # server connection
-# ENV PORT_CORE=${PORT_CORE}
-# ENV PORT_APP=${PORT_APP}
-# ENV HOST_IP=${HOST_IP}
-# # mongodb connection
-# ENV MONGODB_HOST=${MONGODB_HOST}
-# ENV MONGODB_PORT=${MONGODB_PORT}
-# ENV MONGODB_USER=${MONGODB_USER}
-# ENV MONGODB_PWD=${MONGODB_PWD}
-# ENV MONGODB_DB=${MONGODB_DB}
-# # nextflow-api: guest user
-# ENV USER_GUEST=${USER_GUEST}
-# ENV PWD_GUEST=${PWD_GUEST}
-# # nextflow-api: admin user
-# ENV USER_ADMIN=${USER_ADMIN}
-# ENV PWD_ADMIN=${PWD_ADMIN}
-# # shared volumes
-# ENV SHARED_VOLUMES=${SHARED_VOLUMES}
 
 
 

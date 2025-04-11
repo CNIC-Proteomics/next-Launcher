@@ -113,7 +113,7 @@ volumes:
     driver_opts:
       type: 'none'
       o: 'bind'
-      device: 'C:\\next-Launcher\\workspace\\production'
+      device: './workspace'
 
   nl_outspace:
     name: 'nl_outspace'
@@ -121,7 +121,7 @@ volumes:
     driver_opts:
       type: 'none'
       o: 'bind'
-      device: 'C:\\next-Launcher\\workspace\\production'
+      device: './workspace'
 
   c:
     name: 'c'
