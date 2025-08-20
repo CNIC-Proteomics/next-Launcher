@@ -1,48 +1,32 @@
 services:
 
-  next-launcher-db:
-    image: 'proteomicscnic/next-launcher-db:$NL_DB_VERSION'
-    container_name: 'next-launcher-db'
-    environment:
-      # mongodb
-      - MONGODB_HOST=$MONGODB_HOST
-      - MONGODB_PORT=$MONGODB_PORT
-      - MONGO_INITDB_ROOT_USERNAME=$MONGODB_USER
-      - MONGO_INITDB_ROOT_PASSWORD=$MONGODB_PWD
-    ports:
-      - "${MONGODB_PORT}:${MONGODB_PORT}"
-    volumes:
-      - "nl_db:/data/db" # mount data folder
-    networks:
-      - next-launcher-network
-    command: [ "mongod" ]
-
   next-launcher-core:
     image: 'proteomicscnic/next-launcher-core:$NL_VERSION'
     container_name: 'next-launcher-core'
-    depends_on:
-      - next-launcher-db
     environment:
       # mongodb
-      - MONGODB_HOST=$MONGODB_HOST
-      - MONGODB_USER=$MONGODB_USER
-      - MONGODB_PWD=$MONGODB_PWD
-      - MONGODB_DB=$MONGODB_DB
+      - MONGODB_HOST=${MONGODB_HOST}
+      - MONGODB_PORT=${MONGODB_PORT}
+      - MONGODB_USER=${MONGODB_USER}
+      - MONGODB_PWD=${MONGODB_PWD}
+      - MONGODB_DB=${MONGODB_DB}
       # servers
-      - PORT_CORE=$PORT_CORE
-      - PORT_APP=$PORT_APP
-      - HOST_IP=$HOST_IP
+      - PORT_CORE=${PORT_CORE}
+      - PORT_APP=${PORT_APP}
+      - HOST_IP=${HOST_IP}
       # nextflow-api
-      - USER_GUEST=$USER_GUEST
-      - PWD_GUEST=$PWD_GUEST
-      - USER_ADMIN=$USER_ADMIN
-      - PWD_ADMIN=$PWD_ADMIN
+      - USER_GUEST=${USER_GUEST}
+      - PWD_GUEST=${PWD_GUEST}
+      - USER_ADMIN=${USER_ADMIN}
+      - PWD_ADMIN=${PWD_ADMIN}
       # workspace
       - WORKSPACE_HOME=${WORKSPACE_HOME}
       # outspace
       - OUTSPACE_HOME=${OUTSPACE_HOME}
       # shared volumes
-      - SHARED_VOLUMES=$SHARED_VOLUMES
+      - SHARED_VOLUMES=${SHARED_VOLUMES}
+    extra_hosts:
+      - "${MONGODB_HOST}:${MONGODB_IP}" # maps MongoDB hostname to IP inside the container
     ports:
       - "${PORT_CORE}:${PORT_CORE}"
     volumes:
@@ -59,15 +43,15 @@ services:
     container_name: 'next-launcher-app'
     environment:
       # servers
-      - PORT_CORE=$PORT_CORE
-      - PORT_APP=$PORT_APP
-      - HOST_IP=$HOST_IP
+      - PORT_CORE=${PORT_CORE}
+      - PORT_APP=${PORT_APP}
+      - HOST_IP=${HOST_IP}
       # workspace
       - WORKSPACE_HOME=${WORKSPACE_HOME}
       # outspace
       - OUTSPACE_HOME=${OUTSPACE_HOME}
       # shared volumes
-      - SHARED_VOLUMES=$SHARED_VOLUMES
+      - SHARED_VOLUMES=${SHARED_VOLUMES}
     ports:
       - "${PORT_APP}:${PORT_APP}"
     volumes:
@@ -82,14 +66,6 @@ services:
 
 
 volumes:
-
-  nl_db:
-    name: 'nl_db'
-    driver: 'local'
-    driver_opts:
-      type: 'none'
-      o: 'bind'
-      device: './backend/db'
 
   nl_conf:
     name: 'nl_conf'

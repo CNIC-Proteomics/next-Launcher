@@ -1,0 +1,34 @@
+services:
+
+  next-launcher-db:
+    image: 'mongo:7.0.12'
+    container_name: 'next-launcher-db'
+    environment:
+      # mongodb
+      - MONGO_INITDB_ROOT_USERNAME=${MONGODB_USER}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_PWD}
+    ports:
+      - "${MONGODB_PORT}:27017"   # external 27018 → internal 27017
+    volumes:
+      - "nl_db:/data/db" # mount data folder
+    networks:
+      - next-launcher-network
+    command: ["mongod", "--bind_ip_all"] # binds to 127.0.0.1 and to other machines
+
+
+
+volumes:
+
+  nl_db:
+    name: 'nl_db'
+    driver: 'local'
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: './backend/db'
+
+
+
+networks:
+
+  next-launcher-network:
