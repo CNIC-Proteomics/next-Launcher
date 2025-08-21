@@ -12,7 +12,12 @@ cd C:\Users\jmrodriguezc\next-Launcher
 
 + Start service
 ```
-docker-compose --env-file .env_cnic -f docker-compose.cnic.yml up -d
+if [ "$MONGODB_HOST" = "HOST_NAME" ]; then
+  docker-compose --env-file .env_cnic -f docker-compose.cnic.yml -f docker-compose.db.cnic.yml up -d
+else
+  docker-compose --env-file .env_cnic -f docker-compose.cnic.yml up -d
+fi
+
 ```
 
 <!-- + Compose services depeding on the previous version or not
@@ -43,7 +48,11 @@ docker-compose --env-file .env_cnic_dev -f docker-compose.cnic_dev.yml build --n
 
 + Start service
 ```
-docker-compose --env-file .env_cnic_dev -f docker-compose.cnic_dev.yml up -d
+if [ "$MONGODB_HOST" = "HOST_NAME" ]; then
+  docker-compose --env-file .env_cnic_dev -f docker-compose.cnic_dev.yml -f docker-compose.db.cnic_dev.yml up -d
+else
+  docker-compose --env-file .env_cnic_dev -f docker-compose.cnic_dev.yml up -d
+fi
 ```
 
 
@@ -53,9 +62,15 @@ docker-compose --env-file .env_cnic_dev -f docker-compose.cnic_dev.yml up -d
 
 ## Push images to DockerHub
 
+0. Open Windows Prompt
+```
+cd S:\U_Proteomica\UNIDAD\Softwares\jmrodriguezc\next-Launcher
+s:
+```
+
 1. Export current version
 ```
-export NL_VERSION=0.1.5
+set NL_VERSION=0.1.5
 ```
 
 1. Build services
@@ -71,14 +86,14 @@ docker login -u proteomicscnic
 
 3. Tag the the image
 ```
-docker image tag proteomicscnic/next-launcher-core:latest proteomicscnic/next-launcher-core:${NL_VERSION}
-docker image tag proteomicscnic/next-launcher-app:latest  proteomicscnic/next-launcher-app:${NL_VERSION}
+docker image tag proteomicscnic/next-launcher-core:latest proteomicscnic/next-launcher-core:%NL_VERSION%
+docker image tag proteomicscnic/next-launcher-app:latest  proteomicscnic/next-launcher-app:%NL_VERSION%
 ```
 
 4. Push the images
 ```
-docker push proteomicscnic/next-launcher-core:${NL_VERSION}
-docker push proteomicscnic/next-launcher-app:${NL_VERSION}
+docker push proteomicscnic/next-launcher-core:%NL_VERSION%
+docker push proteomicscnic/next-launcher-app:%NL_VERSION%
 ```
 
 ### Push DB image to DockerHub
@@ -108,6 +123,37 @@ docker push proteomicscnic/next-launcher-db:${NL_DB_VERSION}
 
 
 
+# Commit huge files
+
+**Requirements:** Download and install the Git command line extension. Once downloaded and installed, set up Git LFS for your user account by running:
+```
+git lfs install
+```
+You only need to run this once per user account.
+
+1. Track the file:
+
+In each Git repository where you want to use Git LFS, select the file types you'd like Git LFS to manage (or directly edit your .gitattributes). You can configure additional file extensions at anytime.
+```
+git lfs track backend/search_engine/MSFragger-4.2.zip
+```
+
+2. Add the changes in gitattributes:
+
+Now make sure .gitattributes is tracked:
+```
+git add .gitattributes
+```
+Note that defining the file types Git LFS should track will not, by itself, convert any pre-existing files to Git LFS, such as files on other branches or in your prior commit history. To do that, use the git lfs migrate(1) command, which has a range of options designed to suit various potential use cases.
+
+3. Add/Commit/Push the new huge file:
+
+There is no step three. Just commit and push to GitHub as you normally would; for instance, if your current branch is named main:
+```
+git add -f backend/search_engine/MSFragger-4.2.zip
+git commit -m "Add new MSFragger release"
+git push origin main
+```
 
 
 ______________________________
@@ -207,7 +253,7 @@ s:
 @echo off & for /f "tokens=1,2 delims==" %i in (.env_cnic_dev) do set %i=%j
 docker build ^
   --no-cache ^
-  --build-arg HOST_IP=%HOST_IP% ^
+  --build-arg HOST_NAME=%HOST_NAME% ^
   --build-arg PORT_CORE=%PORT_CORE% ^
   --build-arg PORT_APP=%PORT_APP% ^
   ^
@@ -235,7 +281,7 @@ Open Linux shell
 export $(grep -v '^#' .env_cnic_dev | xargs)
 docker build \
   --no-cache \
-  --build-arg HOST_IP=${HOST_IP} \
+  --build-arg HOST_NAME=${HOST_NAME} \
   --build-arg PORT_CORE=${PORT_CORE} \
   --build-arg PORT_APP=${PORT_APP} \
   \
@@ -333,7 +379,7 @@ s:
 @echo off & for /f "tokens=1,2 delims==" %i in (.env_cnic_dev) do set %i=%j
 docker build ^
   --no-cache ^
-  --build-arg HOST_IP=%HOST_IP% ^
+  --build-arg HOST_NAME=%HOST_NAME% ^
   --build-arg PORT_CORE=%PORT_CORE% ^
   --build-arg PORT_APP=%PORT_APP% ^
   ^
@@ -380,6 +426,43 @@ ______________________________
 FOR MORE INFORMATION:
 
 
+## Create a Git tag for your `release candidate` version.
+
+### 1. Create a lightweight tag
+
+If you just want a simple marker (not recommended for releases):
+
+```bash
+git tag 0.1.6-rc1
+```
+
+### 2. Create an annotated tag (recommended for releases)
+
+Annotated tags let you add a message (like a mini changelog):
+
+```bash
+git tag -a 0.1.6-rc1 -m "Release Candidate 1 for version 1.6
+- Removed the hardcoded variable MONGODB_PORT"
+```
+
+### 3. Push the tag to the remote repo (GitHub, GitLab, etc.)
+
+```bash
+git push origin 0.1.6-rc1
+```
+
+✅ After the final release (`1.6`), you can also create a clean tag:
+
+```bash
+git tag -a 0.1.6 -m "Final release 1.6
+- Removed the hardcoded variable MONGODB_PORT
+- Fixed migration script
+- Updated logging configuration"
+git push origin v1.6
+```
+
+
+
 ## Create volumes in Docker
 
 Create workspace volumes (production and development) for the Nextflow pipelines in the container:
@@ -420,7 +503,7 @@ docker run --security-opt seccomp=unconfined --name backend -it -v tierra:/mnt/t
 docker run --privileged --name backend -it -v tierra:/mnt/tierra backend
 ```
 
-export PORT_CORE=8081 && export HOST_IP=localhost && export PORT_APP=3031 && ./scripts/startup-local.sh mongo
+export PORT_CORE=8081 && export HOST_NAME=localhost && export PORT_APP=3031 && ./scripts/startup-local.sh mongo
 cd /opt/nextflow-api/
 cp -r /mnt/tierra/U_Proteomica/UNIDAD/Softwares/jmrodriguezc/nextflow-api/bin/backend.py bin/backend.py
 

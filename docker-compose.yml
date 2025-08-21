@@ -13,7 +13,7 @@ services:
       # servers
       - PORT_CORE=${PORT_CORE}
       - PORT_APP=${PORT_APP}
-      - HOST_IP=${HOST_IP}
+      - HOST_NAME=${HOST_NAME}
       # nextflow-api
       - USER_GUEST=${USER_GUEST}
       - PWD_GUEST=${PWD_GUEST}
@@ -45,7 +45,7 @@ services:
       # servers
       - PORT_CORE=${PORT_CORE}
       - PORT_APP=${PORT_APP}
-      - HOST_IP=${HOST_IP}
+      - HOST_NAME=${HOST_NAME}
       # workspace
       - WORKSPACE_HOME=${WORKSPACE_HOME}
       # outspace
@@ -61,7 +61,7 @@ services:
       - "${SHARED_VOLUME_1}"
     networks:
       - next-launcher-network
-    command: [ "sh", "-c", "cd /opt/next-launcher-app/app && PORT=$PORT_APP  REACT_APP_HOST_IP=$HOST_IP  REACT_APP_PORT_CORE=$PORT_CORE  npm start" ]
+    command: [ "sh", "-c", "cd /opt/next-launcher-app/app && PORT=$PORT_APP  REACT_APP_HOST_NAME=$HOST_NAME  REACT_APP_PORT_CORE=$PORT_CORE  npm start" ]
 
 
 
