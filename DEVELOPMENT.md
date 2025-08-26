@@ -428,38 +428,114 @@ FOR MORE INFORMATION:
 
 ## Create a Git tag for your `release candidate` version.
 
-### 1. Create a lightweight tag
+## Recommended Flow
 
-If you just want a simple marker (not recommended for releases):
+1. Develop features in feature branches.
+2. Merge into `develop`.
+3. When ready → create a **release branch**:
+
+   ```bash
+   git checkout -b release/v1.0.0 develop
+   ```
+4. Test, fix, stabilize.
+```bash
+git add .
+git commit -m "feat(auth): implement JWT-based login"
+```
+5. Tag an **RC** (release candidate):
+
+   ```bash
+   git tag -a v1.0.0-rc1 -m "First release candidate for v1.0.0"
+   git push origin v1.0.0-rc1
+   ```
+6. When approved → merge `release/v1.0.0` into `main`, create a **final tag**:
+
+   ```bash
+   git checkout main
+   git merge release/v1.0.0
+   git tag -a v1.0.0 -m "Release v1.0.0"
+   git push origin main --tags
+   ```
+
+---
+**Best-practice Git workflow** for managing versions, releases, and release candidates using **commits** and **tags**. Let’s break it down step by step:
+## 🔹 1. Commit Discipline
+
+* Always commit **small, logical units of work**.
+* Write clear commit messages (convention: **type(scope): short message**).
+
+  * Examples:
+
+    * `feat(api): add endpoint for peptide search`
+    * `fix(db): correct SQL syntax in peptide insert`
+    * `chore(ci): update GitHub Actions workflow`
+
+Best practices:
 
 ```bash
-git tag 0.1.6-rc1
+git add .
+git commit -m "feat(auth): implement JWT-based login"
 ```
 
-### 2. Create an annotated tag (recommended for releases)
+## 🔹 2. Branching Strategy
 
-Annotated tags let you add a message (like a mini changelog):
+Use branches to isolate work:
+
+* **main / master** → always production-ready.
+* **develop** → integration branch for new features.
+* **feature/xxx** → for feature development.
+* **hotfix/xxx** → for urgent bug fixes.
+
+Example:
 
 ```bash
-git tag -a 0.1.6-rc1 -m "Release Candidate 1 for version 1.6
-- Removed the hardcoded variable MONGODB_PORT"
+git checkout -b feature/add-search
+# do work, commit
+git push origin feature/add-search
 ```
 
-### 3. Push the tag to the remote repo (GitHub, GitLab, etc.)
+## 🔹 3. Tags for Versioning
+
+Git tags mark **specific commits** as versions.
+Two main types:
+
+* **Lightweight tags** → just a pointer (not recommended for releases).
+* **Annotated tags** → includes metadata (best for releases).
+
+### Create a release candidate tag:
 
 ```bash
-git push origin 0.1.6-rc1
+git tag -a v1.0.0-rc1 -m "Release Candidate 1 for v1.0.0"
+git push origin v1.0.0-rc1
 ```
 
-✅ After the final release (`1.6`), you can also create a clean tag:
+### Create a final release tag:
 
 ```bash
-git tag -a 0.1.6 -m "Final release 1.6
-- Removed the hardcoded variable MONGODB_PORT
-- Fixed migration script
-- Updated logging configuration"
-git push origin v1.6
+git tag -a v1.0.0 -m "Release v1.0.0"
+git push origin v1.0.0
 ```
+
+### 4. Semantic Versioning
+
+Follow [SemVer](https://semver.org/):
+
+* **MAJOR** → breaking changes (`v2.0.0`)
+* **MINOR** → new features, backwards compatible (`v1.1.0`)
+* **PATCH** → bug fixes only (`v1.0.1`)
+* Pre-release → `v1.0.0-rc1`, `v1.0.0-beta.2`
+
+### 5. Automating Releases
+
+You can automate tagging + changelog + GitHub/GitLab release:
+
+* Use **GitHub Actions** or **GitLab CI/CD** to:
+
+  * Generate changelogs
+  * Build artifacts
+  * Publish Docker images
+* Example: [semantic-release](https://github.com/semantic-release/semantic-release) tool can do this.
+
 
 
 
