@@ -3,10 +3,10 @@
 #
 # %labels
 #     Author jmrodriguezc@cnic.es
-#     Version v0.0.1
+#     Version v0.1.6
 # 
 # %help
-#     This file create the Backend image that contains: nextflow, nextflow-api, etc.
+#     This file create the Backend image that contains: nextflow, singularity, and nextflow-api.
 
 # our base image
 FROM ubuntu:22.04
@@ -20,6 +20,7 @@ RUN apt-get install -y wget
 RUN apt-get install -y git
 RUN apt-get install -y zip
 RUN apt-get install -y unzip
+RUN apt-get install -y jq
 
 
 ################
@@ -32,17 +33,28 @@ RUN apt-get update -y
 # Install the requirements for nextflow, MSFragger
 RUN apt-get install -y openjdk-19-jre-headless
 
-# Install the requirements for nf-core, and some modules
-RUN apt-get -y install python-is-python3 python3-pip python3-venv python3-tk
-RUN python -m pip install --upgrade pip
-
-# ThermoRawFileParser:
-RUN apt-get install -y ca-certificates gnupg
-# install mono (ThermoRawFileParser)
-RUN gpg --homedir /tmp --no-default-keyring --keyring /usr/share/keyrings/mono-official-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
-RUN echo "deb [signed-by=/usr/share/keyrings/mono-official-archive-keyring.gpg] https://download.mono-project.com/repo/ubuntu stable-focal main" | tee /etc/apt/sources.list.d/mono-official-stable.list
+# Singularity:
+# singularity dependencies
 RUN apt-get update -y
-RUN apt-get install -y mono-devel
+RUN apt-get install -y \
+    autoconf \
+    automake \
+    cryptsetup \
+    fuse2fs \
+    fuse \
+    libfuse-dev \
+    libglib2.0-dev \
+    libseccomp-dev \
+    libtool \
+    pkg-config \
+    runc \
+    squashfs-tools \
+    squashfs-tools-ng \
+    uidmap \
+    zlib1g-dev
+# Install C compiler
+RUN apt-get update -y
+RUN apt-get install -y gcc build-essential
 
 # Nextflow-API: MongoDB.
 RUN apt update -y
@@ -53,8 +65,9 @@ RUN apt update -y
 RUN apt install -y mongodb-org
 RUN apt install -y cron
 
-# Install R
-RUN apt-get install -y r-base
+# Install the requirements for nf-core, and some modules
+RUN apt-get -y install python-is-python3 python3-pip python3-venv python3-tk
+RUN python -m pip install --upgrade pip
 
 
 #################
@@ -74,47 +87,21 @@ ENV NXF_WORK=${INSTALLATION_HOME}/nextflow/work
 RUN mkdir -p "${NXF_WORK}"
 ENV NXF_LOG=${INSTALLATION_HOME}/nextflow/log
 RUN mkdir -p "${NXF_LOG}"
+ENV NXF_PIPELINES=${INSTALLATION_HOME}/nextflow/pipelines
+RUN mkdir -p "${NXF_PIPELINES}"
+ENV NXF_SINGULARITY_CACHEDIR=${INSTALLATION_HOME}/nextflow/singularity
+RUN mkdir -p "${NXF_SINGULARITY_CACHEDIR}"
 
 # NEXTFLOW-API: Setting up the environment variables
 ARG NXF_API_VERSION
 ENV NXF_API_HOME=${INSTALLATION_HOME}/nextflow-api
 RUN mkdir -p "${NXF_API_HOME}"
 
-# SEARCH_ENGINE: Setting up the environment variables
-ENV SEARCH_ENGINE_HOME=${INSTALLATION_HOME}/search_engine
-RUN mkdir -p "${SEARCH_ENGINE_HOME}"
-ENV MSF_HOME=${SEARCH_ENGINE_HOME}/msfragger
-# RUN mkdir -p "${MSF_HOME}" # not required
-ENV RAWPARSER_HOME=${SEARCH_ENGINE_HOME}/thermorawfileparser
-RUN mkdir -p "${RAWPARSER_HOME}"
-ENV BIODATAHUB_HOME=${SEARCH_ENGINE_HOME}/biodatahub
-RUN mkdir -p "${BIODATAHUB_HOME}"
-ENV SEARCHTOOLKIT_HOME=${SEARCH_ENGINE_HOME}/searchtoolkit
-RUN mkdir -p "${SEARCHTOOLKIT_HOME}"
-
-# MSFRAGGER: Declare the file name (with version)
-ARG MSF_FILE_NAME
-
-# THERMORAWPARSER: Declare the file name (with version)
-ARG RAWPARSER_FILE_NAME
-
-# DECOYPYRAT: Setting up variables (with version)
-ARG BIODATAHUB_VERSION
-
-# SEARCH_TOOLKIT: Setting up variables (with version)
-ARG SEARCHTOOLKIT_VERSION
-
-# REFMOD: Setting up the environment variables
-ARG REFMOD_VERSION
-ENV REFMOD_HOME=${SEARCH_ENGINE_HOME}/refmod
-
-# PTM-COMPASS: Setting up the environment variables
-ARG PTM_COMPASS_VERSION
-ENV PTM_COMPASS_HOME=${INSTALLATION_HOME}/ptm-compass
-
-# PTM-ANALYZER: Setting up the environment variables
-ARG PTM_ANALYZER_VERSION
-ENV PTM_ANALYZER_HOME=${INSTALLATION_HOME}/report-analysis
+# SINGULARITY: Setting up the environment variables
+ARG GO_VERSION
+ARG SINGULARITY_VERSION
+ENV SINGULARITY_HOME=${INSTALLATION_HOME}/singularity
+RUN mkdir -p "${SINGULARITY_HOME}"
 
 
 
@@ -124,12 +111,6 @@ ENV PTM_ANALYZER_HOME=${INSTALLATION_HOME}/report-analysis
 
 # NEXTFLOW: Copy Nextflow config files
 COPY nextflow/conf ${NXF_CONF}/.
-
-# MSFRAGGER: Copy file (with version)
-COPY search_engine/${MSF_FILE_NAME}.zip /tmp/.
-
-# THERMORAWPARSER: Copy file (with version)
-COPY search_engine/${RAWPARSER_FILE_NAME}.zip /tmp/.
 
 
 
@@ -141,11 +122,27 @@ COPY search_engine/${RAWPARSER_FILE_NAME}.zip /tmp/.
 RUN mkdir -p /usr/local/bin && cd /usr/local/bin && curl -s https://get.nextflow.io | bash
 
 #
-# NF-CORE ---------------------------------------------------------------------------------------------
+# SINGULARITY ---------------------------------------------------------------------------------------------
 #
 
-# Python Package Index
-RUN pip install nf-core
+# Install Go
+RUN export OS=linux ARCH=amd64 && \
+cd /tmp && \
+wget https://dl.google.com/go/go${GO_VERSION}.$OS-$ARCH.tar.gz && \
+tar -C /usr/local -xzvf go${GO_VERSION}.$OS-$ARCH.tar.gz && \
+rm go${GO_VERSION}.$OS-$ARCH.tar.gz
+ENV PATH="/usr/local/go/bin:${PATH}"
+
+# Install Singularity
+RUN cd /tmp && \
+wget https://github.com/sylabs/singularity/releases/download/v${SINGULARITY_VERSION}/singularity-ce-${SINGULARITY_VERSION}.tar.gz && \
+tar -xzf singularity-ce-${SINGULARITY_VERSION}.tar.gz && \
+mv /tmp/singularity-ce-${SINGULARITY_VERSION}/* ${SINGULARITY_HOME}/. && \
+rm -rf /tmp/singularity-ce-*
+RUN cd ${SINGULARITY_HOME} && \
+./mconfig && \
+make -C builddir && \
+make -C builddir install
 
 #
 # NEXTFLOW-API ---------------------------------------------------------------------------------------------
@@ -156,96 +153,6 @@ RUN git clone https://github.com/CNIC-Proteomics/nextflow-api.git  --branch ${NX
 
 # Requirements for Python
 RUN pip install -r ${NXF_API_HOME}/python_requirements.txt
-
-#
-# SEARCH_ENGINE ---------------------------------------------------------------------------------------------
-#
-
-#############
-# MSFRAGGER #
-#############
-
-# Install MSFragger
-# unzip local file
-RUN unzip /tmp/${MSF_FILE_NAME}.zip -d  ${SEARCH_ENGINE_HOME}/
-# rename the files because we don't want versions in the name
-# take into account that the target name folder does not exist
-RUN mv  ${SEARCH_ENGINE_HOME}/${MSF_FILE_NAME} ${MSF_HOME}
-RUN mv ${MSF_HOME}/${MSF_FILE_NAME}.jar ${MSF_HOME}/MSFragger.jar
-
-###################
-# THERMORAWPARSER #
-###################
-
-# Install ThermoRawFileParser
-RUN unzip /tmp/${RAWPARSER_FILE_NAME}.zip -d ${RAWPARSER_HOME}
-
-##############
-# DECOYPYRAT #
-##############
-
-# Clone the repository
-RUN git clone https://github.com/CNIC-Proteomics/bioDataHub.git  --branch ${BIODATAHUB_VERSION}  ${BIODATAHUB_HOME}
-
-# Python environment --
-RUN cd ${BIODATAHUB_HOME} && python -m venv env
-RUN cd ${BIODATAHUB_HOME} && /bin/bash -c "source ${BIODATAHUB_HOME}/env/bin/activate && pip install -r ${BIODATAHUB_HOME}/python_requirements.txt"
-
-##################
-# SEARCH_TOOLKIT #
-##################
-
-# Clone the repository
-RUN git clone https://github.com/CNIC-Proteomics/SearchToolkit.git  --branch ${SEARCHTOOLKIT_VERSION}  ${SEARCHTOOLKIT_HOME}
-
-# Python environment --
-RUN cd ${SEARCHTOOLKIT_HOME} && python -m venv env
-RUN cd ${SEARCHTOOLKIT_HOME} && /bin/bash -c "source ${SEARCHTOOLKIT_HOME}/env/bin/activate && pip install -r ${SEARCHTOOLKIT_HOME}/python_requirements.txt"
-
-
-
-#
-# REFMOD ---------------------------------------------------------------------------------------------
-#
-
-# Clone the repository
-RUN git clone https://github.com/CNIC-Proteomics/ReFrag.git  --branch ${REFMOD_VERSION}  ${REFMOD_HOME}
-
-# Python environment --
-RUN cd ${REFMOD_HOME} && python -m venv env
-RUN cd ${REFMOD_HOME} && /bin/bash -c "source ${REFMOD_HOME}/env/bin/activate && pip install -r ${REFMOD_HOME}/python_requirements.txt"
-
-
-
-#
-# PTM-COMPASS ---------------------------------------------------------------------------------------------
-#
-
-# Clone the repository
-RUN git clone https://github.com/CNIC-Proteomics/PTM-compass.git  --branch ${PTM_COMPASS_VERSION}  ${PTM_COMPASS_HOME}
-
-# Python environment --
-RUN cd ${PTM_COMPASS_HOME} && python -m venv env
-RUN cd ${PTM_COMPASS_HOME} && /bin/bash -c "source ${PTM_COMPASS_HOME}/env/bin/activate && pip install -r ${PTM_COMPASS_HOME}/python_requirements.txt"
-
-
-
-#
-# PTM-ANALYZER ---------------------------------------------------------------------------------------------
-#
-
-# Clone the repository
-RUN git clone https://github.com/CNIC-Proteomics/ReportAnalysis.git  --branch ${PTM_ANALYZER_VERSION}  ${PTM_ANALYZER_HOME}
-
-# Python environment --
-RUN cd ${PTM_ANALYZER_HOME} && python -m venv env
-RUN cd ${PTM_ANALYZER_HOME} && /bin/bash -c "source ${PTM_ANALYZER_HOME}/env/bin/activate && pip install -r ${PTM_ANALYZER_HOME}/python_requirements.txt"
-
-# Install R packages
-RUN Rscript -e 'if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager"); BiocManager::install("limma")'
-RUN Rscript -e 'install.packages("logging")'
-RUN Rscript -e 'install.packages("yaml")'
-RUN Rscript -e 'install.packages("optparse")'
 
 
 #
