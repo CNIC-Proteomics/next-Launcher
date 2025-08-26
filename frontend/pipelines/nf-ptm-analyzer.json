@@ -5,6 +5,11 @@
 "description": "Nextflow for the PTM-Analyzer pipeline using iSanXoT report and PDM table as one input",
 "url": "https://github.com/CNIC-Proteomics/nf-PTM-Analyzer",
 "revision": "0.1.2",
+"profiles": {
+  "singularity": {
+    "image": "library://proteomicscnic/next-launcher/ptm_analysis:0.1.1"
+  }
+},
 "icon": "",
 "status": 0,
 "type": "object",

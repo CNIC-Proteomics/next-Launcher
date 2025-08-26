@@ -5,6 +5,11 @@
 "description": "Nextflow for the SearchEngine pipeline using raw files",
 "url": "https://github.com/CNIC-Proteomics/nf-SearchEngine",
 "revision": "0.1.5",
+"profiles": {
+  "singularity": {
+    "image": "library://proteomicscnic/next-launcher/search_engine:0.1.5"
+  }
+},
 "icon": "",
 "status": 0,
 "type": "object",
