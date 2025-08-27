@@ -89,7 +89,7 @@ ENV NXF_LOG=${INSTALLATION_HOME}/nextflow/log
 RUN mkdir -p "${NXF_LOG}"
 ENV NXF_PIPELINES=${INSTALLATION_HOME}/nextflow/pipelines
 RUN mkdir -p "${NXF_PIPELINES}"
-ENV NXF_SINGULARITY_CACHEDIR=${INSTALLATION_HOME}/nextflow/singularity
+ENV NXF_SINGULARITY_CACHEDIR=${INSTALLATION_HOME}/nextflow/images
 RUN mkdir -p "${NXF_SINGULARITY_CACHEDIR}"
 
 # NEXTFLOW-API: Setting up the environment variables
