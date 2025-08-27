@@ -70,7 +70,7 @@ s:
 
 1. Export current version
 ```
-set NL_VERSION=0.1.5
+set NL_VERSION=0.1.6
 ```
 
 1. Build services
