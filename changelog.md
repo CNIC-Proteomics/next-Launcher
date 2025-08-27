@@ -1,4 +1,55 @@
 ___
+## 0.1.6
+
+### Date 📅 *2025_08*
+
+### Changes in the detail
+
+**rc1**
++ Centralized MongoDB Access: Instead of running a separate MongoDB instance on each computer, the system now uses a single shared MongoDB instance for the Next-Launcher.
+  - Run MongoDB on a single host using a Docker container.
+  - Allow other machines to connect to MongoDB by binding the container to the host IP (using MONGODB_HOST and MONGODB_IP).
+  - All other machines simply connect to this centralized MongoDB instance.
++ Refined the time parameter for process executions.
+
+**rc2**
++ Rename the env variable HOST_IP to HOST_NAME.
++ Include the host name in the workflow report and in the workflow meta file.
++ Display the summary log correctly in the workflow trace log.
+
+**rc3**
++ Discarded the subfolder in the workflow results.
++ Added the singularity options into backend/nextflow/conf/nextflow.config.
++ Included the singularity info (image library) in pipeline json files.
++ Updated backend.Dockerfile to install Singularity and remove deprecated packages.
++ Added the NXF_SINGULARITY_CACHEDIR and NXF_PIPELINES env variables into backend.Dockerfile.
+
+**rc4**
++ Renamed folder that stores Singularity images.
++ Updated mount points for new volume locations.
++ Updated pipelines to newer versions.
+
+### Repositories Version History
+
++ Updated to the new version. Now only Nextflow, Singularity, and Nextflow API are installed:
+  - next-Launcher-app 0.1.6
+  - nextflow-api 1.6
+  - go 1.22.1
+  - Singularity 4.1.2
+
+| Docker images                                                                                                                   | Software                    | Version   |
+|---------------------------------------------------------------------------------------------------------------------------------|-----------------------------|-----------|
+| [proteomicscnic/next-launcher-core:0.1.6](https://hub.docker.com/repository/docker/proteomicscnic/next-launcher-core/general)   |                             |           |
+|                                                                                                                                 | Nextflow                    | >=24.10.5 |
+|                                                                                                                                 | nextflow-api                | 1.6       |
+|                                                                                                                                 | Singularity                 | 4.1.2     |
+|                                                                                                                                 | go                          | 1.22.1    |
+| [proteomicscnic/next-launcher-app:0.1.6](https://hub.docker.com/repository/docker/proteomicscnic/next-launcher-app/general)	    |                             |           |
+|                                                                                                                                 | next-Launcher-app           | 0.1.6     |
+
+
+
+___
 ## 0.1.5
 
 ### Date 📅 *2025_04*
