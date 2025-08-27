@@ -29,6 +29,9 @@ ___
 + Updated mount points for new volume locations.
 + Updated pipelines to newer versions.
 
+**rc5**
++ Fix bugs during migration to production.
+
 ### Repositories Version History
 
 + Updated to the new version. Now only Nextflow, Singularity, and Nextflow API are installed:
