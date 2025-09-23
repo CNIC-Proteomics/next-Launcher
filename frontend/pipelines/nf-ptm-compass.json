@@ -4,10 +4,10 @@
 "title": "nf-PTM-compass",
 "description": "Nextflow for the PTM-compass pipeline using RefMod results as input",
 "url": "https://github.com/CNIC-Proteomics/nf-PTM-compass",
-"revision": "0.1.8",
+"revision": "1.9",
 "profiles": {
   "singularity": {
-    "image": "library://proteomicscnic/next-launcher/ptm-compass:0.1.5"
+    "image": "library://proteomicscnic/next-launcher/ptm-compass:1.5"
   }
 },
 "icon": "",
