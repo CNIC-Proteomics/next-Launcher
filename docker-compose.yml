@@ -3,6 +3,15 @@ services:
   next-launcher-core:
     image: 'proteomicscnic/next-launcher-core:$NL_VERSION'
     container_name: 'next-launcher-core'
+    # grant privileges for using Singularity
+    privileged: true
+    cap_add:
+      - SYS_ADMIN
+    security_opt:
+      - seccomp=unconfined
+    devices:
+      # give container access to host FUSE device
+      - /dev/fuse:/dev/fuse
     environment:
       # mongodb
       - MONGODB_HOST=${MONGODB_HOST}
@@ -15,6 +24,7 @@ services:
       - PORT_APP=${PORT_APP}
       - HOST_NAME=${HOST_NAME}
       # nextflow-api
+      - ALLOWED_ROLES=${ALLOWED_ROLES}
       - USER_GUEST=${USER_GUEST}
       - PWD_GUEST=${PWD_GUEST}
       - USER_ADMIN=${USER_ADMIN}
@@ -31,6 +41,8 @@ services:
       - "${PORT_CORE}:${PORT_CORE}"
     volumes:
       - "nl_conf:/opt/nextflow/conf" # mount folder for nextflow config
+      - "nl_pipelines:/opt/nextflow/pipelines" # mount folder with the pipeline schemas
+      - "nl_images:/opt/nextflow/images"
       - "nl_workspace:${WORKSPACE_HOME}"
       - "nl_outspace:${OUTSPACE_HOME}"
       - "${SHARED_VOLUME_1}"
@@ -46,6 +58,8 @@ services:
       - PORT_CORE=${PORT_CORE}
       - PORT_APP=${PORT_APP}
       - HOST_NAME=${HOST_NAME}
+      # roles
+      - ALLOWED_ROLES=${ALLOWED_ROLES}
       # workspace
       - WORKSPACE_HOME=${WORKSPACE_HOME}
       # outspace
@@ -55,7 +69,7 @@ services:
     ports:
       - "${PORT_APP}:${PORT_APP}"
     volumes:
-      - "nl_pipelines:/opt/next-launcher-app/app/public/pipelines" # mount folder with the pipeline schemas
+      - "nl_pipelines:/opt/next-launcher-app/app/public/pipelines"
       - "nl_workspace:${WORKSPACE_HOME}"
       - "nl_outspace:${OUTSPACE_HOME}"
       - "${SHARED_VOLUME_1}"
@@ -83,13 +97,21 @@ volumes:
       o: 'bind'
       device: './frontend/pipelines'
 
+  nl_images:
+    name: 'nl_images'
+    driver: 'local'
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: './backend/images'
+
   nl_workspace:
     name: 'nl_workspace'
     driver: 'local'
     driver_opts:
       type: 'none'
       o: 'bind'
-      device: './workspace'
+      device: './backend/workspace'
 
   nl_outspace:
     name: 'nl_outspace'
@@ -97,7 +119,7 @@ volumes:
     driver_opts:
       type: 'none'
       o: 'bind'
-      device: './workspace'
+      device: './backend/workspace'
 
   c:
     name: 'c'
