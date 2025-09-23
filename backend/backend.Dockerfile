@@ -3,7 +3,7 @@
 #
 # %labels
 #     Author jmrodriguezc@cnic.es
-#     Version v0.1.6
+#     Version v1.6
 # 
 # %help
 #     This file create the Backend image that contains: nextflow, singularity, and nextflow-api.
