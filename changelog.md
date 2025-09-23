@@ -38,6 +38,9 @@ ___
 + Upgraded version of nextflow pipelines.
 + Updated to the new version of images.
 
+**rc7**
++ Fixed a bug in the parameter name.
+
 ### Repositories Version History
 
 + Updated to the new version. Now only Nextflow, Singularity, and Nextflow API are installed:
