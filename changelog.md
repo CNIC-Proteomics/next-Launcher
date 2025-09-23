@@ -1,7 +1,7 @@
 ___
-## 0.1.6
+## 1.6
 
-### Date 📅 *2025_08*
+### Date 📅 *2025_09*
 
 ### Changes in the detail
 
@@ -32,23 +32,29 @@ ___
 **rc5**
 + Fix bugs during migration to production.
 
+**rc6**
++ Version format reduced from three segments to two (major.minor).
++ Moved the 'workspace' path.
++ Upgraded version of nextflow pipelines.
++ Updated to the new version of images.
+
 ### Repositories Version History
 
 + Updated to the new version. Now only Nextflow, Singularity, and Nextflow API are installed:
-  - next-Launcher-app 0.1.6
+  - next-Launcher-app 1.6
   - nextflow-api 1.6
   - go 1.22.1
   - Singularity 4.1.2
 
-| Docker images                                                                                                                   | Software                    | Version   |
-|---------------------------------------------------------------------------------------------------------------------------------|-----------------------------|-----------|
-| [proteomicscnic/next-launcher-core:0.1.6](https://hub.docker.com/repository/docker/proteomicscnic/next-launcher-core/general)   |                             |           |
-|                                                                                                                                 | Nextflow                    | >=24.10.5 |
-|                                                                                                                                 | nextflow-api                | 1.6       |
-|                                                                                                                                 | Singularity                 | 4.1.2     |
-|                                                                                                                                 | go                          | 1.22.1    |
-| [proteomicscnic/next-launcher-app:0.1.6](https://hub.docker.com/repository/docker/proteomicscnic/next-launcher-app/general)	    |                             |           |
-|                                                                                                                                 | next-Launcher-app           | 0.1.6     |
+| Docker images                                                                                                                 | Software                    | Version   |
+|-------------------------------------------------------------------------------------------------------------------------------|-----------------------------|-----------|
+| [proteomicscnic/next-launcher-core:1.6](https://hub.docker.com/repository/docker/proteomicscnic/next-launcher-core/general)   |                             |           |
+|                                                                                                                               | Nextflow                    | >=24.10.5 |
+|                                                                                                                               | nextflow-api                | 1.6       |
+|                                                                                                                               | Singularity                 | 4.1.2     |
+|                                                                                                                               | go                          | 1.22.1    |
+| [proteomicscnic/next-launcher-app:1.6](https://hub.docker.com/repository/docker/proteomicscnic/next-launcher-app/general)	    |                             |           |
+|                                                                                                                               | next-Launcher-app           | 1.6       |
 
 
 
