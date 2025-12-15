@@ -75,7 +75,7 @@ set NL_VERSION=1.6
 
 1. Build services
 ```
-docker-compose --env-file .env_cnic_dev -f docker-compose.cnic_dev.yml build --no-cache
+docker-compose --env-file .env_cnic_dev -f docker-compose.cnic_dev.yml -f docker-compose.db.cnic_dev.yml build --no-cache
 ```
 
 2. Authenticating
