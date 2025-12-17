@@ -102,6 +102,15 @@
         "format": "file-path",
         "mimetype": "text/plain"
       },
+      "dm_file": {
+        "title": "DeltaMass parameter file",
+        "description": "File with the delta masses",
+        "help_text": "Under construction...",
+        "fa_icon": "pi pi-file-import",
+        "type": "string",
+        "format": "file-path",
+        "mimetype": "text/plain"
+      },
       "refmod_params_file": {
         "title": "RefMod parameter file",
         "description": "File with the parameters for the RefMod program",
