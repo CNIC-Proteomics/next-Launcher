@@ -30,12 +30,12 @@
     "properties": {
       "search_engine": {
         "title": "Type of input",
-        "description": "Select the type of search engine results to use as input",
+        "description": "Is this REFMOD data? (By default it is MSFragger)",
         "help_text": "Under construction...",
         "fa_icon": "pi pi-pen-to-square",
-        "type": "string",
-        "enum": ["msfragger","refmod"],
-        "default": "msfragger"
+        "type": "boolean",
+        "format": "boolean",
+        "default": false
       },
       "sch_files": {
         "title": "Search results",
