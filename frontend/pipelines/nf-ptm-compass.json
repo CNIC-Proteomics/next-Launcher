@@ -4,10 +4,10 @@
 "title": "nf-PTM-compass",
 "description": "Nextflow for the PTM-compass pipeline using RefMod results as input",
 "url": "https://github.com/CNIC-Proteomics/nf-PTM-compass",
-"revision": "1.9",
+"revision": "1.10",
 "profiles": {
   "singularity": {
-    "image": "library://proteomicscnic/next-launcher/ptm-compass:1.5"
+    "image": "library://proteomicscnic/next-launcher/ptm-compass:1.7"
   }
 },
 "icon": "",
@@ -20,16 +20,26 @@
     "fa_icon": "pi pi-box",
     "description": "Inputs and outputs required for the pipeline",
     "required": [
-      "msf_files",
+      "search_engine",
+      "sch_files",
       "exp_table",
       "database",
       "decoy_prefix",
       "outdir"
     ],
     "properties": {
-      "msf_files": {
-        "title": "MSFragger results",
-        "description": "MSFragger files",
+      "search_engine": {
+        "title": "Type of input",
+        "description": "Select the type of search engine results to use as input",
+        "help_text": "Under construction...",
+        "fa_icon": "pi pi-pen-to-square",
+        "type": "string",
+        "enum": ["msfragger","refmod"],
+        "default": "msfragger"
+      },
+      "sch_files": {
+        "title": "Search results",
+        "description": "MSFragger files or REFMOD files",
         "help_text": "Under construction...",
         "fa_icon": "pi pi-folder",
         "type": "string",
