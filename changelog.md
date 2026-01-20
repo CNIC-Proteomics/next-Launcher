@@ -1,4 +1,41 @@
 ___
+## 1.7
+
+### Date 📅 *2026_01*
+
+### Changes in the detail
+
+**rc1**
++ Upgraded the pipelines to newer versions.
+
+**rc2**
++ Updated the nf-SearchEngine parameter to include the REFMOD module.
+
+**rc3**
++ Fixed bug: include the dm_list for REFMOD module in the ns-SearchEngine pipeline.
+
+**rc4**
++ Upgraded the pipelines to newer versions.
+
+**rc5**
++ Upgrade Java version to 21. It was obsoleted the Ubuntu distribution.
+
+
+### Repositories Version History
+
+| Docker images                                                                                                                 | Software                    | Version   |
+|-------------------------------------------------------------------------------------------------------------------------------|-----------------------------|-----------|
+| [proteomicscnic/next-launcher-core:1.7](https://hub.docker.com/repository/docker/proteomicscnic/next-launcher-core/general)   |                             |           |
+|                                                                                                                               | Nextflow                    | >=24.10.5 |
+|                                                                                                                               | nextflow-api                | 1.6       |
+|                                                                                                                               | Singularity                 | 4.1.2     |
+|                                                                                                                               | go                          | 1.22.1    |
+| [proteomicscnic/next-launcher-app:1.7](https://hub.docker.com/repository/docker/proteomicscnic/next-launcher-app/general)	    |                             |           |
+|                                                                                                                               | next-Launcher-app           | 1.6       |
+
+
+
+___
 ## 1.6
 
 ### Date 📅 *2025_09*
