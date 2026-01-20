@@ -30,8 +30,8 @@ RUN apt-get install -y jq
 # Update packages
 RUN apt-get update -y
 
-# Install the requirements for nextflow, MSFragger
-RUN apt-get install -y openjdk-19-jre-headless
+# Install the requirements for nextflow
+RUN apt-get install -y openjdk-21-jre-headless
 
 # Singularity:
 # singularity dependencies
