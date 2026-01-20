@@ -17,10 +17,15 @@ if [ "$MONGODB_HOST" = "HOST_NAME" ]; then
 else
   docker-compose --env-file .env_cnic -f docker-compose.cnic.yml up -d
 fi
-
 ```
 
-<!-- + Compose services depeding on the previous version or not
++ Execute container in bash mode
+```
+docker exec -it next-launcher-core bash
+```
+
+<!--
++ Compose services depeding on the previous version or not
 ```
 .\bin\start-up.bat .env_cnic docker-compose.cnic.yml
 ``` -->
@@ -70,12 +75,12 @@ s:
 
 1. Export current version
 ```
-set NL_VERSION=1.6
+set NL_VERSION=1.7
 ```
 
 1. Build services
 ```
-docker-compose --env-file .env_cnic_dev -f docker-compose.cnic_dev.yml -f docker-compose.db.cnic_dev.yml build --no-cache
+docker-compose --env-file .env_cnic_dev -f docker-compose.cnic_dev.yml build --no-cache
 ```
 
 2. Authenticating
@@ -84,7 +89,7 @@ docker login -u proteomicscnic
     Authenticating with existing credentials...
 ```
 
-3. Tag the the image
+3. Tag the the image. DEPRECATED
 ```
 docker image tag proteomicscnic/next-launcher-core:latest proteomicscnic/next-launcher-core:%NL_VERSION%
 docker image tag proteomicscnic/next-launcher-app:latest  proteomicscnic/next-launcher-app:%NL_VERSION%
@@ -96,31 +101,17 @@ docker push proteomicscnic/next-launcher-core:%NL_VERSION%
 docker push proteomicscnic/next-launcher-app:%NL_VERSION%
 ```
 
-### Push DB image to DockerHub
-
-1. Export current version
-```
-export NL_DB_VERSION=0.1
-```
-
-1. Build services
-```
-docker-compose --env-file .env_cnic_dev -f docker-compose.cnic_dev.yml build --no-cache next-launcher-db
-```
-
-2. Authenticating
-```
-docker login -u proteomicscnic
-    Authenticating with existing credentials...
-```
-
-3. Push the images
-```
-docker push proteomicscnic/next-launcher-db:${NL_DB_VERSION}
-```
 
 
 
+
+
+
+
+**FROM HERE IT IS ONLY OPTIONAL INFORMATION!!**
+
+
+______________________________
 
 
 # Commit huge files
@@ -188,8 +179,8 @@ docker volume create --name workspace --driver local --opt type=none --opt devic
 
 Create the 'tierra' volumes for the connection with the container:
 ```
-docker volume create --name lab --driver local --opt type=cifs --opt device=\\tierra.cnic.es\sc\LAB_JVC\ --opt o=addr=tierra.cnic.es,domain=CNIC,username=jmrodriguezc,password="JaDe20-34!;"
-docker volume create --name unit --driver local --opt type=cifs --opt device=\\tierra.cnic.es\sc\U_Proteomica\ --opt o=addr=tierra.cnic.es,domain=CNIC,username=jmrodriguezc,password="JaDe20-34!;"
+docker volume create --name lab --driver local --opt type=cifs --opt device=\\tierra.cnic.es\sc\LAB_JVC\ --opt o=addr=tierra.cnic.es,domain=CNIC,username=jmrodriguezc,password=""
+docker volume create --name unit --driver local --opt type=cifs --opt device=\\tierra.cnic.es\sc\U_Proteomica\ --opt o=addr=tierra.cnic.es,domain=CNIC,username=jmrodriguezc,password=""
 ```
 
 
@@ -605,103 +596,3 @@ Remove an image
 docker rmi proteomicscnic/next-launcher-core:latest
 ```
 
-
-
-<!-- 
-
-# TESTING ---
-
-
-
-
-Run the nextflow contaniner
-```
-docker run --name backend -it backend
-
-docker run --name backend -it --volume S:\U_Proteomica\UNIDAD:/mnt/tierra backend
-
-docker run --name backend -it --volume \\tierra.cnic.es\SC:/mnt/tierra backend
-
-
-docker run --name backend -it -v //tierra.cnic.es/SC:/mnt/tierra backend
-
-docker run --name backend -it -v C:\Users\jmrodriguezc:/mnt/tierra backend
-
-
-""
-
-
-docker run --name backend --mount type=bind,source="S:\U_Proteomica\UNIDAD"/target,target=/mnt/tierra backend
-
-docker run --name backend --mount type=bind,source="S:\U_Proteomica\UNIDAD"/target,target=/mnt/tierra backend
-
-docker run --name backend --mount type=bind,source="\\tierra.cnic.es\SC"/target,target=/mnt/tierra -it backend 
-
-
-docker run --name backend --mount type=bind,source="\\tierra.cnic.es\SC"/target,target=/mnt/tierra -it backend 
-
-docker run --name backend -it backend --mount type=bind,source="\\tierra.cnic.es\SC"/target,target=/mnt/tierra
-
-
-docker volume create \
-	--driver local \
-	--opt type=cifs \
-	--opt device=//uxxxxx.your-server.de/backup \
-	--opt o=addr=uxxxxx.your-server.de,username=uxxxxxxx,password=*****,file_mode=0777,dir_mode=0777 \
-	--name cif-volume
-
-
-docker volume create --driver local --opt type=cifs --opt device=\\tierra.cnic.es\sc --opt o=addr=tierra.cnic.es,username=CNIC/jmrodriguezc,password=JaDe20-32!;,file_mode=0777,dir_mode=0777 --name tierra2
-
-docker volume create --driver local --opt type=cifs --opt device=\\tierra.cnic.es\sc --opt o=addr=tierra.cnic.es,domain=CNIC,username=jmrodriguezc,password="JaDe20-32!;" --name tierra
-
-docker volume create --driver local --opt type=cifs --opt device=\\tierra.cnic.es\sc --opt o=addr=tierra.cnic.es,credentials="S:\U_Proteomica\UNIDAD\Softwares\jmrodriguezc\PTMs_nextflow\docker\build\creds_smb_library",vers=3.0 --name tierra4
-
-
-docker volume create --driver local --opt type=cifs --opt device=//tierra.cnic.es/sc --opt o=addr=tierra.cnic.es,username=CNIC/jmrodriguezc,password=JaDe20-32!;,file_mode=0777,dir_mode=0777 --name tierra
-
-docker volume create --driver local --opt type=cifs --opt device=\\tierra.cnic.es\sc --opt o=addr=tierra.cnic.es,credentials="S:\U_Proteomica\UNIDAD\Softwares\jmrodriguezc\PTMs_nextflow\docker\build\creds_smb_library" --name tierra
-
-docker volume create --driver local --opt type=cifs --opt device="\\\\tierra.cnic.es\\sc" --opt o=addr=tierra.cnic.es,username=CNIC/jmrodriguezc,password=JaDe20-32!; --name tierra2
-
-docker volume create --driver local --opt type=cifs --opt device=\\tierra.cnic.es\sc --opt o=addr=tierra.cnic.es,username=CNIC/jmrodriguezc,password=JaDe20-32!;,file_mode=0777,dir_mode=0777 --name tierra2
-
-docker volume create --driver local --name persistent --opt type=cifs --opt device=\\tierra.cnic.es\sc --opt o=vers=3.0,credentials="S:\U_Proteomica\UNIDAD\Softwares\jmrodriguezc\PTMs_nextflow\docker\build\creds_smb_library" --name tierra3
-
-docker volume create --driver local --name persistent --opt type=cifs --opt device=\\tierra.cnic.es\sc --opt o=credentials="S:\U_Proteomica\UNIDAD\Softwares\jmrodriguezc\PTMs_nextflow\docker\build\creds_smb_library" --name tierra
-
-docker volume create --driver local --name persistent --opt type=cifs --opt device=\\tierra.cnic.es\sc --opt o=vers=3.0,credentials=/root/creds_smb_library --name tierra3
-
-
-
-docker run -d --name backend --mount source=tierra,target=/mnt/tierra backend 
-
-docker run -d --name backend --mount source=tierra2,target=/mnt/tierra backend
-
-
-
-$ docker service create \
-    --mount 'type=volume,src=<VOLUME-NAME>,dst=<CONTAINER-PATH>,volume-driver=local,volume-opt=type=nfs,volume-opt=device=<nfs-server>:<nfs-path>,"volume-opt=o=addr=<nfs-address>,vers=4,soft,timeo=180,bg,tcp,rw"'
-    --name myservice \
-    <IMAGE>
-
-$ docker service create \
-    --mount 'type=volume,src=cif-volume,dst=/mnt/tierra,volume-driver=local,volume-opt=type=cifs,volume-opt=device=<nfs-server>:<nfs-path>,"volume-opt=o=addr=<nfs-address>,vers=4,soft,timeo=180,bg,tcp,rw"'
-    --name myservice \
-    backend
-
-
-
-
-
-
-Note: When you "run" nextflow, you can decide how many process to use?? Or not...
-
-
-
-Get all the drives in windows (cmd)???
-```
-wmic logicaldisk get caption
-```
-
--->
