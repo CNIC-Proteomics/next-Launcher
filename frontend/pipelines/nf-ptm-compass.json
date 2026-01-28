@@ -20,7 +20,7 @@
     "fa_icon": "pi pi-box",
     "description": "Inputs and outputs required for the pipeline",
     "required": [
-      "search_engine",
+      "is_refmod_input",
       "sch_files",
       "exp_table",
       "database",
@@ -28,7 +28,7 @@
       "outdir"
     ],
     "properties": {
-      "search_engine": {
+      "is_refmod_input": {
         "title": "Type of input",
         "description": "Is this REFMOD data? (By default it is MSFragger)",
         "help_text": "Under construction...",
