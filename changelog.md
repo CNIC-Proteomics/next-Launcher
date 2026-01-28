@@ -20,6 +20,9 @@ ___
 **rc5**
 + Upgrade Java version to 21. It was obsoleted the Ubuntu distribution.
 
+**rc6**
++ Fixed a bug in the 'refmod' parameter flag.
+
 
 ### Repositories Version History
 
